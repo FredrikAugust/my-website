@@ -32,6 +32,7 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	http.HandleFunc("/", homeHandler)
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	
 	port := ":8080"
 	log.Printf("Server starting on port %s", port)
