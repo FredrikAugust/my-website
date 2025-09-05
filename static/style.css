@@ -1,9 +1,9 @@
 :root {
-  --color-primary: #606c38;
-  --color-secondary: #283618;
-  --color-background: #fefae0;
-  --color-accent: #dda15e;
-  --color-accent-dark: #bc6c25;
+  --color-primary: #2E6F40;
+  --color-secondary: #253D2C;
+  --color-background: #fefefe;
+  --color-accent: #68BA7F;
+  --color-text: #253D2C;
 }
 
 * {
@@ -15,40 +15,49 @@
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   background-color: var(--color-background);
-  color: var(--color-secondary);
+  color: var(--color-text);
   line-height: 1.6;
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: 1rem 2rem;
 }
 
 main {
-  text-align: center;
-  max-width: 600px;
-  padding: 2rem;
+  max-width: 65ch;
 }
 
-h1 {
+.date-line {
+  font-size: 0.875rem;
+  color: var(--color-secondary);
+}
+
+.homepage-title {
+  font-size: 1.125rem;
   color: var(--color-primary);
-  font-size: 2.5rem;
-  margin-bottom: 2rem;
   font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.info-paragraph {
+  font-size: 0.875rem;
+  color: var(--color-secondary);
+  line-height: 1.5;
+  margin-top: 1.5rem;
+}
+
+nav {
+  margin-top: 0.5rem;
 }
 
 nav a {
-  display: inline-block;
-  color: var(--color-background);
-  background-color: var(--color-accent);
-  text-decoration: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 500;
-  transition: background-color 0.2s ease;
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.2s ease;
+  font-size: 0.8rem;
 }
 
 nav a:hover {
-  background-color: var(--color-accent-dark);
+  color: var(--color-secondary);
 }
 
 nav a:focus {
@@ -57,11 +66,7 @@ nav a:focus {
 }
 
 @media (max-width: 768px) {
-  h1 {
-    font-size: 2rem;
-  }
-  
-  main {
+  body {
     padding: 1rem;
   }
 }

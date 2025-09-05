@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Fredrik's personal blog and website - sharing thoughts and projects">
-    <meta name="keywords" content="Fredrik, blog, software, development, programming">
+    <meta name="description" content="Fredrik's personal homepage - hosted on k3s">
+    <meta name="keywords" content="Fredrik, homepage, software, development, programming, k3s">
     <meta name="author" content="Fredrik August">
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Fredrik's Blog">
-    <meta property="og:description" content="Fredrik's personal blog and website - sharing thoughts and projects">
-    <meta property="og:site_name" content="Fredrik's Blog">
+    <meta property="og:title" content="Fredrik's Homepage">
+    <meta property="og:description" content="Fredrik's personal homepage - hosted on k3s">
+    <meta property="og:site_name" content="Fredrik's Homepage">
     
     <!-- Twitter -->
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Fredrik's Blog">
-    <meta name="twitter:description" content="Fredrik's personal blog and website - sharing thoughts and projects">
+    <meta name="twitter:title" content="Fredrik's Homepage">
+    <meta name="twitter:description" content="Fredrik's personal homepage - hosted on k3s">
     
     <!-- Favicon -->
     <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png">
@@ -27,14 +27,18 @@
     <!-- Styles -->
     <link rel="stylesheet" href="/static/style.css">
     
-    <title>Fredrik's Blog</title>
+    <title>Fredrik's Homepage</title>
 </head>
 <body>
     <main>
-        <h1>It's {{.Date}}. You're on Fredrik's blog</h1>
+        <div class="date-line">It's {{.DateTime}} and you're visitor number {{.VisitorNumber}} to {{.Hostname}}.</div>
+        <div class="homepage-title">You're on Fredrik's homepage.</div>
         <nav>
             <a href="https://github.com/FredrikAugust" target="_blank" rel="noopener noreferrer">GitHub</a>
         </nav>
+        <div class="info-paragraph">
+            This web server is hosted in a K3s Kubernetes cluster on Hetzner Cloud. DNS is handled on Cloudflare and TLS certificates are provisioned using ACME-DNS01.
+        </div>
     </main>
 </body>
 </html>

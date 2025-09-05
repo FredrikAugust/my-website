@@ -4,11 +4,17 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
+	"sync/atomic"
 	"time"
 )
 
+var visitorCount int64
+
 type PageData struct {
-	Date string
+	DateTime string
+	VisitorNumber int64
+	Hostname string
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
@@ -19,8 +25,17 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	currentVisitor := atomic.AddInt64(&visitorCount, 1)
+	
+	hostname, err := os.Hostname()
+	if err != nil {
+		hostname = "unknown"
+	}
+
 	data := PageData{
-		Date: time.Now().Format("January 2, 2006"),
+		DateTime:      time.Now().Format("Jan 2nd, 2006 15:04"),
+		VisitorNumber: currentVisitor,
+		Hostname:      hostname,
 	}
 
 	err = tmpl.Execute(w, data)
@@ -30,11 +45,22 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func robotsHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/plain")
+	w.WriteHeader(http.StatusOK)
+}
+
 func main() {
 	http.HandleFunc("/", homeHandler)
+	http.HandleFunc("/robots.txt", robotsHandler)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	
-	port := ":8080"
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	port = ":" + port
+	
 	log.Printf("Server starting on port %s", port)
 	
 	if err := http.ListenAndServe(port, nil); err != nil {
