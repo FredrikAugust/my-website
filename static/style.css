@@ -66,6 +66,38 @@ nav a:focus {
   outline-offset: 2px;
 }
 
+.blog-list {
+  margin-top: 3rem;
+}
+
+.blog-list h2 {
+  font-size: 1rem;
+  color: var(--color-primary);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.blog-list ul {
+  list-style: none;
+  padding: 0;
+}
+
+.blog-list li {
+  margin-bottom: 0.25rem;
+}
+
+.blog-list a {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.2s ease;
+  font-size: 0.875rem;
+}
+
+.blog-list a:hover {
+  color: var(--color-secondary);
+}
+
 @media (max-width: 768px) {
   body {
     padding: 1rem;

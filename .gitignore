@@ -36,5 +36,18 @@ Thumbs.db
 # Log files
 *.log
 
-# Built binary
+# Built binaries
 main
+server
+website-test
+
+# Docker
+.env
+.env.local
+
+# Test coverage
+coverage.txt
+coverage.html
+
+# Temporary test files
+templates/
