@@ -38,7 +38,7 @@ Thumbs.db
 
 # Built binaries
 main
-server
+/server
 website-test
 
 # Docker
