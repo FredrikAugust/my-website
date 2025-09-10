@@ -4,7 +4,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	
+
 	"github.com/fredrikaugust/website/internal/application/usecases"
 )
 
@@ -46,15 +46,16 @@ func (h *Handlers) HomeHandler(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handlers) RobotsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain")
+	// Cloudflare will inject the rest of the robots.txt here.
 	w.WriteHeader(http.StatusOK)
 }
 
 func (h *Handlers) SetupRoutes() *http.ServeMux {
 	mux := http.NewServeMux()
-	
+
 	mux.HandleFunc("/", h.HomeHandler)
 	mux.HandleFunc("/robots.txt", h.RobotsHandler)
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
-	
+
 	return mux
 }

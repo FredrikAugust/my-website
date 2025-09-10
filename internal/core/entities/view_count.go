@@ -10,13 +10,11 @@ type ViewCount struct {
 
 func NewViewCount(hostname string) *ViewCount {
 	return &ViewCount{
-		Hostname:    hostname,
-		Views:       1,
-		LastUpdated: time.Now(),
+		Hostname: hostname,
+		Views:    1,
 	}
 }
 
 func (vc *ViewCount) Increment() {
 	vc.Views++
-	vc.LastUpdated = time.Now()
 }

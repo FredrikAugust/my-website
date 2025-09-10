@@ -1,45 +1,86 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Fredrik's personal homepage - hosted on k3s">
-    <meta name="keywords" content="Fredrik, homepage, software, development, programming, k3s">
-    <meta name="author" content="Fredrik August">
-    
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Fredrik's personal homepage - hosted on k3s"
+    />
+    <meta
+      name="keywords"
+      content="Fredrik, homepage, software, development, programming, k3s"
+    />
+    <meta name="author" content="Fredrik August" />
+
     <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="Fredrik's Homepage">
-    <meta property="og:description" content="Fredrik's personal homepage - hosted on k3s">
-    <meta property="og:site_name" content="Fredrik's Homepage">
-    
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Fredrik's Homepage" />
+    <meta
+      property="og:description"
+      content="Fredrik's personal homepage - hosted on k3s"
+    />
+    <meta property="og:site_name" content="Fredrik's Homepage" />
+
     <!-- Twitter -->
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Fredrik's Homepage">
-    <meta name="twitter:description" content="Fredrik's personal homepage - hosted on k3s">
-    
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Fredrik's Homepage" />
+    <meta
+      name="twitter:description"
+      content="Fredrik's personal homepage - hosted on k3s"
+    />
+
     <!-- Favicon -->
-    <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png">
-    <link rel="manifest" href="/static/site.webmanifest">
-    
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/static/apple-touch-icon.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/static/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="/static/favicon-16x16.png"
+    />
+    <link rel="manifest" href="/static/site.webmanifest" />
+
     <!-- Styles -->
-    <link rel="stylesheet" href="/static/style.css">
-    
+    <link rel="stylesheet" href="/static/style.css" />
+
     <title>Fredrik's Homepage</title>
-</head>
-<body>
+  </head>
+  <body>
     <main>
-        <div class="date-line">It's {{.DateTime}} and you're visitor number {{.VisitorNumber}} to {{.Hostname}}.</div>
-        <div class="homepage-title">You're on Fredrik's homepage.</div>
-        <nav>
-            <a href="https://github.com/FredrikAugust" target="_blank" rel="noopener noreferrer">GitHub</a>
-        </nav>
-        <div class="info-paragraph">
-            This web server is hosted in a K3s Kubernetes cluster on Hetzner Cloud. DNS is handled on Cloudflare and TLS certificates are provisioned using ACME-DNS01.
-        </div>
-        
+      <div class="date-line">
+        It's {{.DateTime}} and you're visitor number {{.VisitorNumber}} to
+        {{.Hostname}}.
+      </div>
+      <div class="homepage-title">You're on Fredrik's homepage.</div>
+      <nav>
+        <a
+          href="https://github.com/FredrikAugust"
+          target="_blank"
+          rel="noopener noreferrer"
+          >GitHub</a
+        >
+      </nav>
+      <div class="info-paragraph">
+        <p>
+          The purpose of the website is to have a place to share my projects,
+          experiments, and photography.
+        </p>
+        <p>
+          This web server is hosted in a K3s Kubernetes cluster on Hetzner
+          Cloud. DNS is handled on Cloudflare and TLS certificates are
+          provisioned using ACME-DNS01 and LetsEncrypt.
+        </p>
+      </div>
     </main>
-</body>
+  </body>
 </html>
