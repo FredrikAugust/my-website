@@ -1,50 +1,105 @@
 package main
 
 import (
-	"log"
-	"net/http"
+	"context"
+	"fmt"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
-	
-	"github.com/fredrikaugust/website/internal/application/container"
+	"website/server"
+
+	"go.uber.org/zap"
+	"golang.org/x/sync/errgroup"
 )
 
-func main() {
-	c, err := container.NewContainer()
-	if err != nil {
-		log.Fatal("Failed to initialize container:", err)
-	}
-	defer c.Close()
+// this will be set at build time using -ldflags "-X main.release=$(git rev-parse --short HEAD)"
+var release string
 
-	handler := c.GetHandler()
-	
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
+func main() {
+	os.Exit(start())
+}
+
+func start() int {
+	logEnv := getStringOrDefault("LOG_ENV", "development")
+	log, err := createLogger(logEnv)
+	if err != nil {
+		fmt.Println("error setting up the logger:", err)
+		return 1
 	}
-	port = ":" + port
-	
-	log.Printf("Server starting on port %s", port)
-	
-	server := &http.Server{
-		Addr:    port,
-		Handler: handler,
-	}
-	
-	// Setup graceful shutdown
-	go func() {
-		sigChan := make(chan os.Signal, 1)
-		signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
-		<-sigChan
-		
-		log.Println("Shutting down server...")
-		server.Close()
+
+	log = log.With(zap.String("release", release))
+
+	defer func() {
+		// if we can't sync there's something seriously wrong so just ignore it
+		_ = log.Sync()
 	}()
-	
-	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		log.Fatal("Server failed to start:", err)
+
+	host := getStringOrDefault("HOST", "localhost")
+	port := getIntOrDefault("PORT", 8080)
+
+	s := server.New(server.Options{
+		Host: host,
+		Log:  log,
+		Port: port,
+	})
+
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
+	eg, ctx := errgroup.WithContext(ctx)
+
+	eg.Go(func() error {
+		if err := s.Start(); err != nil {
+			log.Error("failed to start server", zap.Error(err))
+			return err
+		}
+		return nil
+	})
+
+	<-ctx.Done()
+
+	eg.Go(func() error {
+		if err := s.Stop(); err != nil {
+			log.Error("failed to stop server gracefully", zap.Error(err))
+			return err
+		}
+		return nil
+	})
+
+	if err := eg.Wait(); err != nil {
+		return 1
 	}
-	
-	log.Println("Server stopped")
+
+	return 0
+}
+
+func createLogger(logEnv string) (*zap.Logger, error) {
+	switch logEnv {
+	case "development":
+		return zap.NewDevelopment()
+	case "production":
+		return zap.NewProduction()
+	default:
+		return zap.NewNop(), nil
+	}
+}
+
+func getStringOrDefault(key, defaultValue string) string {
+	value, ok := os.LookupEnv(key)
+	if !ok {
+		return defaultValue
+	}
+	return value
+}
+
+func getIntOrDefault(key string, defaultValue int) int {
+	value, ok := os.LookupEnv(key)
+	if !ok {
+		return defaultValue
+	}
+	intValue, err := strconv.Atoi(value)
+	if err != nil {
+		return defaultValue
+	}
+	return intValue
 }

@@ -1,0 +1,38 @@
+[
+  {
+    "label": "Run all tests",
+    "command": "task test",
+    "reveal": "no_focus",
+    "reveal_target": "dock",
+    // What to do with the terminal pane and tab, after the command had finished:
+    // * `never` — Do nothing when the command finishes (default)
+    // * `always` — always hide the terminal tab, hide the pane also if it was the last tab in it
+    // * `on_success` — hide the terminal tab on task success only, otherwise behaves similar to `always`
+    "hide": "never",
+    "shell": "system"
+  },
+  {
+    "label": "Start server",
+    "command": "task start",
+    "reveal": "no_focus",
+    "reveal_target": "dock",
+    // What to do with the terminal pane and tab, after the command had finished:
+    // * `never` — Do nothing when the command finishes (default)
+    // * `always` — always hide the terminal tab, hide the pane also if it was the last tab in it
+    // * `on_success` — hide the terminal tab on task success only, otherwise behaves similar to `always`
+    "hide": "never",
+    "shell": "system"
+  },
+  {
+    "label": "Start docker image",
+    "command": "task start:docker",
+    "reveal": "no_focus",
+    "reveal_target": "dock",
+    // What to do with the terminal pane and tab, after the command had finished:
+    // * `never` — Do nothing when the command finishes (default)
+    // * `always` — always hide the terminal tab, hide the pane also if it was the last tab in it
+    // * `on_success` — hide the terminal tab on task success only, otherwise behaves similar to `always`
+    "hide": "never",
+    "shell": "system"
+  }
+]

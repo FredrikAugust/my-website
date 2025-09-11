@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: "3"
+
+tasks:
+  test:
+    cmd: go test -coverprofile=cover.out -p 1 ./...
+
+  start:
+    env:
+      LOG_ENV: development
+    cmd: go run cmd/server/main.go
+    interactive: true
+
+  build:docker:
+    cmd: docker build -t website .
+
+  start:docker:
+    deps:
+      - build:docker
+    cmd: docker run -p 8080:8080 -e HOST="" website

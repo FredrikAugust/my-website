@@ -1,22 +1,15 @@
-FROM golang:1.21-alpine AS builder
-
-WORKDIR /app
+FROM golang:1.25.1-trixie AS builder
+WORKDIR /src
 
 COPY go.mod go.sum ./
-RUN go mod download
+RUN go mod download -x
 
-COPY . .
-RUN go build -o main ./cmd/server
+COPY . ./
+RUN GOOS=linux GOARCH=amd64 go build -ldflags="-X 'main.release=`git rev-parse --short=8 HEAD`'" -o /bin/server cmd/server/*.go
 
-FROM alpine:latest
+FROM gcr.io/distroless/base-debian10
+WORKDIR /app
 
-RUN apk --no-cache add ca-certificates
-WORKDIR /root/
+COPY --from=builder /bin/server ./
 
-COPY --from=builder /app/main .
-COPY --from=builder /app/templates ./templates
-COPY --from=builder /app/static ./static
-
-EXPOSE 8080
-
-CMD ["./main"]
+CMD ["./server"]

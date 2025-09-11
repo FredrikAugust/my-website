@@ -1,15 +1,7 @@
 # Fredrik's Personal Website
 
-A simple Go web server that serves Fredrik's personal blog homepage. Displays the current date and a welcome message.
+A simple Go web server that serves Fredrik's homepage.
 
-## Running locally
+The website is developed partially following the guide from [golang.dk](https://golang.dk/).
 
-```bash
-go run main.go
-```
-
-The server will start on port 8080.
-
-## Docker
-
-The application is containerized and automatically built using GitHub Actions. Docker images are pushed to GitHub Container Registry and can be used in Kubernetes deployments.
+`Taskfile` is used to automate tasks such as building, testing, and deploying the website.

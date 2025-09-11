@@ -56,31 +56,60 @@
     <title>Fredrik's Homepage</title>
   </head>
   <body>
-    <main>
-      <div class="date-line">
-        It's {{.DateTime}} and you're visitor number {{.VisitorNumber}} to
-        {{.Hostname}}.
+    <div class="date-line">
+      It's {{.DateTime}} and you're visitor number
+      <span class="visitor-count">{{.VisitorNumber}}</span>.
+    </div>
+    <h1>Fredrik's homepage</h1>
+    <nav>
+      <a
+        href="https://github.com/FredrikAugust"
+        target="_blank"
+        rel="noopener noreferrer"
+        >GitHub</a
+      >
+    </nav>
+
+    <section>
+      <img
+        style="max-width: 400px"
+        src="/static/images/sognsvann.jpeg"
+        alt="sognsvann in oslo"
+      />
+      <small style="display: block">↑ Sognsvann, Oslo, Norway</small>
+    </section>
+
+    <section>
+      <h2>Photo store</h2>
+      <a href="/image-store"
+        >link to store (not yet made i have to figure out how i'm going to make
+        it)</a
+      >
+    </section>
+
+    <section>
+      <h2>Blog posts</h2>
+      <div class="blog-links">
+        <ul style="list-style: none; margin-left: 1rem">
+          <li>
+            <a href="/blog/my-new-website"
+              >creating the website, trying to avoid getting lost in the sauce
+              [10/09/2025]</a
+            >
+          </li>
+        </ul>
       </div>
-      <div class="homepage-title">You're on Fredrik's homepage.</div>
-      <nav>
-        <a
-          href="https://github.com/FredrikAugust"
-          target="_blank"
-          rel="noopener noreferrer"
-          >GitHub</a
-        >
-      </nav>
-      <div class="info-paragraph">
-        <p>
-          The purpose of the website is to have a place to share my projects,
-          experiments, and photography.
-        </p>
-        <p>
-          This web server is hosted in a K3s Kubernetes cluster on Hetzner
-          Cloud. DNS is handled on Cloudflare and TLS certificates are
-          provisioned using ACME-DNS01 and LetsEncrypt.
-        </p>
-      </div>
-    </main>
+    </section>
+    <footer>
+      <p>
+        The purpose of the website is to have a place to share my projects,
+        experiments, and photography.
+      </p>
+      <p>
+        This web server is hosted in a K3s Kubernetes cluster on Hetzner Cloud.
+        DNS is handled on Cloudflare and TLS certificates are provisioned using
+        ACME-DNS01 and LetsEncrypt.
+      </p>
+    </footer>
   </body>
 </html>
