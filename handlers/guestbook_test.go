@@ -29,7 +29,7 @@ func TestPostComment(t *testing.T) {
 	t.Run("posts a comment with valid name and comment", func(t *testing.T) {
 		is := is.New(t)
 		code, _, _ := makePostRequest(mux, "/guestbook", createFormHeader(), strings.NewReader("name=John&comment=Hello"))
-		is.Equal(code, http.StatusCreated)
+		is.Equal(code, http.StatusFound)
 	})
 
 	t.Run("rejects invalid name", func(t *testing.T) {
