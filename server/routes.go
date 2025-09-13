@@ -19,7 +19,9 @@ func (s *Server) SetupRoutes() {
 func loggerMiddleware(log *zap.Logger) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			log.Info("request received", zap.String("method", r.Method), zap.String("path", r.URL.Path))
+			if r.URL.Path != "/health" {
+				log.Info("request received", zap.String("method", r.Method), zap.String("path", r.URL.Path))
+			}
 			next.ServeHTTP(w, r)
 		})
 	}
