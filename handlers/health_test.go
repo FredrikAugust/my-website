@@ -1,6 +1,8 @@
 package handlers_test
 
 import (
+	"context"
+	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -11,14 +13,31 @@ import (
 	"github.com/matryer/is"
 )
 
+type mockPinger struct {
+	err error
+}
+
+func (m *mockPinger) Ping(ctx context.Context) error {
+	return m.err
+}
+
 func TestHealth(t *testing.T) {
 	t.Run("returns 200", func(t *testing.T) {
 		is := is.New(t)
 
 		mux := chi.NewMux()
-		handlers.Health(mux)
+		handlers.Health(mux, &mockPinger{})
 		code, _, _ := makeGetRequest(mux, "/health")
 		is.Equal(http.StatusOK, code)
+	})
+
+	t.Run("returns 502 on broken pinger", func(t *testing.T) {
+		is := is.New(t)
+
+		mux := chi.NewMux()
+		handlers.Health(mux, &mockPinger{err: errors.New("broken pinger in test")})
+		code, _, _ := makeGetRequest(mux, "/health")
+		is.Equal(http.StatusBadGateway, code)
 	})
 }
 

@@ -1,16 +1,23 @@
-version: "3.8"
-
 services:
   postgres:
     image: postgres:17
     environment:
-      POSTGRES_DB: website
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: supersecret
+      POSTGRES_DB: website
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  postgres-test:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: template1
+    ports:
+      - "5433:5432"
 
 volumes:
   postgres_data:

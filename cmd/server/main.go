@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"strconv"
 	"syscall"
+	"time"
+	"website/helpers"
 	"website/server"
+	"website/storage"
 
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
@@ -21,8 +23,9 @@ func main() {
 }
 
 func start() int {
-	logEnv := getStringOrDefault("LOG_ENV", "development")
+	logEnv := helpers.GetStringOrDefault("LOG_ENV", "development")
 	log, err := createLogger(logEnv)
+
 	if err != nil {
 		fmt.Println("error setting up the logger:", err)
 		return 1
@@ -35,13 +38,16 @@ func start() int {
 		_ = log.Sync()
 	}()
 
-	host := getStringOrDefault("HOST", "localhost")
-	port := getIntOrDefault("PORT", 8080)
+	host := helpers.GetStringOrDefault("HOST", "localhost")
+	port := helpers.GetIntOrDefault("PORT", 8080)
+
+	db := createDatatabase(log)
 
 	s := server.New(server.Options{
-		Host: host,
-		Log:  log,
-		Port: port,
+		Database: db,
+		Host:     host,
+		Log:      log,
+		Port:     port,
 	})
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
@@ -84,22 +90,17 @@ func createLogger(logEnv string) (*zap.Logger, error) {
 	}
 }
 
-func getStringOrDefault(key, defaultValue string) string {
-	value, ok := os.LookupEnv(key)
-	if !ok {
-		return defaultValue
-	}
-	return value
-}
-
-func getIntOrDefault(key string, defaultValue int) int {
-	value, ok := os.LookupEnv(key)
-	if !ok {
-		return defaultValue
-	}
-	intValue, err := strconv.Atoi(value)
-	if err != nil {
-		return defaultValue
-	}
-	return intValue
+func createDatatabase(log *zap.Logger) *storage.Database {
+	return storage.NewDatabase(storage.NewDatabaseOptions{
+		Host:                  helpers.GetStringOrDefault("DB_HOST", "localhost"),
+		Port:                  helpers.GetIntOrDefault("DB_PORT", 5432),
+		User:                  helpers.GetStringOrDefault("DB_USER", "postgres"),
+		Password:              helpers.GetStringOrDefault("DB_PASSWORD", ""),
+		Name:                  helpers.GetStringOrDefault("DB_NAME", "website"),
+		MaxOpenConnections:    helpers.GetIntOrDefault("DB_MAX_OPEN_CONNECTIONS", 25),
+		MaxIdleConnections:    helpers.GetIntOrDefault("DB_MAX_IDLE_CONNECTIONS", 5),
+		ConnectionMaxLifetime: helpers.GetDurationOrDefault("DB_CONNECTION_MAX_LIFETIME", 300*time.Second),
+		ConnectionMaxIdleTime: helpers.GetDurationOrDefault("DB_CONNECTION_MAX_IDLE_TIME", 60*time.Second),
+		Log:                   log,
+	})
 }

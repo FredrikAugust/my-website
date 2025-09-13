@@ -3,19 +3,45 @@
 version: "3"
 
 tasks:
+  test:unit:
+    desc: Run unit tests
+    cmd: go test -coverprofile=cover.out ./... -test.short
+
   test:
+    desc: Run tests with integration tests
     cmd: go test -coverprofile=cover.out -p 1 ./...
 
   start:
+    desc: Start the server
     env:
       LOG_ENV: development
+    dotenv:
+      - .env.local
     cmd: go run cmd/server/main.go
     interactive: true
 
+  migrate:up:
+    desc: Run migrations up
+    dotenv:
+      - .env.local
+    cmd: go run cmd/migrate/main.go up
+
+  migrate:down:
+    desc: Run migrations down
+    dotenv:
+      - .env.local
+    cmd: go run cmd/migrate/main.go down
+
   build:docker:
+    desc: Build the Docker image
     cmd: docker build -t website .
 
   start:docker:
+    desc: Start the server in Docker
     deps:
       - build:docker
     cmd: docker run -p 8080:8080 -e HOST="" website
+
+  migrate:add:
+    desc: Add a new migration. Pass name with `migrate:add -- <name>`
+    cmd: migrate create -ext sql -dir storage/migrations -seq {{.CLI_ARGS}}

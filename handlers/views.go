@@ -1,14 +1,27 @@
 package handlers
 
 import (
+	"context"
 	"net/http"
+	"website/model"
 	"website/views"
 
 	"github.com/go-chi/chi/v5"
 )
 
-func FrontPage(mux chi.Router) {
+type guestbookGetter interface {
+	GetComments(ctx context.Context) ([]model.GuestbookEntry, error)
+}
+
+func FrontPage(mux chi.Router, g guestbookGetter) {
 	mux.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		_ = views.FrontPage().Render(w)
+		comments, err := g.GetComments(r.Context())
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		_ = views.FrontPage(comments).Render(w)
 	})
 }
