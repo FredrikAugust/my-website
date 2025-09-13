@@ -12,6 +12,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/matryer/is"
+	"go.uber.org/zap"
 )
 
 type guestbookMock struct {
@@ -24,7 +25,7 @@ func (m *guestbookMock) PostComment(ctx context.Context, name model.Name, commen
 func TestPostComment(t *testing.T) {
 	mux := chi.NewMux()
 	g := &guestbookMock{}
-	handlers.PostComment(mux, g)
+	handlers.PostComment(mux, g, zap.NewNop())
 
 	t.Run("posts a comment with valid name and comment", func(t *testing.T) {
 		is := is.New(t)
