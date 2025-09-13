@@ -33,6 +33,7 @@ type Options struct {
 
 func New(opts Options) *Server {
 	if opts.Log == nil {
+		fmt.Println("no logger was configured. defaulting to zap.NewNop()")
 		opts.Log = zap.NewNop()
 	}
 
@@ -58,6 +59,11 @@ func New(opts Options) *Server {
 func (s *Server) Start() error {
 	if err := s.database.Connect(); err != nil {
 		return fmt.Errorf("error connecting to database: %w", err)
+	}
+
+	err := s.database.MigrateUp()
+	if err != nil {
+		panic(err)
 	}
 
 	s.SetupRoutes()
