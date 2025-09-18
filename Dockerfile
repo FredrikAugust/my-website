@@ -11,5 +11,6 @@ FROM gcr.io/distroless/base-debian12
 WORKDIR /app
 
 COPY --from=builder /bin/server ./
+COPY --from=builder /src/static/ ./static/
 
 CMD ["./server"]

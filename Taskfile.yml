@@ -47,7 +47,10 @@ tasks:
     desc: Start the server in Docker
     deps:
       - build:docker
-    cmd: docker run -p 8080:8080 -e HOST="" website
+      - start-db:main
+    dotenv:
+      - .env.local
+    cmd: docker run -p 8080:8080 --env-file .env.local -e HOST="" -e DB_HOST=host.docker.internal website
 
   migrate:add:
     desc: Add a new migration. Pass name with `migrate:add -- <name>`
