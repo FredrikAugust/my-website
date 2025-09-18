@@ -10,10 +10,33 @@ import (
 func Page(title, path string, body ...g.Node) g.Node {
 	return c.HTML5(c.HTML5Props{
 		Title:       title,
-		Description: "",
+		Description: "Fredrik's homepage about software, development, sports and photography",
 		Language:    "en",
 		Head: []g.Node{
-			Script(Src("https://cdn.tailwindcss.com?plugins=forms,typography")),
+			Meta(Charset("UTF-8")),
+			Meta(Name("viewport"), Content("width=device-width, initial-scale=1.0")),
+			Meta(Name("keywords"), Content("Fredrik, homepage, software, development, programming, k3s")),
+			Meta(Name("author"), Content("Fredrik August")),
+
+			// Tailwind
+			Script(Src("/static/tailwind.min.js")),
+
+			// Open Graph / Facebook
+			Meta(g.Attr("property", "og:type"), Content("website")),
+			Meta(g.Attr("property", "og:title"), Content("Fredrik's Homepage")),
+			Meta(g.Attr("property", "og:description"), Content("Fredrik's personal homepage - hosted on k3s")),
+			Meta(g.Attr("property", "og:site_name"), Content("Fredrik's Homepage")),
+
+			// Twitter
+			Meta(Name("twitter:card"), Content("summary")),
+			Meta(Name("twitter:title"), Content("Fredrik's Homepage")),
+			Meta(Name("twitter:description"), Content("Fredrik's personal homepage - hosted on k3s")),
+
+			// Favicon
+			Link(Rel("apple-touch-icon"), g.Attr("sizes", "180x180"), Href("/static/apple-touch-icon.png")),
+			Link(Rel("icon"), Type("image/png"), g.Attr("sizes", "32x32"), Href("/static/favicon-32x32.png")),
+			Link(Rel("icon"), Type("image/png"), g.Attr("sizes", "16x16"), Href("/static/favicon-16x16.png")),
+			Link(Rel("manifest"), Href("/static/site.webmanifest")),
 		},
 		Body: []g.Node{
 			Main(

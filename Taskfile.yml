@@ -11,13 +11,20 @@ tasks:
     desc: Run tests with integration tests
     cmd: go test -coverprofile=cover.out -p 1 ./...
 
-  start:
+  start-db:main:
+    status:
+      - docker compose ps --format json | jq -e '.Service == "postgres"'
+    cmd: docker compose up -d postgres
+
+  start:dev:
+    deps:
+      - start-db:main
     desc: Start the server
     env:
       LOG_ENV: development
     dotenv:
       - .env.local
-    cmd: go run cmd/server/main.go
+    cmd: air
     interactive: true
 
   migrate:up:

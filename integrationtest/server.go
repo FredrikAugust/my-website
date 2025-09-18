@@ -1,6 +1,7 @@
 package integrationtest
 
 import (
+	"context"
 	"net/http"
 	"testing"
 	"time"
@@ -8,7 +9,7 @@ import (
 	"website/server"
 )
 
-func CreateServer() func() {
+func CreateServer(ctx context.Context) func() {
 	database, cleanup := CreateDatabase()
 	s := server.New(server.Options{
 		Host:     "localhost",
@@ -17,7 +18,7 @@ func CreateServer() func() {
 	})
 
 	go func() {
-		if err := s.Start(); err != nil {
+		if err := s.Start(ctx); err != nil {
 			panic(err)
 		}
 	}()

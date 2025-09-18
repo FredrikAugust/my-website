@@ -1,0 +1,4 @@
+- Fix static file serving
+- Add back favicon
+- Fix text
+- Add photography section

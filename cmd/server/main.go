@@ -38,24 +38,26 @@ func start() int {
 		_ = log.Sync()
 	}()
 
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
+	eg, ctx := errgroup.WithContext(ctx)
+
 	host := helpers.GetStringOrDefault("HOST", "localhost")
 	port := helpers.GetIntOrDefault("PORT", 8080)
 
 	db := createDatatabase(log)
+	s3Client := storage.NewS3()
 
 	s := server.New(server.Options{
 		Database: db,
+		S3Client: s3Client,
 		Host:     host,
 		Log:      log,
 		Port:     port,
 	})
 
-	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
-	defer stop()
-	eg, ctx := errgroup.WithContext(ctx)
-
 	eg.Go(func() error {
-		if err := s.Start(); err != nil {
+		if err := s.Start(ctx); err != nil {
 			log.Error("failed to start server", zap.Error(err))
 			return err
 		}

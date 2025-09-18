@@ -17,15 +17,18 @@ import (
 )
 
 type Server struct {
-	address  string
-	log      *zap.Logger
-	mux      chi.Router
-	server   *http.Server
+	address string
+	log     *zap.Logger
+	mux     chi.Router
+	server  *http.Server
+
 	database *storage.Database
+	s3client *storage.S3
 }
 
 type Options struct {
 	Database *storage.Database
+	S3Client *storage.S3
 	Host     string
 	Log      *zap.Logger
 	Port     int
@@ -43,6 +46,7 @@ func New(opts Options) *Server {
 	return &Server{
 		address:  address,
 		database: opts.Database,
+		s3client: opts.S3Client,
 		mux:      mux,
 		log:      opts.Log,
 		server: &http.Server{
@@ -56,12 +60,17 @@ func New(opts Options) *Server {
 	}
 }
 
-func (s *Server) Start() error {
+func (s *Server) Start(ctx context.Context) error {
 	if err := s.database.Connect(); err != nil {
 		return fmt.Errorf("error connecting to database: %w", err)
 	}
 
 	err := s.database.MigrateUp()
+	if err != nil {
+		panic(err)
+	}
+
+	err = s.s3client.Connect(ctx, s.log)
 	if err != nil {
 		panic(err)
 	}

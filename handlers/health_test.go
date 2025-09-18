@@ -3,11 +3,10 @@ package handlers_test
 import (
 	"context"
 	"errors"
-	"io"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 	"website/handlers"
+	"website/integrationtest"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/matryer/is"
@@ -27,7 +26,7 @@ func TestHealth(t *testing.T) {
 
 		mux := chi.NewMux()
 		handlers.Health(mux, &mockPinger{})
-		code, _, _ := makeGetRequest(mux, "/health")
+		code, _, _ := integrationtest.MakeGetRequest(mux, "/health")
 		is.Equal(http.StatusOK, code)
 	})
 
@@ -36,22 +35,7 @@ func TestHealth(t *testing.T) {
 
 		mux := chi.NewMux()
 		handlers.Health(mux, &mockPinger{err: errors.New("broken pinger in test")})
-		code, _, _ := makeGetRequest(mux, "/health")
+		code, _, _ := integrationtest.MakeGetRequest(mux, "/health")
 		is.Equal(http.StatusBadGateway, code)
 	})
-}
-
-func makeGetRequest(handler http.Handler, target string) (int, http.Header, string) {
-	req := httptest.NewRequest(http.MethodGet, target, nil)
-	res := httptest.NewRecorder()
-
-	handler.ServeHTTP(res, req)
-
-	result := res.Result()
-
-	bodyBytes, err := io.ReadAll(result.Body)
-	if err != nil {
-		panic(err)
-	}
-	return result.StatusCode, result.Header, string(bodyBytes)
 }

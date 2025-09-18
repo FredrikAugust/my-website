@@ -50,8 +50,8 @@ func FrontPage(comments []model.GuestbookEntry) g.Node {
 				c.Classes{
 					"flex flex-col gap-1": true,
 				},
-				Input(c.Classes{"px-2 py-1": true}, Name("name"), Placeholder("Your name"), AutoComplete("given-name")),
-				Textarea(c.Classes{"px-2 py-1": true}, Name("comment"), Placeholder("Comment")),
+				Input(c.Classes{"border border-gray-300 px-2 py-1": true}, Name("name"), Placeholder("Your name"), AutoComplete("given-name")),
+				Textarea(c.Classes{"border border-gray-300 px-2 py-1": true}, Name("comment"), Placeholder("Comment")),
 				Button(c.Classes{"self-start bg-blue-600 text-white px-2 py-1": true}, Type("submit"), g.Text("Post comment")),
 			),
 		),
