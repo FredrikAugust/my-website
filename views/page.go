@@ -43,7 +43,7 @@ func Page(title, path string, body ...g.Node) g.Node {
 				c.Classes{
 					"grid grid-rows-[auto_1fr] p-2 gap-2": true,
 				},
-				Navbar(),
+				Navbar(path),
 				g.Group(body),
 				MyFooter(),
 			),
@@ -51,13 +51,13 @@ func Page(title, path string, body ...g.Node) g.Node {
 	})
 }
 
-func Navbar() g.Node {
+func Navbar(currentPath string) g.Node {
 	return Nav(
 		c.Classes{
-			"flex items-center gap-2 px-2 py-1 underline text-sm": true,
+			"flex items-center gap-2 px-2 py-1 text-sm": true,
 		},
-		A(Href("/"), g.Text("Home")),
-		A(Href("/photos"), g.Text("Photography")),
+		A(c.Classes{"underline": "/" == currentPath, "hover:underline": true}, Href("/"), g.Text("Home")),
+		A(c.Classes{"underline": "/photos" == currentPath, "hover:underline": true}, Href("/photos"), g.Text("Photography")),
 	)
 }
 
