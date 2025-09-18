@@ -7,12 +7,14 @@ import (
 	"time"
 
 	"website/server"
+	"website/storage"
 )
 
 func CreateServer(ctx context.Context) func() {
 	database, cleanup := CreateDatabase()
 	s := server.New(server.Options{
 		Host:     "localhost",
+		S3Client: storage.NewS3(),
 		Database: database,
 		Port:     8081,
 	})
