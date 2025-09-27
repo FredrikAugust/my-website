@@ -16,7 +16,7 @@ func FrontPage(comments []model.GuestbookEntry) g.Node {
 		"Fredrik",
 		route.Root,
 		H1(c.Classes{
-			"text-4xl font-bold font-[ruigslay] text-transparent bg-clip-text bg-contain bg-[url('/static/images/sparkles.gif')]": true,
+			"text-4xl leading-[1.3] font-bold font-[ruigslay] text-transparent bg-clip-text bg-contain bg-[url('/static/images/sparkles.gif')]": true,
 		}, g.Text("Fredrik's Homepage")),
 		Div(
 			c.Classes{

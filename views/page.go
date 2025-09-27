@@ -71,6 +71,6 @@ func MyFooter() g.Node {
 		c.Classes{
 			"text-sm text-gray-700 max-w-prose": true,
 		},
-		P(g.Text("This website is written in Go. It uses Gomponents to build the UI. It's hosted in a Kubernetes (k3s) cluster on Hetzner cloud, using Traefik as a reverse proxy. The DNS (and some rudimentary protection) is handled on Cloudflare.")),
+		P(g.Text("This web server is written in Go. It uses Gomponents and Tailwind for the UI. It's hosted in a Kubernetes (k3s) cluster on Hetzner cloud, using Traefik as a reverse proxy. The DNS, static asset caching and basic protection is handled on Cloudflare.")),
 	)
 }
