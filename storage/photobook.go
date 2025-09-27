@@ -5,11 +5,23 @@ import (
 	"website/model"
 )
 
-func (db *Database) GetPhotos(ctx context.Context) ([]model.Photo, error) {
-	query := `SELECT * FROM photo`
+func (db *Database) GetAlbums(ctx context.Context) ([]model.Album, error) {
+	query := `SELECT * FROM album`
+
+	var albums []model.Album
+	err := db.DB.SelectContext(ctx, &albums, query)
+	if err != nil {
+		return nil, err
+	}
+
+	return albums, nil
+}
+
+func (db *Database) GetPhotos(ctx context.Context, albumID int) ([]model.Photo, error) {
+	query := `SELECT photo_id, url FROM photo WHERE album_id = $1`
 
 	var photos []model.Photo
-	err := db.DB.SelectContext(ctx, &photos, query)
+	err := db.DB.SelectContext(ctx, &photos, query, albumID)
 	if err != nil {
 		return nil, err
 	}

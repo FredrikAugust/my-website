@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"net/http"
+	"strconv"
 	"website/model"
 	"website/views"
 
@@ -31,12 +32,13 @@ func FrontPage(mux chi.Router, g guestbookGetter, logger *zap.Logger) {
 }
 
 type photoGetter interface {
-	GetPhotos(ctx context.Context) ([]model.Photo, error)
+	GetAlbums(ctx context.Context) ([]model.Album, error)
+	GetPhotos(ctx context.Context, albumId int) ([]model.Photo, error)
 }
 
 func Photography(mux chi.Router, p photoGetter, logger *zap.Logger) {
-	mux.Get("/photos", func(w http.ResponseWriter, r *http.Request) {
-		photos, err := p.GetPhotos(r.Context())
+	mux.Get("/albums", func(w http.ResponseWriter, r *http.Request) {
+		albums, err := p.GetAlbums(r.Context())
 
 		if err != nil {
 			logger.Warn("failed to fetch photos", zap.Error(err))
@@ -44,6 +46,23 @@ func Photography(mux chi.Router, p photoGetter, logger *zap.Logger) {
 			return
 		}
 
-		_ = views.Photos(photos).Render(w)
+		_ = views.Albums(albums).Render(w)
+	})
+
+	mux.Get("/albums/{albumId:[0-9]+}", func(w http.ResponseWriter, r *http.Request) {
+		albumId, err := strconv.Atoi(chi.URLParam(r, "albumId"))
+		if err != nil {
+			logger.Warn("failed to parse album ID", zap.Error(err))
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		photos, err := p.GetPhotos(r.Context(), albumId)
+		if err != nil {
+			logger.Warn("failed to fetch photos", zap.Error(err))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		_ = views.Album(albumId, photos).Render(w)
 	})
 }

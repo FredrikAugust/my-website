@@ -1,5 +1,5 @@
 .claude/*.local.json
-cover.out
+website.out
 *.local
 bin/
 tmp/

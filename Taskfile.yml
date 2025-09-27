@@ -5,16 +5,24 @@ version: "3"
 tasks:
   test:unit:
     desc: Run unit tests
-    cmd: go test -coverprofile=cover.out ./... -test.short
+    cmd: go test -coverprofile=website.out ./... -test.short
 
   test:
     desc: Run tests with integration tests
-    cmd: go test -coverprofile=cover.out -p 1 ./...
+    deps:
+      - start-db:test
+    cmds:
+      - go test -coverprofile=website.out -p 1 ./...
 
   start-db:main:
     status:
       - docker compose ps --format json | jq -e '.Service == "postgres"'
     cmd: docker compose up -d postgres
+
+  start-db:test:
+    status:
+      - docker compose ps --format json | jq -e '.Service == "postgres-test"'
+    cmd: docker compose up -d postgres-test
 
   start:dev:
     deps:

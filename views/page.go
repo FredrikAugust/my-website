@@ -2,6 +2,8 @@
 package views
 
 import (
+	"website/views/route"
+
 	g "maragu.dev/gomponents"
 	c "maragu.dev/gomponents/components"
 	. "maragu.dev/gomponents/html"
@@ -56,8 +58,8 @@ func Navbar(currentPath string) g.Node {
 		c.Classes{
 			"flex items-center gap-2 px-2 py-1 text-sm": true,
 		},
-		A(c.Classes{"underline": "/" == currentPath, "hover:underline": true}, Href("/"), g.Text("Home")),
-		A(c.Classes{"underline": "/photos" == currentPath, "hover:underline": true}, Href("/photos"), g.Text("Photography")),
+		A(c.Classes{"underline": route.Root == currentPath, "hover:underline": true}, Href(route.Root), g.Text("Home")),
+		A(c.Classes{"underline": route.Albums == currentPath, "hover:underline": true}, Href(route.Albums), g.Text("Photography")),
 	)
 }
 

@@ -3,6 +3,7 @@ package views
 import (
 	"time"
 	"website/model"
+	"website/views/route"
 
 	g "maragu.dev/gomponents"
 	c "maragu.dev/gomponents/components"
@@ -12,7 +13,7 @@ import (
 func FrontPage(comments []model.GuestbookEntry) g.Node {
 	return Page(
 		"Fredrik",
-		"/",
+		route.Root,
 		H1(c.Classes{
 			"text-xl": true,
 		}, g.Text("Fredrik A. Madsen-Malmo's homepage")),
@@ -44,7 +45,7 @@ func FrontPage(comments []model.GuestbookEntry) g.Node {
 			c.Classes{
 				"max-w-xs text-sm": true,
 			},
-			Action("/guestbook"),
+			Action(route.Guestbook),
 			Method("POST"),
 			Div(
 				c.Classes{
