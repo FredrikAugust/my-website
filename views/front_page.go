@@ -1,13 +1,14 @@
 package views
 
 import (
-	"time"
 	"website/model"
 	"website/views/route"
 
 	g "maragu.dev/gomponents"
 	c "maragu.dev/gomponents/components"
 	. "maragu.dev/gomponents/html"
+
+	"github.com/SerhiiCho/timeago/v3"
 )
 
 func FrontPage(comments []model.GuestbookEntry) g.Node {
@@ -15,8 +16,8 @@ func FrontPage(comments []model.GuestbookEntry) g.Node {
 		"Fredrik",
 		route.Root,
 		H1(c.Classes{
-			"text-xl": true,
-		}, g.Text("Fredrik A. Madsen-Malmo's homepage")),
+			"text-4xl font-bold font-[ruigslay] text-transparent bg-clip-text bg-contain bg-[url('/static/images/sparkles.gif')]": true,
+		}, g.Text("Fredrik's Homepage")),
 		Div(
 			c.Classes{
 				"max-w-prose text-gray-700 text-sm": true,
@@ -24,22 +25,24 @@ func FrontPage(comments []model.GuestbookEntry) g.Node {
 			P(g.Text("Here you can read about my experiments and experiences with various technologies, and look at my photos.")),
 			P(g.Text("I hope you enjoy your visit. Please leave a message in the guestbook if you did.")),
 		),
-		g.If(len(comments) > 0,
-			g.Group{
-				H1(g.Text("Guestbook")),
-				Div(
-					c.Classes{
-						"flex flex-col border border-gray-300 max-w-prose px-2 py-1 gap-1": true,
-					},
-					g.Map(comments, func(comment model.GuestbookEntry) g.Node {
-						return Div(c.Classes{"flex items-center text-sm gap-2 whitespace-nowrap flex-wrap": true},
-							Span(c.Classes{"font-medium": true}, g.Text(comment.Name)),
-							Span(c.Classes{"whitespace-break-spaces": true}, g.Text(comment.Message)),
-							Span(c.Classes{"ml-auto text-xs text-gray-500": true}, g.Text(comment.CreatedAt.Format(time.RFC1123))),
-						)
-					}),
-				),
-			},
+		Div(
+			c.Classes{"flex max-w-prose": true},
+			Img(c.Classes{"h-fit": true}, Src("/static/images/guestbook.gif")),
+			Div(
+				c.Classes{
+					"flex flex-col border border-gray-300 px-2 py-1 gap-1": true,
+				},
+				g.Map(comments, func(comment model.GuestbookEntry) g.Node {
+					timeAgo, err := timeago.Parse(comment.CreatedAt)
+					if err != nil {
+						timeAgo = "Unknown"
+					}
+					return Div(c.Classes{"flex flex-col items-start text-sm whitespace-nowrap flex-wrap": true},
+						Div(c.Classes{"flex gap-1 items-center": true}, Span(c.Classes{"font-bold": true}, g.Text(comment.Name)), Span(c.Classes{"text-xs text-gray-500": true}, g.Text(timeAgo))),
+						Span(c.Classes{"whitespace-break-spaces": true}, g.Text(comment.Message)),
+					)
+				}),
+			),
 		),
 		FormEl(
 			c.Classes{
@@ -51,9 +54,9 @@ func FrontPage(comments []model.GuestbookEntry) g.Node {
 				c.Classes{
 					"flex flex-col gap-1": true,
 				},
-				Input(c.Classes{"border border-gray-300 px-2 py-1": true}, Name("name"), Placeholder("Your name"), AutoComplete("given-name")),
-				Textarea(c.Classes{"border border-gray-300 px-2 py-1": true}, Name("comment"), Placeholder("Comment")),
-				Button(c.Classes{"self-start bg-blue-600 text-white px-2 py-1": true}, Type("submit"), g.Text("Post comment")),
+				Input(c.Classes{"border bg-[#fdf4e3] border-gray-300 px-2 py-1": true}, Name("name"), Placeholder("Your name"), AutoComplete("given-name")),
+				Textarea(c.Classes{"border bg-[#fdf4e3] border-gray-300 px-2 py-1": true}, Name("comment"), Placeholder("Comment")),
+				Button(c.Classes{"font-[oswald] self-start bg-blue-600 text-white px-2 py-1": true}, Type("submit"), g.Text("Post comment")),
 			),
 		),
 	)

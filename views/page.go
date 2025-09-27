@@ -23,6 +23,9 @@ func Page(title, path string, body ...g.Node) g.Node {
 			// Tailwind
 			Script(Src("/static/tailwind.min.js")),
 
+			// Stylesheet
+			Link(Rel("stylesheet"), Href("/static/styles/style.css")),
+
 			// Open Graph / Facebook
 			Meta(g.Attr("property", "og:type"), Content("website")),
 			Meta(g.Attr("property", "og:title"), Content("Fredrik's Homepage")),
@@ -43,7 +46,7 @@ func Page(title, path string, body ...g.Node) g.Node {
 		Body: []g.Node{
 			Main(
 				c.Classes{
-					"grid grid-rows-[auto_1fr] p-2 gap-2": true,
+					"grid grid-rows-[auto_1fr] py-2 px-4 gap-2 font-[domine]": true,
 				},
 				Navbar(path),
 				g.Group(body),
@@ -56,7 +59,7 @@ func Page(title, path string, body ...g.Node) g.Node {
 func Navbar(currentPath string) g.Node {
 	return Nav(
 		c.Classes{
-			"flex items-center gap-2 px-2 py-1 text-sm": true,
+			"flex items-center gap-2 py-1 text-sm font-[oswald]": true,
 		},
 		A(c.Classes{"underline": route.Root == currentPath, "hover:underline": true}, Href(route.Root), g.Text("Home")),
 		A(c.Classes{"underline": route.Albums == currentPath, "hover:underline": true}, Href(route.Albums), g.Text("Photography")),
