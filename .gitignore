@@ -3,3 +3,5 @@ website.out
 *.local
 bin/
 tmp/
+static/styles/style.min.css
+.task

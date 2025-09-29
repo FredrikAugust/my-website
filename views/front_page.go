@@ -27,7 +27,7 @@ func FrontPage(comments []model.GuestbookEntry) g.Node {
 		),
 		Div(
 			c.Classes{"flex max-w-prose": true},
-			Img(c.Classes{"h-fit": true}, Src("/static/images/guestbook.gif")),
+			Img(c.Classes{"h-fit": true}, Src("/static/images/guestbook.gif"), Alt("an old man writing in a guestbook")),
 			Div(
 				c.Classes{
 					"flex flex-col border border-gray-300 px-2 py-1 gap-1": true,

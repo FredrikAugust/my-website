@@ -1,6 +1,16 @@
 FROM golang:1.25.1-trixie AS builder
 WORKDIR /src
 
+# BUILD TAILWIND CSS
+# The URL uses x64 instead of amd64
+ARG BUILDARCH
+RUN ARCH=$( [ "${BUILDARCH}" = "amd64" ] && echo "x64" || echo "arm64" ) && \
+  curl -sfLO https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-linux-${ARCH}
+RUN mv tailwindcss-linux-* tailwindcss
+RUN chmod a+x tailwindcss
+COPY tailwind.css ./
+RUN ./tailwindcss -i ./tailwind.css -o ./static/styles/style.min.css
+
 COPY go.mod go.sum ./
 RUN go mod download -x
 

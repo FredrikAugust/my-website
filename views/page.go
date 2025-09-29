@@ -20,11 +20,9 @@ func Page(title, path string, body ...g.Node) g.Node {
 			Meta(Name("keywords"), Content("Fredrik, homepage, software, development, programming, k3s")),
 			Meta(Name("author"), Content("Fredrik August")),
 
-			// Tailwind
-			Script(Src("/static/tailwind.min.js")),
-
 			// Stylesheet
-			Link(Rel("stylesheet"), Href("/static/styles/style.css")),
+			Link(Rel("stylesheet"), Href("/static/styles/style.min.css")),
+			Link(Rel("stylesheet"), Href("/static/styles/fonts.css")),
 
 			// Open Graph / Facebook
 			Meta(g.Attr("property", "og:type"), Content("website")),
@@ -44,13 +42,15 @@ func Page(title, path string, body ...g.Node) g.Node {
 			Link(Rel("manifest"), Href("/static/site.webmanifest")),
 		},
 		Body: []g.Node{
-			Main(
-				c.Classes{
-					"grid grid-rows-[auto_1fr] py-2 px-4 gap-2 font-[domine]": true,
-				},
-				Navbar(path),
-				g.Group(body),
-				MyFooter(),
+			Body(c.Classes{"bg-[#fdf4e3]": true},
+				Main(
+					c.Classes{
+						"grid grid-rows-[auto_1fr] py-2 px-4 gap-2 font-[domine]": true,
+					},
+					Navbar(path),
+					g.Group(body),
+					MyFooter(),
+				),
 			),
 		},
 	})

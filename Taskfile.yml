@@ -2,6 +2,8 @@
 
 version: "3"
 
+output: prefixed
+
 tasks:
   test:unit:
     desc: Run unit tests
@@ -27,13 +29,27 @@ tasks:
   start:dev:
     deps:
       - start-db:main
+      - build:css
     desc: Start the server
     env:
       LOG_ENV: development
     dotenv:
       - .env.local
-    cmd: air
-    interactive: true
+    cmds:
+      - air
+
+  build:css:
+    desc: Build CSS
+    method: checksum
+    run: once
+    sources:
+      - views/**/*
+      - tailwind.css
+    generates:
+      - static/styles/style.min.css
+    watch: true
+    cmds:
+      - tailwindcss -i ./tailwind.css -o ./static/styles/style.min.css --minify
 
   migrate:up:
     desc: Run migrations up

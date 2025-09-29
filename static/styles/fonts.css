@@ -1,22 +1,21 @@
 @font-face {
-  font-family: "ruigslay";
+  font-family: "ruigslay", sans-serif;
   src:
     url("/static/fonts/ruigslay.otf") format("opentype"),
     url("/static/fonts/ruigslay.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-  font-family: "domine";
+  font-family: "domine", serif;
   src: url("/static/fonts/Domine-VariableFont_wght.ttf") format("truetype");
+  font-display: swap;
 }
 
 @font-face {
-  font-family: "oswald";
+  font-family: "oswald", sans-serif;
   src: url("/static/fonts/Oswald-VariableFont_wght.ttf") format("truetype");
-}
-
-body {
-  background-color: #fdf4e3;
+  font-display: swap;
 }
