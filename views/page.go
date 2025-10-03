@@ -42,7 +42,7 @@ func Page(title, path string, body ...g.Node) g.Node {
 			Link(Rel("manifest"), Href("/static/site.webmanifest")),
 		},
 		Body: []g.Node{
-			Body(c.Classes{"bg-[#fdf4e3]": true},
+			Body(c.Classes{"bg-[#fdf4e3] max-w-prose": true},
 				Main(
 					c.Classes{
 						"grid grid-rows-[auto_1fr] py-2 px-4 gap-2 font-[domine]": true,

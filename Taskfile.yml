@@ -41,15 +41,24 @@ tasks:
   build:css:
     desc: Build CSS
     method: checksum
-    run: once
     sources:
-      - views/**/*
+      - ./views/**/*.go
       - tailwind.css
     generates:
       - static/styles/style.min.css
-    watch: true
     cmds:
       - tailwindcss -i ./tailwind.css -o ./static/styles/style.min.css --minify
+
+  build:css:watch:
+    desc: Build CSS
+    method: checksum
+    sources:
+      - ./views/**/*.go
+      - tailwind.css
+    generates:
+      - static/styles/style.min.css
+    cmds:
+      - tailwindcss -i ./tailwind.css -o ./static/styles/style.min.css --minify --watch
 
   migrate:up:
     desc: Run migrations up
