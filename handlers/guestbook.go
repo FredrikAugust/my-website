@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"website/model"
 
@@ -13,7 +14,11 @@ type guestbook interface {
 	PostComment(ctx context.Context, name model.Name, comment model.Comment) error
 }
 
-func PostComment(mux chi.Router, g guestbook, log *zap.Logger) {
+type emailClient interface {
+	SendEmail(ctx context.Context, from, subject, body string) error
+}
+
+func PostComment(mux chi.Router, g guestbook, e emailClient, log *zap.Logger) {
 	mux.Post("/guestbook", func(w http.ResponseWriter, r *http.Request) {
 		name := model.Name(r.FormValue("name"))
 		comment := model.Comment(r.FormValue("comment"))
@@ -34,6 +39,17 @@ func PostComment(mux chi.Router, g guestbook, log *zap.Logger) {
 			log.Warn("failed to post comment", zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
+		}
+
+		err := e.SendEmail(
+			r.Context(),
+			name.String(),
+			"New Comment from "+name.String(),
+			fmt.Sprintf("You've gotten a new comment from %s.\n\n%s", name.String(), comment.String()),
+		)
+
+		if err != nil {
+			log.Error("failed to send email", zap.Error(err))
 		}
 
 		log.Info("comment posted", zap.String("name", string(name)), zap.String("comment", string(comment)))

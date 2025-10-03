@@ -16,7 +16,7 @@ func (s *Server) SetupRoutes() {
 	handlers.Health(s.mux, s.database)
 
 	// Controllers
-	handlers.PostComment(s.mux, s.database, s.log)
+	handlers.PostComment(s.mux, s.database, s.emailClient, s.log)
 
 	// Views
 	handlers.FrontPage(s.mux, s.database, s.log)

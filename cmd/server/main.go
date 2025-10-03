@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+	"website/email"
 	"website/helpers"
 	"website/server"
 	"website/storage"
@@ -48,12 +49,15 @@ func start() int {
 	db := createDatatabase(log)
 	s3Client := storage.NewS3()
 
+	emailClient := createEmailClient(log)
+
 	s := server.New(server.Options{
-		Database: db,
-		S3Client: s3Client,
-		Host:     host,
-		Log:      log,
-		Port:     port,
+		Database:    db,
+		S3Client:    s3Client,
+		EmailClient: emailClient,
+		Host:        host,
+		Log:         log,
+		Port:        port,
 	})
 
 	eg.Go(func() error {
@@ -104,5 +108,12 @@ func createDatatabase(log *zap.Logger) *storage.Database {
 		ConnectionMaxLifetime: helpers.GetDurationOrDefault("DB_CONNECTION_MAX_LIFETIME", 300*time.Second),
 		ConnectionMaxIdleTime: helpers.GetDurationOrDefault("DB_CONNECTION_MAX_IDLE_TIME", 60*time.Second),
 		Log:                   log,
+	})
+}
+
+func createEmailClient(logger *zap.Logger) *email.EmailClient {
+	return email.NewEmailClient(email.NewEmailClientOptions{
+		ApiKey: helpers.GetStringOrDefault("RESEND_API_KEY", ""),
+		Logger: logger,
 	})
 }

@@ -40,6 +40,7 @@ require (
 	github.com/SerhiiCho/timeago/v3 v3.3.1
 	github.com/golang-migrate/migrate/v4 v4.19.0
 	github.com/joho/godotenv v1.5.1
+	github.com/resend/resend-go/v2 v2.25.0
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/sync v0.17.0
 	maragu.dev/gomponents v1.2.0

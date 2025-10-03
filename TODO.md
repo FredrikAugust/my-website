@@ -4,5 +4,7 @@
 - [x] Add back favicon
 - [x] Fix text
 - [x] Add photography section
-- [ ] add notion of albums with text and images to make photography section more interesting
+- [x] add notion of albums with text and images to make photography section more interesting
 - [ ] add login so i can manage photos from there (upload to s3)
+- [ ] add blog
+- [ ] attach link in email to delete bad emails

@@ -17,14 +17,23 @@ import (
 type guestbookMock struct {
 }
 
+type emailClientMock struct {
+}
+
 func (m *guestbookMock) PostComment(ctx context.Context, name model.Name, comment model.Comment) error {
+	return nil
+}
+
+func (m *emailClientMock) SendEmail(ctx context.Context, from, subject, body string) error {
 	return nil
 }
 
 func TestPostComment(t *testing.T) {
 	mux := chi.NewMux()
 	g := &guestbookMock{}
-	handlers.PostComment(mux, g, zap.NewNop())
+	e := &emailClientMock{}
+
+	handlers.PostComment(mux, g, e, zap.NewNop())
 
 	t.Run("posts a comment with valid name and comment", func(t *testing.T) {
 		is := is.New(t)
