@@ -8,10 +8,11 @@ import (
 	. "maragu.dev/gomponents/html"
 )
 
-func Login() g.Node {
+func Login(authenticated bool) g.Node {
 	return Page(
 		"Login",
 		route.Login,
+		authenticated,
 		Form(
 			c.Classes{"font-sans text-sm": true},
 			Action(route.Login),

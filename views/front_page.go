@@ -1,6 +1,7 @@
 package views
 
 import (
+	"strconv"
 	"website/model"
 	"website/views/route"
 
@@ -11,10 +12,11 @@ import (
 	"github.com/SerhiiCho/timeago/v3"
 )
 
-func FrontPage(comments []model.GuestbookEntry) g.Node {
+func FrontPage(authenticated bool, comments []model.GuestbookEntry) g.Node {
 	return Page(
 		"Fredrik",
 		route.Root,
+		authenticated,
 		H1(c.Classes{
 			"text-4xl leading-[1.3] font-bold font-display text-transparent bg-clip-text bg-contain bg-[url('/static/images/sparkles.gif')]": true,
 		}, g.Text("Fredrik's Homepage")),
@@ -32,14 +34,23 @@ func FrontPage(comments []model.GuestbookEntry) g.Node {
 				c.Classes{
 					"flex flex-col border border-gray-300 px-2 py-1 gap-1 h-80 overflow-y-auto": true,
 				},
-
 				g.Map(comments, func(comment model.GuestbookEntry) g.Node {
 					timeAgo, err := timeago.Parse(comment.CreatedAt)
 					if err != nil {
 						timeAgo = "Unknown"
 					}
 					return Div(c.Classes{"flex flex-col items-start text-sm whitespace-nowrap flex-wrap": true},
-						Div(c.Classes{"flex gap-1 items-center": true}, Span(c.Classes{"font-bold": true}, g.Text(comment.Name)), Span(c.Classes{"text-xs text-gray-600": true}, g.Text(timeAgo))),
+						Div(
+							c.Classes{"flex gap-1 items-center": true},
+							Span(c.Classes{"font-bold": true}, g.Text(comment.Name)),
+							Span(c.Classes{"text-xs text-gray-600": true}, g.Text(timeAgo)),
+							g.If(authenticated, FormEl(
+								Action(route.GuestbookDelete),
+								Method("POST"), // DELETE in browsers just does GET with query params
+								Input(Type("hidden"), Name("comment_id"), Value(strconv.Itoa(comment.CommentID))),
+								Button(Type("submit"), c.Classes{"text-red-600 text-xs font-sans cursor-pointer": true}, g.Text("Delete comment")),
+							)),
+						),
 						Span(c.Classes{"whitespace-break-spaces": true}, g.Text(comment.Message)),
 					)
 				}),

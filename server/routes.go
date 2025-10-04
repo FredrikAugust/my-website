@@ -17,11 +17,13 @@ func (s *Server) SetupRoutes() {
 
 	// Controllers
 	handlers.PostComment(s.mux, s.database, s.emailClient, s.log)
+	handlers.DeleteComment(s.mux, s.database, s.log)
+	handlers.SignIn(s.mux, s.database, s.sessionStore, s.log)
 
 	// Views
-	handlers.FrontPage(s.mux, s.database, s.log)
-	handlers.Photography(s.mux, s.database, s.log)
-	handlers.Login(s.mux)
+	handlers.FrontPage(s.mux, s.database, s.sessionStore, s.log)
+	handlers.Photography(s.mux, s.database, s.sessionStore, s.log)
+	handlers.Login(s.mux, s.sessionStore)
 }
 
 func loggerMiddleware(log *zap.Logger) func(http.Handler) http.Handler {

@@ -26,6 +26,8 @@ type Server struct {
 	database    *storage.Database
 	s3client    *storage.S3
 	emailClient *email.EmailClient
+
+	sessionStore *storage.SessionStore
 }
 
 type Options struct {
@@ -47,12 +49,13 @@ func New(opts Options) *Server {
 	mux := chi.NewMux()
 
 	return &Server{
-		address:     address,
-		database:    opts.Database,
-		s3client:    opts.S3Client,
-		emailClient: opts.EmailClient,
-		mux:         mux,
-		log:         opts.Log,
+		address:      address,
+		database:     opts.Database,
+		s3client:     opts.S3Client,
+		emailClient:  opts.EmailClient,
+		sessionStore: storage.NewSessionStore(),
+		mux:          mux,
+		log:          opts.Log,
 		server: &http.Server{
 			Addr:              address,
 			Handler:           mux,

@@ -9,8 +9,9 @@ import (
 	. "maragu.dev/gomponents/html"
 )
 
-func Albums(albums []model.Album) g.Node {
+func Albums(albums []model.Album, authenticated bool) g.Node {
 	return Page("Photography", route.Albums,
+		authenticated,
 		Div(
 			c.Classes{
 				"flex flex-col gap-1": true,

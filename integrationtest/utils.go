@@ -34,6 +34,19 @@ func MakePostRequest(handler http.Handler, target string, header http.Header, bo
 	return result.StatusCode, result.Header, string(bodyBytes)
 }
 
+func MakeDeleteRequest(handler http.Handler, target string, header http.Header, body io.Reader) (int, http.Header, string) {
+	req := httptest.NewRequest(http.MethodDelete, target, body)
+	req.Header = header
+	res := httptest.NewRecorder()
+	handler.ServeHTTP(res, req)
+	result := res.Result()
+	bodyBytes, err := io.ReadAll(result.Body)
+	if err != nil {
+		panic(err)
+	}
+	return result.StatusCode, result.Header, string(bodyBytes)
+}
+
 func CreateFormHeader() http.Header {
 	header := http.Header{}
 	header.Set("Content-Type", "application/x-www-form-urlencoded")

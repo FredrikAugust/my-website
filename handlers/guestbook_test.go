@@ -8,6 +8,7 @@ import (
 	"website/handlers"
 	"website/integrationtest"
 	"website/model"
+	"website/views/route"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/matryer/is"
@@ -18,6 +19,11 @@ type guestbookMock struct {
 }
 
 type emailClientMock struct {
+}
+
+// DeleteComment implements handlers.guestbook.
+func (m *guestbookMock) DeleteComment(ctx context.Context, commentID int) error {
+	return nil
 }
 
 func (m *guestbookMock) PostComment(ctx context.Context, name model.Name, comment model.Comment) error {
@@ -37,19 +43,32 @@ func TestPostComment(t *testing.T) {
 
 	t.Run("posts a comment with valid name and comment", func(t *testing.T) {
 		is := is.New(t)
-		code, _, _ := integrationtest.MakePostRequest(mux, "/guestbook", integrationtest.CreateFormHeader(), strings.NewReader("name=John&comment=Hello"))
+		code, _, _ := integrationtest.MakePostRequest(mux, route.Guestbook, integrationtest.CreateFormHeader(), strings.NewReader("name=John&comment=Hello"))
 		is.Equal(code, http.StatusFound)
 	})
 
 	t.Run("rejects invalid name", func(t *testing.T) {
 		is := is.New(t)
-		code, _, _ := integrationtest.MakePostRequest(mux, "/guestbook", integrationtest.CreateFormHeader(), strings.NewReader("name=&comment=Hello"))
+		code, _, _ := integrationtest.MakePostRequest(mux, route.Guestbook, integrationtest.CreateFormHeader(), strings.NewReader("name=&comment=Hello"))
 		is.Equal(code, http.StatusBadRequest)
 	})
 
 	t.Run("rejects invalid comment", func(t *testing.T) {
 		is := is.New(t)
-		code, _, _ := integrationtest.MakePostRequest(mux, "/guestbook", integrationtest.CreateFormHeader(), strings.NewReader("name=John&comment="))
+		code, _, _ := integrationtest.MakePostRequest(mux, route.Guestbook, integrationtest.CreateFormHeader(), strings.NewReader("name=John&comment="))
+		is.Equal(code, http.StatusBadRequest)
+	})
+}
+
+func TestDeleteComment(t *testing.T) {
+	mux := chi.NewMux()
+	g := &guestbookMock{}
+
+	handlers.DeleteComment(mux, g, zap.NewNop())
+
+	t.Run("invalid comment id", func(t *testing.T) {
+		is := is.New(t)
+		code, _, _ := integrationtest.MakeDeleteRequest(mux, route.GuestbookDelete, integrationtest.CreateFormHeader(), strings.NewReader("comment_id=dog"))
 		is.Equal(code, http.StatusBadRequest)
 	})
 }

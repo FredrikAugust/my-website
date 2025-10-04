@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strconv"
 	"website/model"
+	"website/views/route"
 
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
@@ -12,14 +14,35 @@ import (
 
 type guestbook interface {
 	PostComment(ctx context.Context, name model.Name, comment model.Comment) error
+	DeleteComment(ctx context.Context, commentID int) error
 }
 
 type emailClient interface {
 	SendEmail(ctx context.Context, from, subject, body string) error
 }
 
+func DeleteComment(mux chi.Router, g guestbook, log *zap.Logger) {
+	mux.Post(route.GuestbookDelete, func(w http.ResponseWriter, r *http.Request) {
+		commentID := r.FormValue("comment_id")
+
+		commmentIDNum, err := strconv.Atoi(commentID)
+		if err != nil {
+			log.Warn("comment id was not a number", zap.String("commentID", commentID), zap.Error(err))
+			w.WriteHeader(http.StatusBadRequest)
+		}
+
+		err = g.DeleteComment(r.Context(), commmentIDNum)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		http.Redirect(w, r, route.Root, http.StatusFound)
+	})
+}
+
 func PostComment(mux chi.Router, g guestbook, e emailClient, log *zap.Logger) {
-	mux.Post("/guestbook", func(w http.ResponseWriter, r *http.Request) {
+	mux.Post(route.Guestbook, func(w http.ResponseWriter, r *http.Request) {
 		name := model.Name(r.FormValue("name"))
 		comment := model.Comment(r.FormValue("comment"))
 
@@ -54,6 +77,6 @@ func PostComment(mux chi.Router, g guestbook, e emailClient, log *zap.Logger) {
 
 		log.Info("comment posted", zap.String("name", string(name)), zap.String("comment", string(comment)))
 
-		http.Redirect(w, r, "/", http.StatusFound)
+		http.Redirect(w, r, route.Root, http.StatusFound)
 	})
 }

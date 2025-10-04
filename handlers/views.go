@@ -16,7 +16,11 @@ type guestbookGetter interface {
 	GetComments(ctx context.Context) ([]model.GuestbookEntry, error)
 }
 
-func FrontPage(mux chi.Router, g guestbookGetter, logger *zap.Logger) {
+type requestSessionStore interface {
+	GetSessionFromRequest(r *http.Request) (model.Email, error)
+}
+
+func FrontPage(mux chi.Router, g guestbookGetter, rss requestSessionStore, logger *zap.Logger) {
 	mux.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		comments, err := g.GetComments(r.Context())
 
@@ -28,7 +32,9 @@ func FrontPage(mux chi.Router, g guestbookGetter, logger *zap.Logger) {
 
 		logger.Info("guestbook comments fetched successfully", zap.Int("count", len(comments)))
 
-		_ = views.FrontPage(comments).Render(w)
+		_, err = rss.GetSessionFromRequest(r)
+
+		_ = views.FrontPage(err == nil, comments).Render(w)
 	})
 }
 
@@ -37,7 +43,7 @@ type photoGetter interface {
 	GetPhotos(ctx context.Context, albumId int) ([]model.Photo, error)
 }
 
-func Photography(mux chi.Router, p photoGetter, logger *zap.Logger) {
+func Photography(mux chi.Router, p photoGetter, rss requestSessionStore, logger *zap.Logger) {
 	mux.Get("/albums", func(w http.ResponseWriter, r *http.Request) {
 		albums, err := p.GetAlbums(r.Context())
 
@@ -47,7 +53,9 @@ func Photography(mux chi.Router, p photoGetter, logger *zap.Logger) {
 			return
 		}
 
-		_ = views.Albums(albums).Render(w)
+		_, err = rss.GetSessionFromRequest(r)
+
+		_ = views.Albums(albums, err == nil).Render(w)
 	})
 
 	mux.Get("/albums/{albumId:[0-9]+}", func(w http.ResponseWriter, r *http.Request) {
@@ -64,12 +72,15 @@ func Photography(mux chi.Router, p photoGetter, logger *zap.Logger) {
 			return
 		}
 
-		_ = views.Album(albumId, photos).Render(w)
+		_, err = rss.GetSessionFromRequest(r)
+
+		_ = views.Album(albumId, photos, err == nil).Render(w)
 	})
 }
 
-func Login(mux chi.Router) {
+func Login(mux chi.Router, rss requestSessionStore) {
 	mux.Get(route.Login, func(w http.ResponseWriter, r *http.Request) {
-		_ = views.Login().Render(w)
+		_, err := rss.GetSessionFromRequest(r)
+		_ = views.Login(err == nil).Render(w)
 	})
 }

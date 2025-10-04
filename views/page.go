@@ -9,7 +9,7 @@ import (
 	. "maragu.dev/gomponents/html"
 )
 
-func Page(title, path string, body ...g.Node) g.Node {
+func Page(title, path string, authenticated bool, body ...g.Node) g.Node {
 	return c.HTML5(c.HTML5Props{
 		Title:       title,
 		Description: "Fredrik's homepage about software, development, sports and photography",
@@ -46,7 +46,7 @@ func Page(title, path string, body ...g.Node) g.Node {
 					c.Classes{
 						"grid grid-rows-[auto_1fr] py-2 px-4 gap-2 font-serif": true,
 					},
-					Navbar(path),
+					Navbar(path, authenticated),
 					g.Group(body),
 					MyFooter(),
 				),
@@ -55,14 +55,19 @@ func Page(title, path string, body ...g.Node) g.Node {
 	})
 }
 
-func Navbar(currentPath string) g.Node {
+func Navbar(currentPath string, authenticated bool) g.Node {
 	return Nav(
 		c.Classes{
 			"flex items-center gap-2 py-1 text-sm font-sans": true,
 		},
 		A(c.Classes{"underline": route.Root == currentPath, "hover:underline": true}, Href(route.Root), g.Text("Home")),
 		A(c.Classes{"underline": route.Albums == currentPath, "hover:underline": true}, Href(route.Albums), g.Text("Photography")),
-		A(c.Classes{"underline": route.Login == currentPath, "hover:underline ml-auto": true}, Href(route.Login), g.Text("Login")),
+		A(
+			c.Classes{"underline": route.Login == currentPath, "hover:underline ml-auto": true},
+			Href(route.Login),
+			g.If(authenticated == false, g.Text("Login")),
+			g.If(authenticated == true, g.Text("Signed in")),
+		),
 	)
 }
 

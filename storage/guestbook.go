@@ -14,8 +14,16 @@ func (db *Database) PostComment(ctx context.Context, name model.Name, comment mo
 	return err
 }
 
+func (db *Database) DeleteComment(ctx context.Context, commentID int) error {
+	query := `DELETE FROM guestbook WHERE comment_id = $1`
+
+	_, err := db.DB.ExecContext(ctx, query, commentID)
+
+	return err
+}
+
 func (db *Database) GetComments(ctx context.Context) ([]model.GuestbookEntry, error) {
-	query := `SELECT name, message, created_at FROM guestbook ORDER BY created_at DESC LIMIT 100`
+	query := `SELECT comment_id, name, message, created_at FROM guestbook ORDER BY created_at DESC LIMIT 100`
 
 	var entries []model.GuestbookEntry
 	err := db.DB.SelectContext(ctx, &entries, query)
