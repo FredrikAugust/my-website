@@ -22,7 +22,6 @@ func Page(title, path string, body ...g.Node) g.Node {
 
 			// Stylesheet
 			Link(Rel("stylesheet"), Href("/static/styles/style.min.css")),
-			Link(Rel("stylesheet"), Href("/static/styles/fonts.css")),
 
 			// Open Graph / Facebook
 			Meta(g.Attr("property", "og:type"), Content("website")),
@@ -45,7 +44,7 @@ func Page(title, path string, body ...g.Node) g.Node {
 			Body(c.Classes{"bg-[#fdf4e3] max-w-prose": true},
 				Main(
 					c.Classes{
-						"grid grid-rows-[auto_1fr] py-2 px-4 gap-2 font-[domine]": true,
+						"grid grid-rows-[auto_1fr] py-2 px-4 gap-2 font-serif": true,
 					},
 					Navbar(path),
 					g.Group(body),
@@ -59,7 +58,7 @@ func Page(title, path string, body ...g.Node) g.Node {
 func Navbar(currentPath string) g.Node {
 	return Nav(
 		c.Classes{
-			"flex items-center gap-2 py-1 text-sm font-[oswald]": true,
+			"flex items-center gap-2 py-1 text-sm font-sans": true,
 		},
 		A(c.Classes{"underline": route.Root == currentPath, "hover:underline": true}, Href(route.Root), g.Text("Home")),
 		A(c.Classes{"underline": route.Albums == currentPath, "hover:underline": true}, Href(route.Albums), g.Text("Photography")),
@@ -69,7 +68,7 @@ func Navbar(currentPath string) g.Node {
 func MyFooter() g.Node {
 	return Footer(
 		c.Classes{
-			"text-sm text-gray-700 max-w-prose": true,
+			"text-sm text-gray-800 max-w-prose": true,
 		},
 		P(g.Text("This web server is written in Go. It uses Gomponents and Tailwind for the UI. It's hosted in a Kubernetes (k3s) cluster on Hetzner cloud, using Traefik as a reverse proxy. The DNS, static asset caching and basic protection is handled on Cloudflare.")),
 	)

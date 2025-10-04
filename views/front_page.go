@@ -16,11 +16,11 @@ func FrontPage(comments []model.GuestbookEntry) g.Node {
 		"Fredrik",
 		route.Root,
 		H1(c.Classes{
-			"text-4xl leading-[1.3] font-bold font-[ruigslay] text-transparent bg-clip-text bg-contain bg-[url('/static/images/sparkles.gif')]": true,
+			"text-4xl leading-[1.3] font-bold font-display text-transparent bg-clip-text bg-contain bg-[url('/static/images/sparkles.gif')]": true,
 		}, g.Text("Fredrik's Homepage")),
 		Div(
 			c.Classes{
-				"text-gray-700 text-sm": true,
+				"text-gray-800 text-sm": true,
 			},
 			P(g.Text("Here you can read about my experiments and experiences with various technologies, and look at my photos.")),
 			P(g.Text("I hope you enjoy your visit. Please leave a message in the guestbook if you did.")),
@@ -57,7 +57,7 @@ func FrontPage(comments []model.GuestbookEntry) g.Node {
 				},
 				Input(c.Classes{"border bg-white border-gray-300 px-2 py-1": true}, Name("name"), Placeholder("Your name"), AutoComplete("given-name")),
 				Textarea(c.Classes{"border bg-white border-gray-300 px-2 py-1": true}, Name("comment"), Placeholder("Comment")),
-				Button(c.Classes{"font-[oswald] self-start bg-gray-800 text-white px-2 py-1": true}, Type("submit"), g.Text("Post comment")),
+				Button(c.Classes{"font-sans self-start bg-gray-800 text-white px-2 py-1": true}, Type("submit"), g.Text("Post comment")),
 			),
 		),
 	)
