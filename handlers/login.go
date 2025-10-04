@@ -40,7 +40,13 @@ func SignIn(mux chi.Router, a authenticationService, s sessionStore, logger *zap
 			return
 		}
 
-		w.Header().Set("Set-Cookie", "session="+sessionID)
+		http.SetCookie(w, &http.Cookie{
+			Name:     "session",
+			Value:    sessionID,
+			SameSite: http.SameSiteStrictMode,
+			Secure:   true,
+			HttpOnly: true,
+		})
 
 		logger.Info("successfully signed in", zap.String("email", email))
 

@@ -2,6 +2,7 @@ package handlers_test
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"strings"
 	"testing"
@@ -19,6 +20,20 @@ type guestbookMock struct {
 }
 
 type emailClientMock struct {
+}
+
+// GetSessionFromRequest implements handlers.requestSessionStore.
+func (s *sessionStoreMock) GetSessionFromRequest(r *http.Request) (model.Email, error) {
+	session, err := r.Cookie("session")
+	if err != nil {
+		return model.Email(""), err
+	}
+
+	if session.Value == "pass" {
+		return model.Email("email"), nil
+	}
+
+	return model.Email(""), errors.New("no session")
 }
 
 // DeleteComment implements handlers.guestbook.
@@ -63,12 +78,29 @@ func TestPostComment(t *testing.T) {
 func TestDeleteComment(t *testing.T) {
 	mux := chi.NewMux()
 	g := &guestbookMock{}
+	ssm := &sessionStoreMock{}
 
-	handlers.DeleteComment(mux, g, zap.NewNop())
+	handlers.DeleteComment(mux, g, ssm, zap.NewNop())
 
 	t.Run("invalid comment id", func(t *testing.T) {
 		is := is.New(t)
 		code, _, _ := integrationtest.MakePostRequest(mux, route.GuestbookDelete, integrationtest.CreateFormHeader(), strings.NewReader("comment_id=dog"))
 		is.Equal(code, http.StatusBadRequest)
+	})
+
+	t.Run("no authentication", func(t *testing.T) {
+		is := is.New(t)
+		header := integrationtest.CreateFormHeader()
+		header.Add("Cookie", "session=fail")
+		code, _, _ := integrationtest.MakePostRequest(mux, route.GuestbookDelete, header, strings.NewReader("comment_id=4"))
+		is.Equal(code, http.StatusUnauthorized)
+	})
+
+	t.Run("authentication", func(t *testing.T) {
+		is := is.New(t)
+		header := integrationtest.CreateFormHeader()
+		header.Add("Cookie", "session=pass")
+		code, _, _ := integrationtest.MakePostRequest(mux, route.GuestbookDelete, header, strings.NewReader("comment_id=4"))
+		is.Equal(code, http.StatusFound)
 	})
 }

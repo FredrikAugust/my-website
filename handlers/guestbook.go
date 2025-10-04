@@ -21,7 +21,7 @@ type emailClient interface {
 	SendEmail(ctx context.Context, from, subject, body string) error
 }
 
-func DeleteComment(mux chi.Router, g guestbook, log *zap.Logger) {
+func DeleteComment(mux chi.Router, g guestbook, rss requestSessionStore, log *zap.Logger) {
 	mux.Post(route.GuestbookDelete, func(w http.ResponseWriter, r *http.Request) {
 		commentID := r.FormValue("comment_id")
 
@@ -29,6 +29,12 @@ func DeleteComment(mux chi.Router, g guestbook, log *zap.Logger) {
 		if err != nil {
 			log.Warn("comment id was not a number", zap.String("commentID", commentID), zap.Error(err))
 			w.WriteHeader(http.StatusBadRequest)
+		}
+
+		_, err = rss.GetSessionFromRequest(r)
+		if err != nil {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
 		}
 
 		err = g.DeleteComment(r.Context(), commmentIDNum)
