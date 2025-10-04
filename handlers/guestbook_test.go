@@ -68,7 +68,7 @@ func TestDeleteComment(t *testing.T) {
 
 	t.Run("invalid comment id", func(t *testing.T) {
 		is := is.New(t)
-		code, _, _ := integrationtest.MakeDeleteRequest(mux, route.GuestbookDelete, integrationtest.CreateFormHeader(), strings.NewReader("comment_id=dog"))
+		code, _, _ := integrationtest.MakePostRequest(mux, route.GuestbookDelete, integrationtest.CreateFormHeader(), strings.NewReader("comment_id=dog"))
 		is.Equal(code, http.StatusBadRequest)
 	})
 }
