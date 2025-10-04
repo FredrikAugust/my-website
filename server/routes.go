@@ -21,6 +21,7 @@ func (s *Server) SetupRoutes() {
 	// Views
 	handlers.FrontPage(s.mux, s.database, s.log)
 	handlers.Photography(s.mux, s.database, s.log)
+	handlers.Login(s.mux)
 }
 
 func loggerMiddleware(log *zap.Logger) func(http.Handler) http.Handler {

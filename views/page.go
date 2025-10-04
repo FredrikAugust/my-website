@@ -62,6 +62,7 @@ func Navbar(currentPath string) g.Node {
 		},
 		A(c.Classes{"underline": route.Root == currentPath, "hover:underline": true}, Href(route.Root), g.Text("Home")),
 		A(c.Classes{"underline": route.Albums == currentPath, "hover:underline": true}, Href(route.Albums), g.Text("Photography")),
+		A(c.Classes{"underline": route.Login == currentPath, "hover:underline ml-auto": true}, Href(route.Login), g.Text("Login")),
 	)
 }
 

@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"website/model"
 	"website/views"
+	"website/views/route"
 
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
@@ -64,5 +65,11 @@ func Photography(mux chi.Router, p photoGetter, logger *zap.Logger) {
 		}
 
 		_ = views.Album(albumId, photos).Render(w)
+	})
+}
+
+func Login(mux chi.Router) {
+	mux.Get(route.Login, func(w http.ResponseWriter, r *http.Request) {
+		_ = views.Login().Render(w)
 	})
 }
