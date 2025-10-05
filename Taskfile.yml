@@ -11,7 +11,7 @@ tasks:
     desc: Run tests with integration tests
     deps:
       - start-db:test
-    cmd: gotestsum -- -coverprofile=website.out ./...
+    cmd: gotestsum -- -coverprofile=website.out -p 1 ./...
 
   start-db:main:
     status:
