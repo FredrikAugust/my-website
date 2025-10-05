@@ -43,14 +43,14 @@ The website is developed partially following the guide from [golang.dk](https://
    go mod download
    ```
 
-4. Run the development server:
+4. Run the development server and tailwind CLI:
    ```bash
-   task start:dev
+   task -p start:dev build:css:watch
    ```
    This will:
    - Start the PostgreSQL database via Docker
-   - Build the CSS with Tailwind
-   - Start the web server with live reload
+   - Build the CSS with Tailwind CLI and rebuild it on change
+   - Start the web server with "live" reload (you have to manually refresh the browser)
 
 
 ## Run tests

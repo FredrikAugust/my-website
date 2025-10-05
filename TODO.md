@@ -10,3 +10,4 @@
   - [ ] image upload
 - [ ] add blog
 - [ ] attach link in email to delete bad emails
+- [ ] CSRF
