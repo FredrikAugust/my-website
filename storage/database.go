@@ -126,28 +126,28 @@ func (db *Database) Ping(ctx context.Context) error {
 }
 
 func (db *Database) MustExecContext(ctx context.Context, query string, args ...any) sql.Result {
-	ctx, span := databaseTracer.Start(ctx, query, trace.WithAttributes(semconv.DBSystemNamePostgreSQL, semconv.DBQueryText(query)))
+	ctx, span := databaseTracer.Start(ctx, "database.exec (panic)", trace.WithAttributes(semconv.DBSystemNamePostgreSQL, semconv.DBQueryText(query)))
 	defer span.End()
 
 	return db.DB.MustExecContext(ctx, query, args...)
 }
 
 func (db *Database) ExecContext(ctx context.Context, query string, args ...any) (sql.Result, error) {
-	ctx, span := databaseTracer.Start(ctx, query, trace.WithAttributes(semconv.DBSystemNamePostgreSQL, semconv.DBQueryText(query)))
+	ctx, span := databaseTracer.Start(ctx, "database.exec", trace.WithAttributes(semconv.DBSystemNamePostgreSQL, semconv.DBQueryText(query)))
 	defer span.End()
 
 	return db.DB.ExecContext(ctx, query, args...)
 }
 
 func (db *Database) QueryRowContext(ctx context.Context, query string, args ...any) *sql.Row {
-	ctx, span := databaseTracer.Start(ctx, query, trace.WithAttributes(semconv.DBSystemNamePostgreSQL, semconv.DBQueryText(query)))
+	ctx, span := databaseTracer.Start(ctx, "database.query_row", trace.WithAttributes(semconv.DBSystemNamePostgreSQL, semconv.DBQueryText(query)))
 	defer span.End()
 
 	return db.DB.QueryRowContext(ctx, query, args...)
 }
 
 func (db *Database) SelectContext(ctx context.Context, dest any, query string, args ...any) error {
-	ctx, span := databaseTracer.Start(ctx, query, trace.WithAttributes(semconv.DBSystemNamePostgreSQL, semconv.DBQueryText(query)))
+	ctx, span := databaseTracer.Start(ctx, "database.select", trace.WithAttributes(semconv.DBSystemNamePostgreSQL, semconv.DBQueryText(query)))
 	defer span.End()
 
 	return db.DB.SelectContext(ctx, dest, query, args...)
