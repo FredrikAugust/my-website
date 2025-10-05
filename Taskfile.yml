@@ -2,19 +2,16 @@
 
 version: "3"
 
-output: prefixed
-
 tasks:
   test:unit:
     desc: Run unit tests
-    cmd: go test -coverprofile=website.out ./... -test.short
+    cmd: gotestsum -- -coverprofile=website.out ./... -test.short
 
   test:
     desc: Run tests with integration tests
     deps:
       - start-db:test
-    cmds:
-      - go test -coverprofile=website.out -p 1 ./...
+    cmd: gotestsum -- -coverprofile=website.out ./...
 
   start-db:main:
     status:

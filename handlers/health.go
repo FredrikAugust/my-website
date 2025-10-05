@@ -14,9 +14,9 @@ type pinger interface {
 func Health(mux chi.Router, p pinger) {
 	mux.Get("/health", func(w http.ResponseWriter, r *http.Request) {
 		if err := p.Ping(r.Context()); err != nil {
-			w.WriteHeader(http.StatusBadGateway)
+			http.Error(w, "database ping failed", http.StatusBadGateway)
 			return
 		}
-		w.WriteHeader(http.StatusOK)
+		http.Error(w, "OK", http.StatusOK)
 	})
 }

@@ -74,12 +74,12 @@ func (s *Server) Start(ctx context.Context) error {
 
 	err := s.database.MigrateUp()
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("failed to run up migration: %w", err)
 	}
 
 	err = s.s3client.Connect(ctx, s.log)
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("failed to connect to s3 client: %w", err)
 	}
 
 	s.SetupRoutes()

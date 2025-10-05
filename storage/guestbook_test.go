@@ -16,7 +16,7 @@ func TestDatabase_PostComment(t *testing.T) {
 		db, cleanup := integrationtest.CreateDatabase()
 		defer cleanup()
 
-		err := db.PostComment(t.Context(), model.Name("fredrik"), model.Comment("hello world"))
+		err := db.PostComment(t.Context(), model.Name("Fredrik"), model.Comment("hello world"))
 		is.NoErr(err)
 
 		var message string

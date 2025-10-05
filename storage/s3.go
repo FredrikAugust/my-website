@@ -10,16 +10,18 @@ import (
 
 type S3 struct {
 	client *s3.Client
+
+	endpoint string
 }
 
-func NewS3() *S3 {
-	return &S3{}
+func NewS3(endpoint string) *S3 {
+	return &S3{
+		endpoint: endpoint,
+	}
 }
 
 func (s *S3) Connect(ctx context.Context, log *zap.Logger) error {
-	endpoint := "https://nbg1.your-objectstorage.com"
-
-	cfg, err := config.LoadDefaultConfig(ctx, config.WithBaseEndpoint(endpoint))
+	cfg, err := config.LoadDefaultConfig(ctx, config.WithBaseEndpoint(s.endpoint))
 	if err != nil {
 		log.Error("could not create aws configuration", zap.Error(err))
 		return err

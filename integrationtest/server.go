@@ -14,7 +14,7 @@ func CreateServer(ctx context.Context) func() {
 	database, cleanup := CreateDatabase()
 	s := server.New(server.Options{
 		Host:     "localhost",
-		S3Client: storage.NewS3(),
+		S3Client: storage.NewS3(""), // we won't call connnect in test so we'll just leave it blank
 		Database: database,
 		Port:     8081,
 	})

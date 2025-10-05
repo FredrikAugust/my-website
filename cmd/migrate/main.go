@@ -18,17 +18,17 @@ func start() int {
 	logEnv := helpers.GetStringOrDefault("LOG_ENV", "development")
 	log, err := createLogger(logEnv)
 	if err != nil {
-		fmt.Println("Error setting up the logger:", err)
+		fmt.Println("error setting up the logger:", err)
 		return 1
 	}
 
 	if len(os.Args) < 2 {
-		log.Warn("Usage: migrate up|down")
+		log.Warn("usage: migrate up|down")
 		return 1
 	}
 
 	if os.Args[1] == "to" && len(os.Args) < 3 {
-		log.Info("Usage: migrate to <version>")
+		log.Info("usage: migrate to <version>")
 		return 1
 	}
 
@@ -41,7 +41,7 @@ func start() int {
 		Log:      log,
 	})
 	if err := db.Connect(); err != nil {
-		log.Error("Error connection to database", zap.Error(err))
+		log.Error("error connecting to database", zap.Error(err))
 		return 1
 	}
 
@@ -51,11 +51,11 @@ func start() int {
 	case "down":
 		err = db.MigrateDown()
 	default:
-		log.Error("Unknown command", zap.String("name", os.Args[1]))
+		log.Error("unknown command", zap.String("name", os.Args[1]))
 		return 1
 	}
 	if err != nil {
-		log.Error("Error migrating", zap.Error(err))
+		log.Error("error migrating", zap.Error(err))
 		return 1
 	}
 

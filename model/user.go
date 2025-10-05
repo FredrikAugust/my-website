@@ -4,8 +4,8 @@ type Email string
 type PasswordHash string
 
 type User struct {
-	email     Email
-	password  PasswordHash
-	createdAt string `db:"created_at"`
-	updatedAt string `db:"updated_at"`
+	Email     Email        `db:"email"`
+	Password  PasswordHash `db:"password"`
+	CreatedAt string       `db:"created_at"`
+	UpdatedAt string       `db:"updated_at"`
 }

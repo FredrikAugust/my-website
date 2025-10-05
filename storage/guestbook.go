@@ -6,8 +6,7 @@ import (
 )
 
 func (db *Database) PostComment(ctx context.Context, name model.Name, comment model.Comment) error {
-	query := `INSERT INTO guestbook (name, message, created_at)
-	VALUES ($1, $2, now())`
+	query := `INSERT INTO guestbook (name, message, created_at) VALUES ($1, $2, now())`
 
 	_, err := db.DB.ExecContext(ctx, query, name.String(), comment.String())
 

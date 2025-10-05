@@ -38,6 +38,8 @@ type NewDatabaseOptions struct {
 	Log                   *zap.Logger
 }
 
+// Creates a new database instance, but does not connect to it.
+// For connection, use Database.Connect.
 func NewDatabase(opts NewDatabaseOptions) *Database {
 	if opts.Log == nil {
 		opts.Log = zap.NewNop()
@@ -79,7 +81,6 @@ func (db *Database) Connect() error {
 	db.DB.SetMaxIdleConns(db.maxIdleConnections)
 	db.DB.SetConnMaxLifetime(db.connectionMaxLifetime)
 	db.DB.SetConnMaxIdleTime(db.connectionMaxIdleTime)
-	db.DB.SetMaxIdleConns(db.maxIdleConnections)
 
 	return nil
 }

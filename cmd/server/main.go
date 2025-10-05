@@ -47,7 +47,7 @@ func start() int {
 	port := helpers.GetIntOrDefault("PORT", 8080)
 
 	db := createDatatabase(log)
-	s3Client := storage.NewS3()
+	s3Client := storage.NewS3(helpers.GetStringOrDefault("S3_URL", "https://nbg1.your-objectstorage.com"))
 
 	emailClient := createEmailClient(log)
 

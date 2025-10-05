@@ -23,20 +23,20 @@ func SignIn(mux chi.Router, a authenticationService, s sessionStore, logger *zap
 		password := r.FormValue("password")
 
 		if len(email) == 0 || len(password) == 0 {
-			w.WriteHeader(http.StatusBadRequest)
+			http.Error(w, "email and password are required", http.StatusBadRequest)
 			return
 		}
 
 		if err := a.SignIn(r.Context(), email, password); err != nil {
 			logger.Warn("user failed authentication", zap.String("email", email))
-			w.WriteHeader(http.StatusUnauthorized)
+			http.Error(w, "invalid credentials", http.StatusUnauthorized)
 			return
 		}
 
 		sessionID, err := s.CreateSession(email)
 		if err != nil {
 			logger.Error("failed to create session id for user", zap.String("email", email))
-			w.WriteHeader(http.StatusInternalServerError)
+			http.Error(w, "failed to create session", http.StatusInternalServerError)
 			return
 		}
 

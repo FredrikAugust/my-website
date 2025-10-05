@@ -25,21 +25,22 @@ func DeleteComment(mux chi.Router, g guestbook, rss requestSessionStore, log *za
 	mux.Post(route.GuestbookDelete, func(w http.ResponseWriter, r *http.Request) {
 		commentID := r.FormValue("comment_id")
 
-		commmentIDNum, err := strconv.Atoi(commentID)
+		commentIDNum, err := strconv.Atoi(commentID)
 		if err != nil {
 			log.Warn("comment id was not a number", zap.String("commentID", commentID), zap.Error(err))
-			w.WriteHeader(http.StatusBadRequest)
+			http.Error(w, "comment id was not a number", http.StatusBadRequest)
+			return
 		}
 
 		_, err = rss.GetSessionFromRequest(r)
 		if err != nil {
-			w.WriteHeader(http.StatusUnauthorized)
+			http.Error(w, "unauthorized", http.StatusUnauthorized)
 			return
 		}
 
-		err = g.DeleteComment(r.Context(), commmentIDNum)
+		err = g.DeleteComment(r.Context(), commentIDNum)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
+			http.Error(w, "failed to delete comment", http.StatusInternalServerError)
 			return
 		}
 

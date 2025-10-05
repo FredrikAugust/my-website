@@ -9,17 +9,27 @@ import (
 	"github.com/google/uuid"
 )
 
+var (
+	ErrorNoSessionFound = errors.New("no session found")
+	ErrorInvalidUUID    = errors.New("invalid UUID")
+)
+
 type SessionID uuid.UUID
 
 type SessionStore struct {
-	store map[model.Email]SessionID
-	lock  sync.Mutex
+	// Double maps for O(1) lookups
+	emailSessionIDMap map[model.Email]SessionID
+	sessionIDEmailMap map[SessionID]model.Email
+
+	lock sync.Mutex
 }
 
 func NewSessionStore() *SessionStore {
 	return &SessionStore{
-		store: make(map[model.Email]SessionID),
-		lock:  sync.Mutex{},
+		emailSessionIDMap: make(map[model.Email]SessionID),
+		sessionIDEmailMap: make(map[SessionID]model.Email),
+
+		lock: sync.Mutex{},
 	}
 }
 
@@ -28,7 +38,9 @@ func (s *SessionStore) CreateSession(email string) (string, error) {
 	defer s.lock.Unlock()
 
 	sessionID := uuid.New()
-	s.store[model.Email(email)] = SessionID(sessionID)
+
+	s.emailSessionIDMap[model.Email(email)] = SessionID(sessionID)
+	s.sessionIDEmailMap[SessionID(sessionID)] = model.Email(email)
 
 	return sessionID.String(), nil
 }
@@ -39,16 +51,15 @@ func (s *SessionStore) GetSession(sessionID string) (model.Email, error) {
 
 	sessionUUID, err := uuid.Parse(sessionID)
 	if err != nil {
-		return model.Email(""), err
+		return model.Email(""), ErrorInvalidUUID
 	}
 
-	for e, sID := range s.store {
-		if sID == SessionID(sessionUUID) {
-			return e, nil
-		}
+	email, exists := s.sessionIDEmailMap[SessionID(sessionUUID)]
+	if !exists {
+		return model.Email(""), ErrorNoSessionFound
 	}
 
-	return model.Email(""), errors.New("no session exists for sessionID")
+	return model.Email(email), nil
 }
 
 func (s *SessionStore) GetSessionFromRequest(r *http.Request) (model.Email, error) {
