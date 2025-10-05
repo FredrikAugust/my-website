@@ -6,7 +6,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 	"website/helpers"
 
 	"go.opentelemetry.io/otel"
@@ -111,9 +110,7 @@ func newTracerProvider(ctx context.Context, insecure bool, res *resource.Resourc
 	}
 
 	tracerProvider := trace.NewTracerProvider(
-		trace.WithBatcher(traceExporter,
-			// Default is 5s. Set to 1s for demonstrative purposes.
-			trace.WithBatchTimeout(time.Second)),
+		trace.WithBatcher(traceExporter),
 		trace.WithResource(res),
 	)
 	return tracerProvider, nil
@@ -130,9 +127,7 @@ func newMeterProvider(ctx context.Context, insecure bool, res *resource.Resource
 	}
 
 	meterProvider := metric.NewMeterProvider(
-		metric.WithReader(metric.NewPeriodicReader(metricExporter,
-			// Default is 1m. Set to 3s for demonstrative purposes.
-			metric.WithInterval(3*time.Second))),
+		metric.WithReader(metric.NewPeriodicReader(metricExporter)),
 		metric.WithResource(res),
 	)
 	return meterProvider, nil

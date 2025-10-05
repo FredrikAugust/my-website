@@ -12,10 +12,6 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-var (
-	serverName = "my-website"
-)
-
 func InstrumentRouter(chi chi.Router) chi.Router {
 	tracerProvider := otel.GetTracerProvider()
 	tracer := tracerProvider.Tracer("chi")
