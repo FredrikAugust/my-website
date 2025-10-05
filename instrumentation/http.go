@@ -33,8 +33,7 @@ func InstrumentRouter(chi chi.Router) chi.Router {
 					semconv.ServerAddress(r.Host),
 					semconv.URLFull(r.URL.String()),
 					semconv.UserAgentOriginal(r.Header.Get("user-agent")),
-					semconv.ClientAddress(r.Header.Get("Cf-Connecting-Ip")),          // Cloudflare specific
-					attribute.String("client.country", r.Header.Get("Cf-Ipcountry")), // Cloudflare specific
+					semconv.ClientAddress(r.Header.Get("Cf-Connecting-Ip")), // Cloudflare specific
 				),
 			)
 			defer span.End()
