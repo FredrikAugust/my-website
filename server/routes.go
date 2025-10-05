@@ -1,14 +1,15 @@
 package server
 
 import (
-	"net/http"
 	"website/handlers"
-
-	"go.uber.org/zap"
+	"website/instrumentation"
 )
 
 func (s *Server) SetupRoutes() {
-	s.mux.Use(loggerMiddleware(s.log))
+	// Due to a limitation in how middlewares get access to route data
+	// we have to create a "new router" with .With for the middleware
+	// to get access to the `Pattern` property.
+	s.mux = instrumentation.InstrumentRouter(s.mux)
 
 	// Static
 	handlers.FileServer(s.mux)
@@ -24,15 +25,4 @@ func (s *Server) SetupRoutes() {
 	handlers.FrontPage(s.mux, s.database, s.sessionStore, s.log)
 	handlers.Photography(s.mux, s.database, s.sessionStore, s.log)
 	handlers.Login(s.mux, s.sessionStore)
-}
-
-func loggerMiddleware(log *zap.Logger) func(http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.URL.Path != "/health" && r.URL.Path != "/.well-known/appspecific/com.chrome.devtools.json" {
-				log.Info("request received", zap.String("method", r.Method), zap.String("path", r.URL.Path))
-			}
-			next.ServeHTTP(w, r)
-		})
-	}
 }

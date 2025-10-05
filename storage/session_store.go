@@ -7,6 +7,8 @@ import (
 	"website/model"
 
 	"github.com/google/uuid"
+	semconv "go.opentelemetry.io/otel/semconv/v1.37.0"
+	"go.opentelemetry.io/otel/trace"
 )
 
 var (
@@ -68,5 +70,9 @@ func (s *SessionStore) GetSessionFromRequest(r *http.Request) (model.Email, erro
 		return model.Email(""), err
 	}
 
-	return s.GetSession(sessionCookie.Value)
+	email, err := s.GetSession(sessionCookie.Value)
+	if err == nil {
+		trace.SpanFromContext(r.Context()).SetAttributes(semconv.UserEmail(string(email)))
+	}
+	return email, err
 }

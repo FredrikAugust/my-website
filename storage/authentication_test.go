@@ -34,7 +34,7 @@ func TestDatabase_SignIn(t *testing.T) {
 		defer cleanup()
 
 		passwordHash, _ := storage.HashPassword(password)
-		_, err := db.DB.ExecContext(t.Context(), "INSERT INTO \"user\" (email, password) VALUES ($1, $2)", email, passwordHash)
+		_, err := db.ExecContext(t.Context(), "INSERT INTO \"user\" (email, password) VALUES ($1, $2)", email, passwordHash)
 		is.NoErr(err)
 
 		err = db.SignIn(t.Context(), email, "wrong-password")
@@ -48,7 +48,7 @@ func TestDatabase_SignIn(t *testing.T) {
 		defer cleanup()
 
 		passwordHash, _ := storage.HashPassword(password)
-		_, err := db.DB.ExecContext(t.Context(), "INSERT INTO \"user\" (email, password) VALUES ($1, $2)", email, passwordHash)
+		_, err := db.ExecContext(t.Context(), "INSERT INTO \"user\" (email, password) VALUES ($1, $2)", email, passwordHash)
 		is.NoErr(err)
 
 		err = db.SignIn(t.Context(), email, password)

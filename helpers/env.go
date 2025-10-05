@@ -38,3 +38,15 @@ func GetDurationOrDefault(key string, defaultValue time.Duration) time.Duration 
 	}
 	return durationValue
 }
+
+func GetBoolOrDefault(key string, defaultValue bool) bool {
+	value, ok := os.LookupEnv(key)
+	if !ok {
+		return defaultValue
+	}
+	boolValue, err := strconv.ParseBool(value)
+	if err != nil {
+		return defaultValue
+	}
+	return boolValue
+}

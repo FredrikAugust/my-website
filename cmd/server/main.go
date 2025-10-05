@@ -9,6 +9,7 @@ import (
 	"time"
 	"website/email"
 	"website/helpers"
+	"website/instrumentation"
 	"website/server"
 	"website/storage"
 
@@ -43,6 +44,12 @@ func start() int {
 	defer stop()
 	eg, ctx := errgroup.WithContext(ctx)
 
+	cleanupOtel, err := instrumentation.SetupOTelSDK(ctx, release)
+	if err != nil {
+		log.Error("failed to set up otel", zap.Error(err))
+		return 1
+	}
+
 	host := helpers.GetStringOrDefault("HOST", "localhost")
 	port := helpers.GetIntOrDefault("PORT", 8080)
 
@@ -73,6 +80,13 @@ func start() int {
 	eg.Go(func() error {
 		if err := s.Stop(); err != nil {
 			log.Error("failed to stop server gracefully", zap.Error(err))
+			return err
+		}
+
+		log.Debug("stopping open telemetry instrumentation")
+
+		err := cleanupOtel(context.Background())
+		if err != nil {
 			return err
 		}
 		return nil

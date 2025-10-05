@@ -3,12 +3,20 @@ package storage
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"time"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+	"go.opentelemetry.io/otel"
+	semconv "go.opentelemetry.io/otel/semconv/v1.37.0"
+	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
+)
+
+var (
+	databaseTracer = otel.GetTracerProvider().Tracer("database")
 )
 
 type Database struct {
@@ -85,6 +93,14 @@ func (db *Database) Connect() error {
 	return nil
 }
 
+func (db *Database) Close() error {
+	if err := db.DB.Close(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (db *Database) createDataSourceName(withPassword bool) string {
 	password := db.password
 	if !withPassword {
@@ -107,4 +123,32 @@ func (db *Database) Ping(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+func (db *Database) MustExecContext(ctx context.Context, query string, args ...any) sql.Result {
+	ctx, span := databaseTracer.Start(ctx, query, trace.WithAttributes(semconv.DBSystemNamePostgreSQL, semconv.DBQueryText(query)))
+	defer span.End()
+
+	return db.DB.MustExecContext(ctx, query, args...)
+}
+
+func (db *Database) ExecContext(ctx context.Context, query string, args ...any) (sql.Result, error) {
+	ctx, span := databaseTracer.Start(ctx, query, trace.WithAttributes(semconv.DBSystemNamePostgreSQL, semconv.DBQueryText(query)))
+	defer span.End()
+
+	return db.DB.ExecContext(ctx, query, args...)
+}
+
+func (db *Database) QueryRowContext(ctx context.Context, query string, args ...any) *sql.Row {
+	ctx, span := databaseTracer.Start(ctx, query, trace.WithAttributes(semconv.DBSystemNamePostgreSQL, semconv.DBQueryText(query)))
+	defer span.End()
+
+	return db.DB.QueryRowContext(ctx, query, args...)
+}
+
+func (db *Database) SelectContext(ctx context.Context, dest any, query string, args ...any) error {
+	ctx, span := databaseTracer.Start(ctx, query, trace.WithAttributes(semconv.DBSystemNamePostgreSQL, semconv.DBQueryText(query)))
+	defer span.End()
+
+	return db.DB.SelectContext(ctx, dest, query, args...)
 }

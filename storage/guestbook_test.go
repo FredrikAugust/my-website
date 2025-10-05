@@ -20,7 +20,7 @@ func TestDatabase_PostComment(t *testing.T) {
 		is.NoErr(err)
 
 		var message string
-		err = db.DB.QueryRow("SELECT message FROM guestbook WHERE comment_id = 1").Scan(&message)
+		err = db.QueryRowContext(t.Context(), "SELECT message FROM guestbook WHERE comment_id = 1").Scan(&message)
 		is.NoErr(err)
 		is.Equal(message, "hello world")
 	})

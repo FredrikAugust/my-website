@@ -9,7 +9,7 @@ func (db *Database) GetAlbums(ctx context.Context) ([]model.Album, error) {
 	query := `SELECT * FROM album`
 
 	var albums []model.Album
-	err := db.DB.SelectContext(ctx, &albums, query)
+	err := db.SelectContext(ctx, &albums, query)
 	if err != nil {
 		return nil, err
 	}
@@ -21,7 +21,7 @@ func (db *Database) GetPhotos(ctx context.Context, albumID int) ([]model.Photo, 
 	query := `SELECT photo_id, url FROM photo WHERE album_id = $1`
 
 	var photos []model.Photo
-	err := db.DB.SelectContext(ctx, &photos, query, albumID)
+	err := db.SelectContext(ctx, &photos, query, albumID)
 	if err != nil {
 		return nil, err
 	}

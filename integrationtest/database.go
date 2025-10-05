@@ -3,6 +3,7 @@
 package integrationtest
 
 import (
+	"context"
 	"os"
 	"sync"
 	"website/helpers"
@@ -30,8 +31,8 @@ func CreateDatabase() (*storage.Database, func()) {
 	dropConnections(db.DB, "template1")
 
 	name := helpers.GetStringOrDefault("DB_NAME", "test")
-	db.DB.MustExec("DROP DATABASE IF EXISTS " + name)
-	db.DB.MustExec("CREATE DATABASE " + name)
+	db.MustExecContext(context.Background(), "DROP DATABASE IF EXISTS "+name)
+	db.MustExecContext(context.Background(), "CREATE DATABASE "+name)
 
 	return connect(name)
 }
@@ -51,7 +52,7 @@ func initDatabase() {
 		panic(err)
 	}
 
-	if err := db.DB.Close(); err != nil {
+	if err := db.Close(); err != nil {
 		panic(err)
 	}
 }
@@ -72,7 +73,7 @@ func connect(name string) (*storage.Database, func()) {
 	}
 
 	return db, func() {
-		if err := db.DB.Close(); err != nil {
+		if err := db.Close(); err != nil {
 			panic(err)
 		}
 	}
