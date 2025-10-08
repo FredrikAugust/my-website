@@ -74,7 +74,7 @@ func (t *CfTurnstileClient) Validate(ctx context.Context, responseKey string) er
 		"https://challenges.cloudflare.com/turnstile/v0/siteverify",
 		strings.NewReader(
 			fmt.Sprintf(
-				`{ "params": { "secret": "%s", "response": %s } }`,
+				`{ "params": { "secret": "%s", "response": "%s" } }`,
 				t.Secret,
 				responseKey,
 			),
