@@ -48,13 +48,9 @@ func DeleteComment(mux chi.Router, g guestbook, rss requestSessionStore, log *za
 	})
 }
 
-type turnstileClient interface {
-	Validate(ctx context.Context, turnstileResponseKey string) error
-}
-
-func PostComment(mux chi.Router, g guestbook, e email.EmailClient, t turnstileClient, log *zap.Logger) {
+func PostComment(mux chi.Router, g guestbook, e email.EmailClient, t security.TurnstileClient, log *zap.Logger) {
 	mux.Post(route.Guestbook, func(w http.ResponseWriter, r *http.Request) {
-		if err := t.Validate(r.Context(), r.FormValue(security.TurnstileResponseKeyFormBodyName)); err != nil {
+		if err := t.Validate(r.Context(), r); err != nil {
 			log.Info("request failed turnstile validation")
 			http.Error(w, "failed turnstile validation", http.StatusForbidden)
 			return
@@ -81,17 +77,15 @@ func PostComment(mux chi.Router, g guestbook, e email.EmailClient, t turnstileCl
 			return
 		}
 
-		err := e.SendEmail(
-			r.Context(),
+		log.Info("comment posted", zap.String("name", string(name)), zap.String("comment", string(comment)))
+
+		// Just spin this off in the background. We don't need to wait :)
+		go e.SendEmail(
+			context.WithoutCancel(r.Context()),
 			name.String(),
 			"New Comment from "+name.String(),
 			fmt.Sprintf("You've gotten a new comment from %s.\n\n%s", name.String(), comment.String()),
 		)
-		if err != nil {
-			log.Error("failed to send email", zap.Error(err))
-		}
-
-		log.Info("comment posted", zap.String("name", string(name)), zap.String("comment", string(comment)))
 
 		http.Redirect(w, r, route.Root, http.StatusFound)
 	})

@@ -26,8 +26,8 @@ type emailClientMock struct{}
 type turnstileMock struct{}
 
 // Validate implements handlers.turnstileClient.
-func (t *turnstileMock) Validate(ctx context.Context, turnstileResponseKey string) error {
-	if turnstileResponseKey == security.DummyResponseToken {
+func (t *turnstileMock) Validate(ctx context.Context, r *http.Request) error {
+	if r.FormValue(security.TurnstileResponseKeyFormBodyName) == security.DummyResponseToken {
 		return nil
 	}
 	return errors.New("invalid turnstile response key")

@@ -2,13 +2,13 @@
 package security
 
 import (
+	"bytes"
 	"context"
-	"fmt"
+	"encoding/json"
+	"mime/multipart"
 	"net/http"
-	"strings"
 
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/codes"
 )
 
 // Cloudflare Turnstile test keys
@@ -52,7 +52,7 @@ type TurnstileFrontendOptions struct {
 }
 
 type TurnstileClient interface {
-	Validate(ctx context.Context, responseKey string) error
+	Validate(ctx context.Context, request *http.Request) error
 }
 
 type CfTurnstileClient struct {
@@ -64,36 +64,51 @@ var (
 	tracer         = tracerProvider.Tracer("chi")
 )
 
-func (t *CfTurnstileClient) Validate(ctx context.Context, responseKey string) error {
+func (t *CfTurnstileClient) Validate(ctx context.Context, r *http.Request) error {
 	ctx, span := tracer.Start(ctx, "turnstile.verify")
 	defer span.End()
+
+	response := r.FormValue("cf-turnstile-response")
+	realip := r.FormValue("CF-Connecting-IP")
+
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+
+	writer.WriteField("secret", t.Secret)
+	writer.WriteField("response", response)
+	if realip != "" {
+		writer.WriteField("realip", realip)
+	}
+	if err := writer.Close(); err != nil {
+		return err
+	}
 
 	req, err := http.NewRequestWithContext(
 		ctx,
 		http.MethodPost,
 		"https://challenges.cloudflare.com/turnstile/v0/siteverify",
-		strings.NewReader(
-			fmt.Sprintf(
-				`{ "params": { "secret": "%s", "response": "%s" } }`,
-				t.Secret,
-				responseKey,
-			),
-		),
+		body,
 	)
+	req.Header.Set("Content-Type", writer.FormDataContentType())
 	if err != nil {
-		span.RecordError(err)
-		span.SetStatus(codes.Error, "failed to create http request")
 		return err
 	}
 
-	_, err = http.DefaultClient.Do(req)
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		span.RecordError(err)
-		span.SetStatus(codes.Ok, "failed to query cloudflare for validity of key")
+		return err
+	}
+	defer resp.Body.Close()
+
+	result := make(map[string]any)
+	err = json.NewDecoder(resp.Body).Decode(&result)
+	if err != nil {
 		return err
 	}
 
-	span.SetStatus(codes.Ok, "all okay")
+	if success, ok := result["success"].(bool); ok && success {
+		return nil
+	}
 
-	return nil
+	return err
 }

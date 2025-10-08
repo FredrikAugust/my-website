@@ -6,7 +6,15 @@ import (
 	"fmt"
 
 	"github.com/resend/resend-go/v2"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
+)
+
+var (
+	traceProvider = otel.GetTracerProvider()
+	tracer        = traceProvider.Tracer("email")
 )
 
 type EmailClient interface {
@@ -43,6 +51,17 @@ func NewDummyEmailClient(logger *zap.Logger) *DummyEmailClient {
 }
 
 func (e *ResendEmailClient) SendEmail(ctx context.Context, from, subject, body string) error {
+	ctx, span := tracer.Start(
+		ctx,
+		"email.send",
+		trace.WithAttributes(
+			attribute.String("email.from", from),
+			attribute.String("email.to", "Fredrik Malmo <contact@fredrikmalmo.com>"),
+			attribute.String("email.subject", subject),
+			attribute.Int("email.body.length", len(body)),
+		),
+	)
+	defer span.End()
 	_, err := e.client.Emails.SendWithContext(ctx, &resend.SendEmailRequest{
 		From:    fmt.Sprintf("%s <noreply@fredrikmalmo.com>", from),
 		To:      []string{"Fredrik Malmo <contact@fredrikmalmo.com>"},
@@ -50,15 +69,17 @@ func (e *ResendEmailClient) SendEmail(ctx context.Context, from, subject, body s
 		Text:    body,
 	})
 	if err != nil {
+		e.logger.Warn("failed to send email", zap.String("from", from), zap.String("subject", subject))
 		return err
 	}
 
-	e.logger.Info("debug implementation of email", zap.String("from", from), zap.String("subject", subject))
+	e.logger.Info("send email", zap.String("from", from), zap.String("subject", subject))
 
 	return nil
 }
 
 func (de *DummyEmailClient) SendEmail(_ context.Context, from, subject, body string) error {
-	de.logger.Info("send email", zap.String("from", from), zap.String("subject", subject), zap.String("body", body))
+	de.logger.Info("debug implementation of email", zap.String("from", from), zap.String("subject", subject))
+
 	return nil
 }
