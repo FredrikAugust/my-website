@@ -48,11 +48,15 @@ type TurnstileFrontendOptions struct {
 	Sitekey string
 }
 
-type TurnstileClient struct {
+type TurnstileClient interface {
+	Validate(ctx context.Context, responseKey string) error
+}
+
+type CfTurnstileClient struct {
 	Secret string
 }
 
-func (t *TurnstileClient) Validate(ctx context.Context, responseKey string) error {
+func (t *CfTurnstileClient) Validate(ctx context.Context, responseKey string) error {
 	req, err := http.NewRequestWithContext(
 		ctx,
 		http.MethodPost,

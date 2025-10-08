@@ -156,14 +156,14 @@ func createTurnstileOptions(log *zap.Logger) *security.TurnstileFrontendOptions 
 	}
 }
 
-func createTurnstileClient(log *zap.Logger) *security.TurnstileClient {
+func createTurnstileClient(log *zap.Logger) security.TurnstileClient {
 	secret, ok := os.LookupEnv("CF_TURNSTILE_SECRET")
 	if !ok {
 		log.Warn("no Cloudflare Turnstile secret was found. initializing with allow-all")
 		secret = security.AlwaysPassesSecret
 	}
 
-	return &security.TurnstileClient{
+	return &security.CfTurnstileClient{
 		Secret: secret,
 	}
 }

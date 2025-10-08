@@ -32,7 +32,7 @@ type Server struct {
 	sessionStore *storage.SessionStore
 
 	turnstileConfig *security.TurnstileFrontendOptions
-	turnstileClient *security.TurnstileClient
+	turnstileClient security.TurnstileClient
 }
 
 type Options struct {
@@ -40,7 +40,7 @@ type Options struct {
 	S3Client         *storage.S3
 	EmailClient      email.EmailClient
 	TurnstileOptions *security.TurnstileFrontendOptions
-	TurnstileClient  *security.TurnstileClient
+	TurnstileClient  security.TurnstileClient
 	Host             string
 	Log              *zap.Logger
 	Port             int
