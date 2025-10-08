@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/codes"
 )
 
 // Cloudflare Turnstile test keys
@@ -56,7 +59,15 @@ type CfTurnstileClient struct {
 	Secret string
 }
 
+var (
+	tracerProvider = otel.GetTracerProvider()
+	tracer         = tracerProvider.Tracer("chi")
+)
+
 func (t *CfTurnstileClient) Validate(ctx context.Context, responseKey string) error {
+	ctx, span := tracer.Start(ctx, "turnstile.verify")
+	defer span.End()
+
 	req, err := http.NewRequestWithContext(
 		ctx,
 		http.MethodPost,
@@ -70,13 +81,19 @@ func (t *CfTurnstileClient) Validate(ctx context.Context, responseKey string) er
 		),
 	)
 	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, "failed to create http request")
 		return err
 	}
 
 	_, err = http.DefaultClient.Do(req)
 	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Ok, "failed to query cloudflare for validity of key")
 		return err
 	}
+
+	span.SetStatus(codes.Ok, "all okay")
 
 	return nil
 }
