@@ -4,7 +4,9 @@ import (
 	"context"
 	"net/http"
 	"strconv"
+
 	"website/model"
+	"website/security"
 	"website/views"
 	"website/views/route"
 
@@ -20,10 +22,9 @@ type requestSessionStore interface {
 	GetSessionFromRequest(r *http.Request) (model.Email, error)
 }
 
-func FrontPage(mux chi.Router, g guestbookGetter, rss requestSessionStore, logger *zap.Logger) {
+func FrontPage(mux chi.Router, g guestbookGetter, rss requestSessionStore, logger *zap.Logger, turnstileOptions *security.TurnstileOptions) {
 	mux.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		comments, err := g.GetComments(r.Context())
-
 		if err != nil {
 			logger.Warn("failed to fetch guestbook comments", zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -34,7 +35,7 @@ func FrontPage(mux chi.Router, g guestbookGetter, rss requestSessionStore, logge
 
 		_, err = rss.GetSessionFromRequest(r)
 
-		_ = views.FrontPage(err == nil, comments).Render(w)
+		_ = views.FrontPage(err == nil, comments, turnstileOptions.Sitekey).Render(w)
 	})
 }
 
@@ -46,7 +47,6 @@ type photoGetter interface {
 func Photography(mux chi.Router, p photoGetter, rss requestSessionStore, logger *zap.Logger) {
 	mux.Get("/albums", func(w http.ResponseWriter, r *http.Request) {
 		albums, err := p.GetAlbums(r.Context())
-
 		if err != nil {
 			logger.Warn("failed to fetch photos", zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)

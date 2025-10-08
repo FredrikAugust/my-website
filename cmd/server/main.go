@@ -7,9 +7,11 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
 	"website/email"
 	"website/helpers"
 	"website/instrumentation"
+	"website/security"
 	"website/server"
 	"website/storage"
 
@@ -27,7 +29,6 @@ func main() {
 func start() int {
 	logEnv := helpers.GetStringOrDefault("LOG_ENV", "development")
 	log, err := createLogger(logEnv)
-
 	if err != nil {
 		fmt.Println("error setting up the logger:", err)
 		return 1
@@ -58,13 +59,16 @@ func start() int {
 
 	emailClient := createEmailClient(log)
 
+	turnstileOptions := createTurnstileOptions(log)
+
 	s := server.New(server.Options{
-		Database:    db,
-		S3Client:    s3Client,
-		EmailClient: emailClient,
-		Host:        host,
-		Log:         log,
-		Port:        port,
+		Database:         db,
+		S3Client:         s3Client,
+		TurnstileOptions: turnstileOptions,
+		EmailClient:      emailClient,
+		Host:             host,
+		Log:              log,
+		Port:             port,
 	})
 
 	eg.Go(func() error {
@@ -130,4 +134,23 @@ func createEmailClient(logger *zap.Logger) *email.EmailClient {
 		ApiKey: helpers.GetStringOrDefault("RESEND_API_KEY", ""),
 		Logger: logger,
 	})
+}
+
+func createTurnstileOptions(log *zap.Logger) *security.TurnstileOptions {
+	sitekey, ok := os.LookupEnv("CF_TURNSTILE_SITEKEY")
+	if !ok {
+		log.Warn("no Cloudflare Turnstile Sitekey was found. initializing with allow-all")
+		sitekey = security.AlwaysPassesVisibleSitekey
+	}
+
+	secret, ok := os.LookupEnv("CF_TURNSTILE_SECRET")
+	if !ok {
+		log.Warn("no Cloudflare Turnstile secret was found. initializing with allow-all")
+		secret = security.AlwaysPassesSecret
+	}
+
+	return &security.TurnstileOptions{
+		Sitekey: sitekey,
+		Secret:  secret,
+	}
 }

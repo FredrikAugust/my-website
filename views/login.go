@@ -5,7 +5,7 @@ import (
 
 	g "maragu.dev/gomponents"
 	c "maragu.dev/gomponents/components"
-	. "maragu.dev/gomponents/html"
+	h "maragu.dev/gomponents/html"
 )
 
 func Login(authenticated bool) g.Node {
@@ -13,29 +13,29 @@ func Login(authenticated bool) g.Node {
 		"Login",
 		route.Login,
 		authenticated,
-		Form(
+		h.Form(
 			c.Classes{"font-sans text-sm": true},
-			Action(route.Login),
-			Method("POST"),
-			Div(
+			h.Action(route.Login),
+			h.Method("POST"),
+			h.Div(
 				c.Classes{"flex flex-col gap-2 items-start": true},
-				Input(
+				h.Input(
 					c.Classes{"border bg-white border-gray-300 px-2 py-1": true},
-					Type("email"),
-					Name("email"),
-					Placeholder("Email"),
-					AutoComplete("username email"),
-					Required(),
+					h.Type("email"),
+					h.Name("email"),
+					h.Placeholder("Email"),
+					h.AutoComplete("username email"),
+					h.Required(),
 				),
-				Input(
+				h.Input(
 					c.Classes{"border bg-white border-gray-300 px-2 py-1": true},
-					Type("password"),
-					Name("password"),
-					Placeholder("Password"),
-					AutoComplete("current-password"),
-					Required(),
+					h.Type("password"),
+					h.Name("password"),
+					h.Placeholder("Password"),
+					h.AutoComplete("current-password"),
+					h.Required(),
 				),
-				Button(c.Classes{"font-sans self-start bg-gray-800 text-white px-2 py-1": true}, Type("submit"), g.Text("Login")),
+				h.Button(c.Classes{"font-sans self-start bg-gray-800 text-white px-2 py-1": true}, h.Type("submit"), g.Text("Login")),
 			),
 		),
 	)

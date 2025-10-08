@@ -1,4 +1,4 @@
-// Server package handles setting up and running the HTTP server
+// Package server handles setting up and running the HTTP server
 package server
 
 import (
@@ -9,7 +9,9 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+
 	"website/email"
+	"website/security"
 	"website/storage"
 
 	"github.com/go-chi/chi/v5"
@@ -28,15 +30,18 @@ type Server struct {
 	emailClient *email.EmailClient
 
 	sessionStore *storage.SessionStore
+
+	turnstileConfig *security.TurnstileOptions
 }
 
 type Options struct {
-	Database    *storage.Database
-	S3Client    *storage.S3
-	EmailClient *email.EmailClient
-	Host        string
-	Log         *zap.Logger
-	Port        int
+	Database         *storage.Database
+	S3Client         *storage.S3
+	EmailClient      *email.EmailClient
+	TurnstileOptions *security.TurnstileOptions
+	Host             string
+	Log              *zap.Logger
+	Port             int
 }
 
 func New(opts Options) *Server {
@@ -49,13 +54,15 @@ func New(opts Options) *Server {
 	mux := chi.NewMux()
 
 	return &Server{
-		address:      address,
-		database:     opts.Database,
-		s3client:     opts.S3Client,
-		emailClient:  opts.EmailClient,
-		sessionStore: storage.NewSessionStore(),
-		mux:          mux,
-		log:          opts.Log,
+		address:         address,
+		database:        opts.Database,
+		s3client:        opts.S3Client,
+		emailClient:     opts.EmailClient,
+		sessionStore:    storage.NewSessionStore(),
+		turnstileConfig: opts.TurnstileOptions,
+		mux:             mux,
+		log:             opts.Log,
+
 		server: &http.Server{
 			Addr:              address,
 			Handler:           mux,

@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"website/security"
 	"website/server"
 	"website/storage"
 )
@@ -15,6 +16,10 @@ func CreateServer(ctx context.Context) func() {
 	s := server.New(server.Options{
 		Host:     "localhost",
 		S3Client: storage.NewS3(""), // we won't call connnect in test so we'll just leave it blank
+		TurnstileOptions: &security.TurnstileOptions{
+			Sitekey: security.AlwaysBlocksInvisibleSitekey,
+			Secret:  security.AlwaysPassesSecret,
+		},
 		Database: database,
 		Port:     8081,
 	})
