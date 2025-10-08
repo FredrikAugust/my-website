@@ -60,11 +60,13 @@ func start() int {
 	emailClient := createEmailClient(log)
 
 	turnstileOptions := createTurnstileOptions(log)
+	turnstileClient := createTurnstileClient(log)
 
 	s := server.New(server.Options{
 		Database:         db,
 		S3Client:         s3Client,
 		TurnstileOptions: turnstileOptions,
+		TurnstileClient:  turnstileClient,
 		EmailClient:      emailClient,
 		Host:             host,
 		Log:              log,
@@ -129,28 +131,39 @@ func createDatatabase(log *zap.Logger) *storage.Database {
 	})
 }
 
-func createEmailClient(logger *zap.Logger) *email.EmailClient {
+func createEmailClient(logger *zap.Logger) email.EmailClient {
+	resendAPIKey, ok := os.LookupEnv("RESEND_API_KEY")
+	if !ok {
+		logger.Warn("no resend api key was provided. falling back to log-only email client. this is only meant for local development")
+		return email.NewDummyEmailClient(logger)
+	}
+
 	return email.NewEmailClient(email.NewEmailClientOptions{
-		ApiKey: helpers.GetStringOrDefault("RESEND_API_KEY", ""),
+		APIKey: resendAPIKey,
 		Logger: logger,
 	})
 }
 
-func createTurnstileOptions(log *zap.Logger) *security.TurnstileOptions {
+func createTurnstileOptions(log *zap.Logger) *security.TurnstileFrontendOptions {
 	sitekey, ok := os.LookupEnv("CF_TURNSTILE_SITEKEY")
 	if !ok {
 		log.Warn("no Cloudflare Turnstile Sitekey was found. initializing with allow-all")
 		sitekey = security.AlwaysPassesVisibleSitekey
 	}
 
+	return &security.TurnstileFrontendOptions{
+		Sitekey: sitekey,
+	}
+}
+
+func createTurnstileClient(log *zap.Logger) *security.TurnstileClient {
 	secret, ok := os.LookupEnv("CF_TURNSTILE_SECRET")
 	if !ok {
 		log.Warn("no Cloudflare Turnstile secret was found. initializing with allow-all")
 		secret = security.AlwaysPassesSecret
 	}
 
-	return &security.TurnstileOptions{
-		Sitekey: sitekey,
-		Secret:  secret,
+	return &security.TurnstileClient{
+		Secret: secret,
 	}
 }

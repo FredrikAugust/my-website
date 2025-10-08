@@ -1,10 +1,12 @@
 // Package security handles everything related to security both in application and infra layer
 package security
 
-type TurnstileOptions struct {
-	Sitekey string
-	Secret  string
-}
+import (
+	"context"
+	"fmt"
+	"net/http"
+	"strings"
+)
 
 // Cloudflare Turnstile test keys
 // These keys are for testing purposes only and should not be used in production
@@ -34,4 +36,43 @@ const (
 
 	// TokenAlreadySpentSecret - Yields a "token already spent" error
 	TokenAlreadySpentSecret = "3x0000000000000000000000000000000AA"
+
+	// DummyResponseToken - The token which is always returned from challenge when using testing sitekey
+	DummyResponseToken = "XXXX.DUMMY.TOKEN.XXXX"
+
+	// TurnstileResponseKeyFormBodyName - The form body key which contains the response key
+	TurnstileResponseKeyFormBodyName = "cf-turnstile-response"
 )
+
+type TurnstileFrontendOptions struct {
+	Sitekey string
+}
+
+type TurnstileClient struct {
+	Secret string
+}
+
+func (t *TurnstileClient) Validate(ctx context.Context, responseKey string) error {
+	req, err := http.NewRequestWithContext(
+		ctx,
+		http.MethodPost,
+		"https://challenges.cloudflare.com/turnstile/v0/siteverify",
+		strings.NewReader(
+			fmt.Sprintf(
+				`{ "params": { "secret": "%s", "response": %s } }`,
+				t.Secret,
+				responseKey,
+			),
+		),
+	)
+	if err != nil {
+		return err
+	}
+
+	_, err = http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -27,18 +27,20 @@ type Server struct {
 
 	database    *storage.Database
 	s3client    *storage.S3
-	emailClient *email.EmailClient
+	emailClient email.EmailClient
 
 	sessionStore *storage.SessionStore
 
-	turnstileConfig *security.TurnstileOptions
+	turnstileConfig *security.TurnstileFrontendOptions
+	turnstileClient *security.TurnstileClient
 }
 
 type Options struct {
 	Database         *storage.Database
 	S3Client         *storage.S3
-	EmailClient      *email.EmailClient
-	TurnstileOptions *security.TurnstileOptions
+	EmailClient      email.EmailClient
+	TurnstileOptions *security.TurnstileFrontendOptions
+	TurnstileClient  *security.TurnstileClient
 	Host             string
 	Log              *zap.Logger
 	Port             int
@@ -60,6 +62,7 @@ func New(opts Options) *Server {
 		emailClient:     opts.EmailClient,
 		sessionStore:    storage.NewSessionStore(),
 		turnstileConfig: opts.TurnstileOptions,
+		turnstileClient: opts.TurnstileClient,
 		mux:             mux,
 		log:             opts.Log,
 

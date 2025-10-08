@@ -1,3 +1,4 @@
+// Package handlers have the logic for handling incoming HTTP requests
 package handlers
 
 import (
@@ -5,7 +6,10 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+
+	"website/email"
 	"website/model"
+	"website/security"
 	"website/views/route"
 
 	"github.com/go-chi/chi/v5"
@@ -15,10 +19,6 @@ import (
 type guestbook interface {
 	PostComment(ctx context.Context, name model.Name, comment model.Comment) error
 	DeleteComment(ctx context.Context, commentID int) error
-}
-
-type emailClient interface {
-	SendEmail(ctx context.Context, from, subject, body string) error
 }
 
 func DeleteComment(mux chi.Router, g guestbook, rss requestSessionStore, log *zap.Logger) {
@@ -48,8 +48,18 @@ func DeleteComment(mux chi.Router, g guestbook, rss requestSessionStore, log *za
 	})
 }
 
-func PostComment(mux chi.Router, g guestbook, e emailClient, log *zap.Logger) {
+type turnstileClient interface {
+	Validate(ctx context.Context, turnstileResponseKey string) error
+}
+
+func PostComment(mux chi.Router, g guestbook, e email.EmailClient, t turnstileClient, log *zap.Logger) {
 	mux.Post(route.Guestbook, func(w http.ResponseWriter, r *http.Request) {
+		if err := t.Validate(r.Context(), r.FormValue(security.TurnstileResponseKeyFormBodyName)); err != nil {
+			log.Info("request failed turnstile validation")
+			http.Error(w, "failed turnstile validation", http.StatusForbidden)
+			return
+		}
+
 		name := model.Name(r.FormValue("name"))
 		comment := model.Comment(r.FormValue("comment"))
 
@@ -77,7 +87,6 @@ func PostComment(mux chi.Router, g guestbook, e emailClient, log *zap.Logger) {
 			"New Comment from "+name.String(),
 			fmt.Sprintf("You've gotten a new comment from %s.\n\n%s", name.String(), comment.String()),
 		)
-
 		if err != nil {
 			log.Error("failed to send email", zap.Error(err))
 		}

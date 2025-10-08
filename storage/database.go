@@ -15,9 +15,7 @@ import (
 	"go.uber.org/zap"
 )
 
-var (
-	databaseTracer = otel.GetTracerProvider().Tracer("database")
-)
+var databaseTracer = otel.GetTracerProvider().Tracer("database")
 
 type Database struct {
 	DB                    *sqlx.DB
@@ -46,7 +44,7 @@ type NewDatabaseOptions struct {
 	Log                   *zap.Logger
 }
 
-// Creates a new database instance, but does not connect to it.
+// NewDatabase creates a new database instance, but does not connect to it.
 // For connection, use Database.Connect.
 func NewDatabase(opts NewDatabaseOptions) *Database {
 	if opts.Log == nil {

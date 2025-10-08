@@ -22,7 +22,7 @@ type requestSessionStore interface {
 	GetSessionFromRequest(r *http.Request) (model.Email, error)
 }
 
-func FrontPage(mux chi.Router, g guestbookGetter, rss requestSessionStore, logger *zap.Logger, turnstileOptions *security.TurnstileOptions) {
+func FrontPage(mux chi.Router, g guestbookGetter, rss requestSessionStore, logger *zap.Logger, turnstileOptions *security.TurnstileFrontendOptions) {
 	mux.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		comments, err := g.GetComments(r.Context())
 		if err != nil {
@@ -41,7 +41,7 @@ func FrontPage(mux chi.Router, g guestbookGetter, rss requestSessionStore, logge
 
 type photoGetter interface {
 	GetAlbums(ctx context.Context) ([]model.Album, error)
-	GetPhotos(ctx context.Context, albumId int) ([]model.Photo, error)
+	GetPhotos(ctx context.Context, albumID int) ([]model.Photo, error)
 }
 
 func Photography(mux chi.Router, p photoGetter, rss requestSessionStore, logger *zap.Logger) {
@@ -59,13 +59,13 @@ func Photography(mux chi.Router, p photoGetter, rss requestSessionStore, logger 
 	})
 
 	mux.Get("/albums/{albumId:[0-9]+}", func(w http.ResponseWriter, r *http.Request) {
-		albumId, err := strconv.Atoi(chi.URLParam(r, "albumId"))
+		albumID, err := strconv.Atoi(chi.URLParam(r, "albumId"))
 		if err != nil {
 			logger.Warn("failed to parse album ID", zap.Error(err))
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		photos, err := p.GetPhotos(r.Context(), albumId)
+		photos, err := p.GetPhotos(r.Context(), albumID)
 		if err != nil {
 			logger.Warn("failed to fetch photos", zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -74,7 +74,7 @@ func Photography(mux chi.Router, p photoGetter, rss requestSessionStore, logger 
 
 		_, err = rss.GetSessionFromRequest(r)
 
-		_ = views.Album(albumId, photos, err == nil).Render(w)
+		_ = views.Album(albumID, photos, err == nil).Render(w)
 	})
 }
 

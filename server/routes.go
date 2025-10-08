@@ -17,7 +17,7 @@ func (s *Server) SetupRoutes() {
 	handlers.Health(s.mux, s.database)
 
 	// Controllers
-	handlers.PostComment(s.mux, s.database, s.emailClient, s.log)
+	handlers.PostComment(s.mux, s.database, s.emailClient, s.turnstileClient, s.log)
 	handlers.DeleteComment(s.mux, s.database, s.sessionStore, s.log)
 	handlers.SignIn(s.mux, s.database, s.sessionStore, s.log)
 
