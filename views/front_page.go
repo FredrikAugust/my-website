@@ -2,6 +2,7 @@ package views
 
 import (
 	"strconv"
+	"time"
 
 	"website/model"
 	"website/views/components"
@@ -45,7 +46,11 @@ func FrontPage(authenticated bool, comments []model.GuestbookEntry, turnstileSit
 						h.Div(
 							c.Classes{"flex gap-1 items-center": true},
 							h.Span(c.Classes{"font-bold": true}, g.Text(comment.Name)),
-							h.Span(c.Classes{"text-xs text-gray-600": true}, g.Text(timeAgo)),
+							h.Span(
+								h.Class("text-xs text-gray-600"),
+								h.Title(comment.CreatedAt.Format(time.RFC3339)),
+								g.Text(timeAgo),
+							),
 							g.If(authenticated, h.Form(
 								h.Action(route.GuestbookDelete),
 								h.Method("POST"), // DELETE in browsers just does GET with query params
@@ -69,8 +74,7 @@ func FrontPage(authenticated bool, comments []model.GuestbookEntry, turnstileSit
 				c.Classes{
 					"flex flex-col gap-1": true,
 				},
-				h.Input(
-					c.Classes{"border bg-white border-gray-300 px-2 py-1": true},
+				components.Input(
 					h.Name("name"),
 					h.Placeholder("Your name"),
 					h.AutoComplete("given-name"),
@@ -87,7 +91,7 @@ func FrontPage(authenticated bool, comments []model.GuestbookEntry, turnstileSit
 					h.MaxLength("1000"),
 				),
 				components.TurnstileDiv(turnstileSitekey, "enableGuesbookSubmit"),
-				h.Button(c.Classes{"font-sans self-start bg-gray-800 text-white px-2 py-1": true}, h.ID("guestbookSubmit"), h.Disabled(), h.Type("submit"), g.Text("Post comment")),
+				components.Button(h.ID("guestbookSubmit"), h.Disabled(), h.Type("submit"), g.Text("Post comment")),
 			),
 		),
 	)

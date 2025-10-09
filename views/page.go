@@ -65,11 +65,17 @@ func Navbar(currentPath string, authenticated bool) g.Node {
 		},
 		h.A(c.Classes{"underline": route.Root == currentPath, "hover:underline": true}, h.Href(route.Root), g.Text("Home")),
 		h.A(c.Classes{"underline": route.Albums == currentPath, "hover:underline": true}, h.Href(route.Albums), g.Text("Photography")),
-		h.A(
-			c.Classes{"underline": route.Login == currentPath, "hover:underline ml-auto": true},
-			h.Href(route.Login),
-			g.If(!authenticated, g.Text("Login")),
-			g.If(authenticated, g.Text("Signed in")),
+		g.If(
+			!authenticated,
+			h.A(
+				c.Classes{"underline": route.Login == currentPath, "hover:underline ml-auto": true},
+				h.Href(route.Login),
+				g.Text("Login"),
+			),
+		),
+		g.If(
+			authenticated,
+			h.Span(h.Class("ml-auto"), g.Text("Signed in")),
 		),
 	)
 }

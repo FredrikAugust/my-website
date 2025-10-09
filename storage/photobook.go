@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+
 	"website/model"
 )
 
@@ -15,6 +16,14 @@ func (db *Database) GetAlbums(ctx context.Context) ([]model.Album, error) {
 	}
 
 	return albums, nil
+}
+
+func (db *Database) CreateAlbum(ctx context.Context, albumName string) error {
+	query := `INSERT INTO album (name) VALUES ($1)`
+
+	_, err := db.ExecContext(ctx, query, albumName)
+
+	return err
 }
 
 func (db *Database) GetPhotos(ctx context.Context, albumID int) ([]model.Photo, error) {

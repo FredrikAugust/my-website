@@ -23,18 +23,18 @@ type guestbook interface {
 
 func DeleteComment(mux chi.Router, g guestbook, rss requestSessionStore, log *zap.Logger) {
 	mux.Post(route.GuestbookDelete, func(w http.ResponseWriter, r *http.Request) {
+		_, err := rss.GetSessionFromRequest(r)
+		if err != nil {
+			http.Error(w, "unauthorized", http.StatusUnauthorized)
+			return
+		}
+
 		commentID := r.FormValue("comment_id")
 
 		commentIDNum, err := strconv.Atoi(commentID)
 		if err != nil {
 			log.Warn("comment id was not a number", zap.String("commentID", commentID), zap.Error(err))
 			http.Error(w, "comment id was not a number", http.StatusBadRequest)
-			return
-		}
-
-		_, err = rss.GetSessionFromRequest(r)
-		if err != nil {
-			http.Error(w, "unauthorized", http.StatusUnauthorized)
 			return
 		}
 

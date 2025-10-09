@@ -1,4 +1,4 @@
-// Contains code related to configuration of instrumentation
+// Package instrumentation contains code related to configuration of instrumentation
 // including OpenTelemetry;
 package instrumentation
 
@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"website/helpers"
 
 	"go.opentelemetry.io/otel"
