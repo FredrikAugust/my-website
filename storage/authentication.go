@@ -6,7 +6,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func (db *Database) SignIn(ctx context.Context, email, password string) error {
+func (db *PostgresDatabase) SignIn(ctx context.Context, email, password string) error {
 	var storedPasswordHash []byte
 	err := db.QueryRowContext(ctx, "SELECT password FROM \"user\" WHERE email = $1", email).Scan(&storedPasswordHash)
 	if err != nil {

@@ -11,7 +11,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func (db *Database) MigrateUp() error {
+func (db *PostgresDatabase) MigrateUp() error {
 	m, err := createMigrateInstance(db)
 	if err != nil {
 		return err
@@ -27,7 +27,7 @@ func (db *Database) MigrateUp() error {
 	return nil
 }
 
-func (db *Database) MigrateDown() error {
+func (db *PostgresDatabase) MigrateDown() error {
 	m, err := createMigrateInstance(db)
 	if err != nil {
 		return err
@@ -46,7 +46,7 @@ func (db *Database) MigrateDown() error {
 //go:embed migrations/*.sql
 var migrationsFS embed.FS
 
-func createMigrateInstance(db *Database) (*migrate.Migrate, error) {
+func createMigrateInstance(db *PostgresDatabase) (*migrate.Migrate, error) {
 	driver, err := postgres.WithInstance(db.DB.DB, &postgres.Config{})
 	if err != nil {
 		db.log.Error("failed to create migrate driver", zap.Error(err))

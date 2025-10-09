@@ -8,6 +8,10 @@ import (
 	"go.uber.org/zap"
 )
 
+type BlobStorage interface {
+	Connect(ctx context.Context, log *zap.Logger) error
+}
+
 type S3 struct {
 	client *s3.Client
 

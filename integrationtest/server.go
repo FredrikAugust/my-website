@@ -12,10 +12,10 @@ import (
 )
 
 func CreateServer(ctx context.Context) func() {
-	database, cleanup := CreateDatabase()
+	database, cleanup := CreateDatabase(ctx)
 	s := server.New(server.Options{
-		Host:     "localhost",
-		S3Client: storage.NewS3(""), // we won't call connnect in test so we'll just leave it blank
+		Host:        "localhost",
+		BlobStorage: storage.NewS3(""), // we won't call connnect in test so we'll just leave it blank
 		TurnstileOptions: &security.TurnstileFrontendOptions{
 			Sitekey: security.AlwaysBlocksInvisibleSitekey,
 		},

@@ -6,16 +6,16 @@ import (
 	"context"
 	"os"
 	"sync"
+
 	"website/helpers"
 	"website/storage"
 
-	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 )
 
 var once sync.Once
 
-func CreateDatabase() (*storage.Database, func()) {
+func CreateDatabase(ctx context.Context) (*storage.PostgresDatabase, func()) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		panic(err)
@@ -24,21 +24,21 @@ func CreateDatabase() (*storage.Database, func()) {
 
 	once.Do(initDatabase)
 
-	db, cleanup := connect("postgres")
+	db, cleanup := connect(ctx, "postgres")
 	defer cleanup()
 
 	// Read about this trick here: https://www.maragu.dk/blog/speeding-up-postgres-integration-tests-in-go/
-	dropConnections(db.DB, "template1")
+	dropConnections(ctx, db, "template1")
 
 	name := helpers.GetStringOrDefault("DB_NAME", "test")
 	db.MustExecContext(context.Background(), "DROP DATABASE IF EXISTS "+name)
 	db.MustExecContext(context.Background(), "CREATE DATABASE "+name)
 
-	return connect(name)
+	return connect(ctx, name)
 }
 
 func initDatabase() {
-	db, cleanup := connect("template1")
+	db, cleanup := connect(context.Background(), "template1")
 	defer cleanup()
 
 	// We go up-down-up to ensure the migrations are stable and idempotent
@@ -57,8 +57,8 @@ func initDatabase() {
 	}
 }
 
-func connect(name string) (*storage.Database, func()) {
-	db := storage.NewDatabase(storage.NewDatabaseOptions{
+func connect(ctx context.Context, name string) (*storage.PostgresDatabase, func()) {
+	db := storage.NewSQLXDatabase(storage.NewDatabaseOptions{
 		Host:               helpers.GetStringOrDefault("DB_HOST", "localhost"),
 		Port:               helpers.GetIntOrDefault("DB_PORT", 5432),
 		User:               helpers.GetStringOrDefault("DB_USER", "test"),
@@ -68,7 +68,7 @@ func connect(name string) (*storage.Database, func()) {
 		MaxIdleConnections: 10,
 	})
 
-	if err := db.Connect(); err != nil {
+	if err := db.Connect(ctx); err != nil {
 		panic(err)
 	}
 
@@ -79,8 +79,8 @@ func connect(name string) (*storage.Database, func()) {
 	}
 }
 
-func dropConnections(db *sqlx.DB, name string) {
-	db.MustExec(`
+func dropConnections(ctx context.Context, db *storage.PostgresDatabase, name string) {
+	db.MustExecContext(ctx, `
 		select pg_terminate_backend(pg_stat_activity.pid)
 		from pg_stat_activity
 		where pg_stat_activity.datname = $1 and pid <> pg_backend_pid()`, name)

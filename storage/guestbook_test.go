@@ -2,6 +2,7 @@ package storage_test
 
 import (
 	"testing"
+
 	"website/integrationtest"
 	"website/model"
 
@@ -13,7 +14,7 @@ func TestDatabase_PostComment(t *testing.T) {
 
 	t.Run("posts a comment", func(t *testing.T) {
 		is := is.New(t)
-		db, cleanup := integrationtest.CreateDatabase()
+		db, cleanup := integrationtest.CreateDatabase(t.Context())
 		defer cleanup()
 
 		err := db.PostComment(t.Context(), model.Name("Fredrik"), model.Comment("hello world"))
@@ -27,7 +28,7 @@ func TestDatabase_PostComment(t *testing.T) {
 
 	t.Run("get comments", func(t *testing.T) {
 		is := is.New(t)
-		db, cleanup := integrationtest.CreateDatabase()
+		db, cleanup := integrationtest.CreateDatabase(t.Context())
 		defer cleanup()
 
 		comments, err := db.GetComments(t.Context())

@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"mime/multipart"
 	"net/http"
 
@@ -110,5 +111,5 @@ func (t *CfTurnstileClient) Validate(ctx context.Context, r *http.Request) error
 		return nil
 	}
 
-	return err
+	return errors.New("turnstile validation failed")
 }

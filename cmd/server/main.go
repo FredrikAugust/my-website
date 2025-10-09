@@ -54,7 +54,7 @@ func start() int {
 	host := helpers.GetStringOrDefault("HOST", "localhost")
 	port := helpers.GetIntOrDefault("PORT", 8080)
 
-	db := createDatatabase(log)
+	db := createDatabase(log)
 	s3Client := storage.NewS3(helpers.GetStringOrDefault("S3_URL", "https://nbg1.your-objectstorage.com"))
 
 	emailClient := createEmailClient(log)
@@ -64,7 +64,7 @@ func start() int {
 
 	s := server.New(server.Options{
 		Database:         db,
-		S3Client:         s3Client,
+		BlobStorage:      s3Client,
 		TurnstileOptions: turnstileOptions,
 		TurnstileClient:  turnstileClient,
 		EmailClient:      emailClient,
@@ -116,8 +116,8 @@ func createLogger(logEnv string) (*zap.Logger, error) {
 	}
 }
 
-func createDatatabase(log *zap.Logger) *storage.Database {
-	return storage.NewDatabase(storage.NewDatabaseOptions{
+func createDatabase(log *zap.Logger) *storage.PostgresDatabase {
+	return storage.NewSQLXDatabase(storage.NewDatabaseOptions{
 		Host:                  helpers.GetStringOrDefault("DB_HOST", "localhost"),
 		Port:                  helpers.GetIntOrDefault("DB_PORT", 5432),
 		User:                  helpers.GetStringOrDefault("DB_USER", "postgres"),

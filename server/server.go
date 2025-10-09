@@ -25,8 +25,8 @@ type Server struct {
 	mux     chi.Router
 	server  *http.Server
 
-	database    *storage.Database
-	s3client    *storage.S3
+	database    *storage.PostgresDatabase
+	blobStorage storage.BlobStorage
 	emailClient email.EmailClient
 
 	sessionStore *storage.SessionStore
@@ -36,14 +36,18 @@ type Server struct {
 }
 
 type Options struct {
-	Database         *storage.Database
-	S3Client         *storage.S3
-	EmailClient      email.EmailClient
+	Host string
+	Port int
+
+	Log *zap.Logger
+
+	Database *storage.PostgresDatabase
+
 	TurnstileOptions *security.TurnstileFrontendOptions
-	TurnstileClient  security.TurnstileClient
-	Host             string
-	Log              *zap.Logger
-	Port             int
+
+	BlobStorage     storage.BlobStorage
+	EmailClient     email.EmailClient
+	TurnstileClient security.TurnstileClient
 }
 
 func New(opts Options) *Server {
@@ -58,7 +62,7 @@ func New(opts Options) *Server {
 	return &Server{
 		address:         address,
 		database:        opts.Database,
-		s3client:        opts.S3Client,
+		blobStorage:     opts.BlobStorage,
 		emailClient:     opts.EmailClient,
 		sessionStore:    storage.NewSessionStore(),
 		turnstileConfig: opts.TurnstileOptions,
@@ -78,7 +82,7 @@ func New(opts Options) *Server {
 }
 
 func (s *Server) Start(ctx context.Context) error {
-	if err := s.database.Connect(); err != nil {
+	if err := s.database.Connect(ctx); err != nil {
 		return fmt.Errorf("error connecting to database: %w", err)
 	}
 
@@ -87,7 +91,7 @@ func (s *Server) Start(ctx context.Context) error {
 		return fmt.Errorf("failed to run up migration: %w", err)
 	}
 
-	err = s.s3client.Connect(ctx, s.log)
+	err = s.blobStorage.Connect(ctx, s.log)
 	if err != nil {
 		return fmt.Errorf("failed to connect to s3 client: %w", err)
 	}

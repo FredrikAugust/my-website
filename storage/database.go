@@ -17,7 +17,7 @@ import (
 
 var databaseTracer = otel.GetTracerProvider().Tracer("database")
 
-type Database struct {
+type PostgresDatabase struct {
 	DB                    *sqlx.DB
 	host                  string
 	port                  int
@@ -44,13 +44,13 @@ type NewDatabaseOptions struct {
 	Log                   *zap.Logger
 }
 
-// NewDatabase creates a new database instance, but does not connect to it.
+// NewSQLXDatabase creates a new database instance, but does not connect to it.
 // For connection, use Database.Connect.
-func NewDatabase(opts NewDatabaseOptions) *Database {
+func NewSQLXDatabase(opts NewDatabaseOptions) *PostgresDatabase {
 	if opts.Log == nil {
 		opts.Log = zap.NewNop()
 	}
-	return &Database{
+	return &PostgresDatabase{
 		DB:                    nil,
 		host:                  opts.Host,
 		port:                  opts.Port,
@@ -65,10 +65,10 @@ func NewDatabase(opts NewDatabaseOptions) *Database {
 	}
 }
 
-func (db *Database) Connect() error {
+func (db *PostgresDatabase) Connect(ctx context.Context) error {
 	db.log.Info("connecting to database", zap.String("url", db.createDataSourceName(false)))
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 
 	var err error
@@ -91,15 +91,11 @@ func (db *Database) Connect() error {
 	return nil
 }
 
-func (db *Database) Close() error {
-	if err := db.DB.Close(); err != nil {
-		return err
-	}
-
-	return nil
+func (db *PostgresDatabase) Close() error {
+	return db.DB.Close()
 }
 
-func (db *Database) createDataSourceName(withPassword bool) string {
+func (db *PostgresDatabase) createDataSourceName(withPassword bool) string {
 	password := db.password
 	if !withPassword {
 		password = "[REDACTED]"
@@ -107,7 +103,7 @@ func (db *Database) createDataSourceName(withPassword bool) string {
 	return fmt.Sprintf("postgresql://%v:%v@%v:%v/%v?sslmode=disable", db.user, password, db.host, db.port, db.name)
 }
 
-func (db *Database) Ping(ctx context.Context) error {
+func (db *PostgresDatabase) Ping(ctx context.Context) error {
 	ctx, cancel := context.WithTimeout(ctx, time.Second)
 	defer cancel()
 
@@ -123,28 +119,28 @@ func (db *Database) Ping(ctx context.Context) error {
 	return nil
 }
 
-func (db *Database) MustExecContext(ctx context.Context, query string, args ...any) sql.Result {
+func (db *PostgresDatabase) MustExecContext(ctx context.Context, query string, args ...any) sql.Result {
 	ctx, span := databaseTracer.Start(ctx, "database.exec (panic)", trace.WithAttributes(semconv.DBSystemNamePostgreSQL, semconv.DBQueryText(query)))
 	defer span.End()
 
 	return db.DB.MustExecContext(ctx, query, args...)
 }
 
-func (db *Database) ExecContext(ctx context.Context, query string, args ...any) (sql.Result, error) {
+func (db *PostgresDatabase) ExecContext(ctx context.Context, query string, args ...any) (sql.Result, error) {
 	ctx, span := databaseTracer.Start(ctx, "database.exec", trace.WithAttributes(semconv.DBSystemNamePostgreSQL, semconv.DBQueryText(query)))
 	defer span.End()
 
 	return db.DB.ExecContext(ctx, query, args...)
 }
 
-func (db *Database) QueryRowContext(ctx context.Context, query string, args ...any) *sql.Row {
+func (db *PostgresDatabase) QueryRowContext(ctx context.Context, query string, args ...any) *sql.Row {
 	ctx, span := databaseTracer.Start(ctx, "database.query_row", trace.WithAttributes(semconv.DBSystemNamePostgreSQL, semconv.DBQueryText(query)))
 	defer span.End()
 
 	return db.DB.QueryRowContext(ctx, query, args...)
 }
 
-func (db *Database) SelectContext(ctx context.Context, dest any, query string, args ...any) error {
+func (db *PostgresDatabase) SelectContext(ctx context.Context, dest any, query string, args ...any) error {
 	ctx, span := databaseTracer.Start(ctx, "database.select", trace.WithAttributes(semconv.DBSystemNamePostgreSQL, semconv.DBQueryText(query)))
 	defer span.End()
 

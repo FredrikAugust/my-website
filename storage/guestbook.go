@@ -2,10 +2,11 @@ package storage
 
 import (
 	"context"
+
 	"website/model"
 )
 
-func (db *Database) PostComment(ctx context.Context, name model.Name, comment model.Comment) error {
+func (db *PostgresDatabase) PostComment(ctx context.Context, name model.Name, comment model.Comment) error {
 	query := `INSERT INTO guestbook (name, message, created_at) VALUES ($1, $2, now())`
 
 	_, err := db.ExecContext(ctx, query, name.String(), comment.String())
@@ -13,7 +14,7 @@ func (db *Database) PostComment(ctx context.Context, name model.Name, comment mo
 	return err
 }
 
-func (db *Database) DeleteComment(ctx context.Context, commentID int) error {
+func (db *PostgresDatabase) DeleteComment(ctx context.Context, commentID int) error {
 	query := `DELETE FROM guestbook WHERE comment_id = $1`
 
 	_, err := db.ExecContext(ctx, query, commentID)
@@ -21,7 +22,7 @@ func (db *Database) DeleteComment(ctx context.Context, commentID int) error {
 	return err
 }
 
-func (db *Database) GetComments(ctx context.Context) ([]model.GuestbookEntry, error) {
+func (db *PostgresDatabase) GetComments(ctx context.Context) ([]model.GuestbookEntry, error) {
 	query := `SELECT comment_id, name, message, created_at FROM guestbook ORDER BY created_at DESC LIMIT 100`
 
 	var entries []model.GuestbookEntry

@@ -1,8 +1,10 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
+
 	"website/helpers"
 	"website/storage"
 
@@ -32,7 +34,7 @@ func start() int {
 		return 1
 	}
 
-	db := storage.NewDatabase(storage.NewDatabaseOptions{
+	db := storage.NewSQLXDatabase(storage.NewDatabaseOptions{
 		Host:     helpers.GetStringOrDefault("DB_HOST", "localhost"),
 		Port:     helpers.GetIntOrDefault("DB_PORT", 5432),
 		User:     helpers.GetStringOrDefault("DB_USER", ""),
@@ -40,7 +42,7 @@ func start() int {
 		Name:     helpers.GetStringOrDefault("DB_NAME", ""),
 		Log:      log,
 	})
-	if err := db.Connect(); err != nil {
+	if err := db.Connect(context.Background()); err != nil {
 		log.Error("error connecting to database", zap.Error(err))
 		return 1
 	}

@@ -2,6 +2,7 @@ package storage_test
 
 import (
 	"testing"
+
 	"website/integrationtest"
 
 	"github.com/matryer/is"
@@ -12,7 +13,7 @@ func TestDatabase_GetAlbums(t *testing.T) {
 
 	t.Run("get albums", func(t *testing.T) {
 		is := is.New(t)
-		db, cleanup := integrationtest.CreateDatabase()
+		db, cleanup := integrationtest.CreateDatabase(t.Context())
 		defer cleanup()
 
 		albums, err := db.GetAlbums(t.Context())

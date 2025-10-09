@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"testing"
+
 	"website/integrationtest"
 	"website/storage"
 
@@ -21,7 +22,7 @@ func TestDatabase_SignIn(t *testing.T) {
 
 	t.Run("non-existent user", func(t *testing.T) {
 		is := is.New(t)
-		db, cleanup := integrationtest.CreateDatabase()
+		db, cleanup := integrationtest.CreateDatabase(t.Context())
 		defer cleanup()
 
 		err := db.SignIn(t.Context(), email, password)
@@ -30,7 +31,7 @@ func TestDatabase_SignIn(t *testing.T) {
 
 	t.Run("wrong password", func(t *testing.T) {
 		is := is.New(t)
-		db, cleanup := integrationtest.CreateDatabase()
+		db, cleanup := integrationtest.CreateDatabase(t.Context())
 		defer cleanup()
 
 		passwordHash, _ := storage.HashPassword(password)
@@ -44,7 +45,7 @@ func TestDatabase_SignIn(t *testing.T) {
 
 	t.Run("correct password", func(t *testing.T) {
 		is := is.New(t)
-		db, cleanup := integrationtest.CreateDatabase()
+		db, cleanup := integrationtest.CreateDatabase(t.Context())
 		defer cleanup()
 
 		passwordHash, _ := storage.HashPassword(password)
