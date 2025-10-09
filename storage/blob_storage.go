@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"io"
 
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -10,6 +11,7 @@ import (
 
 type BlobStorage interface {
 	Connect(ctx context.Context, log *zap.Logger) error
+	Upload(ctx context.Context, bucketName, filePath string, content io.Reader) error
 }
 
 type S3 struct {
@@ -38,4 +40,14 @@ func (s *S3) Connect(ctx context.Context, log *zap.Logger) error {
 	log.Info("connected to s3")
 
 	return nil
+}
+
+func (s *S3) Upload(ctx context.Context, bucketName, filePath string, content io.Reader) error {
+	_, err := s.client.PutObject(ctx, &s3.PutObjectInput{
+		Key:    &filePath,
+		Bucket: &bucketName,
+		Body:   content,
+	})
+
+	return err
 }
