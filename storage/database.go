@@ -10,6 +10,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/codes"
 	semconv "go.opentelemetry.io/otel/semconv/v1.37.0"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
@@ -130,7 +131,14 @@ func (db *PostgresDatabase) ExecContext(ctx context.Context, query string, args 
 	ctx, span := databaseTracer.Start(ctx, "database.exec", trace.WithAttributes(semconv.DBSystemNamePostgreSQL, semconv.DBQueryText(query)))
 	defer span.End()
 
-	return db.DB.ExecContext(ctx, query, args...)
+	result, err := db.DB.ExecContext(ctx, query, args...)
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, "error during database execution")
+		return result, err
+	}
+
+	return result, err
 }
 
 func (db *PostgresDatabase) QueryRowContext(ctx context.Context, query string, args ...any) *sql.Row {
@@ -144,5 +152,12 @@ func (db *PostgresDatabase) SelectContext(ctx context.Context, dest any, query s
 	ctx, span := databaseTracer.Start(ctx, "database.select", trace.WithAttributes(semconv.DBSystemNamePostgreSQL, semconv.DBQueryText(query)))
 	defer span.End()
 
-	return db.DB.SelectContext(ctx, dest, query, args...)
+	// TODO: add error handling
+	err := db.DB.SelectContext(ctx, dest, query, args...)
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, "error during database select")
+	}
+
+	return err
 }
