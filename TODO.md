@@ -14,3 +14,5 @@
 - [ ] attach link in email to delete bad emails
 - [ ] CSRF
 - [x] Cloudflare Turnstile for anti-bots
+- [x] replace in memory storage with redis
+- [ ] use CLI args instead of env vars for configuring? or another better system. easy to get lost with env vars
