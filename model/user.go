@@ -1,3 +1,4 @@
+// Package model contains the core models of the application
 package model
 
 import "time"

@@ -3,21 +3,22 @@ package handlers
 import (
 	"context"
 	"net/http"
+
 	"website/views/route"
 
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
 )
 
-type sessionStore interface {
-	CreateSession(email string) (string, error)
-}
-
 type authenticationService interface {
 	SignIn(ctx context.Context, email, password string) error
 }
 
-func SignIn(mux chi.Router, a authenticationService, s sessionStore, logger *zap.Logger) {
+type sessionCreator interface {
+	CreateSession(ctx context.Context, email string) (string, error)
+}
+
+func SignIn(mux chi.Router, a authenticationService, s sessionCreator, logger *zap.Logger) {
 	mux.Post(route.Login, func(w http.ResponseWriter, r *http.Request) {
 		email := r.FormValue("email")
 		password := r.FormValue("password")
@@ -33,7 +34,7 @@ func SignIn(mux chi.Router, a authenticationService, s sessionStore, logger *zap
 			return
 		}
 
-		sessionID, err := s.CreateSession(email)
+		sessionID, err := s.CreateSession(r.Context(), email)
 		if err != nil {
 			logger.Error("failed to create session id for user", zap.String("email", email))
 			http.Error(w, "failed to create session", http.StatusInternalServerError)

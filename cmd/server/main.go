@@ -16,6 +16,7 @@ import (
 	"website/storage"
 
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -62,10 +63,13 @@ func start() int {
 	turnstileOptions := createTurnstileOptions(log)
 	turnstileClient := createTurnstileClient(log)
 
+	sessionStore := createSessionStore(log)
+
 	s := server.New(server.Options{
 		Database:         db,
 		BlobStorage:      s3Client,
 		TurnstileOptions: turnstileOptions,
+		SessionStore:     sessionStore,
 		TurnstileClient:  turnstileClient,
 		EmailClient:      emailClient,
 		Host:             host,
@@ -108,7 +112,9 @@ func start() int {
 func createLogger(logEnv string) (*zap.Logger, error) {
 	switch logEnv {
 	case "development":
-		return zap.NewDevelopment()
+		config := zap.NewDevelopmentConfig()
+		config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
+		return config.Build()
 	case "production":
 		return zap.NewProduction()
 	default:
@@ -129,6 +135,23 @@ func createDatabase(log *zap.Logger) *storage.PostgresDatabase {
 		ConnectionMaxIdleTime: helpers.GetDurationOrDefault("DB_CONNECTION_MAX_IDLE_TIME", 60*time.Second),
 		Log:                   log,
 	})
+}
+
+func createSessionStore(logger *zap.Logger) storage.SessionStore {
+	sessionStoreType, ok := os.LookupEnv("SESSION_STORE_TYPE")
+	if !ok {
+		logger.Warn("no session store type was defined. defaulting to in-memory which is meant for testing")
+		return storage.NewInMemorySessionStore()
+	}
+
+	switch sessionStoreType {
+	case "redis":
+		logger.Info("setting up redis")
+		return storage.NewRedisSessionStore()
+	default:
+		logger.Panic("session store type does not exist", zap.String("type", sessionStoreType))
+		return nil
+	}
 }
 
 func createEmailClient(logger *zap.Logger) email.EmailClient {

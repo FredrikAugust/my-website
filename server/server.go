@@ -29,7 +29,7 @@ type Server struct {
 	blobStorage storage.BlobStorage
 	emailClient email.EmailClient
 
-	sessionStore *storage.SessionStore
+	sessionStore storage.SessionStore
 
 	turnstileConfig *security.TurnstileFrontendOptions
 	turnstileClient security.TurnstileClient
@@ -41,7 +41,8 @@ type Options struct {
 
 	Log *zap.Logger
 
-	Database *storage.PostgresDatabase
+	Database     *storage.PostgresDatabase
+	SessionStore storage.SessionStore
 
 	TurnstileOptions *security.TurnstileFrontendOptions
 
@@ -64,7 +65,7 @@ func New(opts Options) *Server {
 		database:        opts.Database,
 		blobStorage:     opts.BlobStorage,
 		emailClient:     opts.EmailClient,
-		sessionStore:    storage.NewSessionStore(),
+		sessionStore:    opts.SessionStore,
 		turnstileConfig: opts.TurnstileOptions,
 		turnstileClient: opts.TurnstileClient,
 		mux:             mux,

@@ -10,22 +10,28 @@ tasks:
   test:
     desc: Run tests with integration tests
     deps:
-      - start-db:test
+      - start:db:test
     cmd: gotestsum -- -coverprofile=website.out -p 1 ./...
 
-  start-db:main:
+  start:db:main:
     status:
       - docker compose ps --format json | jq -e '.Service == "postgres"'
     cmd: docker compose up -d postgres
 
-  start-db:test:
+  start:db:test:
     status:
       - docker compose ps --format json | jq -e '.Service == "postgres-test"'
     cmd: docker compose up -d postgres-test
 
+  start:redis:main:
+    status:
+      - docker compose ps --format json | jq -e '.Service == "redis"'
+    cmd: docker compose up -d redis
+
   start:dev:
     deps:
-      - start-db:main
+      - start:db:main
+      - start:redis:main
       - build:css
     desc: Start the server
     env:
@@ -77,7 +83,7 @@ tasks:
     desc: Start the server in Docker
     deps:
       - build:docker
-      - start-db:main
+      - start:db:main
     dotenv:
       - .env.local
     cmd: docker run -p 8080:8080 --env-file .env.local -e HOST="" -e DB_HOST=host.docker.internal website

@@ -152,7 +152,6 @@ func (db *PostgresDatabase) SelectContext(ctx context.Context, dest any, query s
 	ctx, span := databaseTracer.Start(ctx, "database.select", trace.WithAttributes(semconv.DBSystemNamePostgreSQL, semconv.DBQueryText(query)))
 	defer span.End()
 
-	// TODO: add error handling
 	err := db.DB.SelectContext(ctx, dest, query, args...)
 	if err != nil {
 		span.RecordError(err)

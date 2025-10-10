@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 	"testing"
+
 	"website/handlers"
 	"website/integrationtest"
 	"website/views/route"
@@ -19,8 +20,7 @@ const (
 	validPassword = "my-valid-password"
 )
 
-type authenticationServiceMock struct {
-}
+type authenticationServiceMock struct{}
 
 // SignIn implements handlers.authenticationService.
 func (a *authenticationServiceMock) SignIn(ctx context.Context, email string, password string) error {
@@ -28,11 +28,10 @@ func (a *authenticationServiceMock) SignIn(ctx context.Context, email string, pa
 	return bcrypt.CompareHashAndPassword(validHash, []byte(password))
 }
 
-type sessionStoreMock struct {
-}
+type sessionStoreMock struct{}
 
 // CreateSession implements handlers.sessionStore.
-func (s *sessionStoreMock) CreateSession(email string) (string, error) {
+func (s *sessionStoreMock) CreateSession(ctx context.Context, email string) (string, error) {
 	return "session:)", nil
 }
 
