@@ -5,3 +5,4 @@ bin/
 tmp/
 static/styles/style.min.css
 .task
+.DS_Store

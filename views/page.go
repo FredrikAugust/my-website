@@ -83,8 +83,21 @@ func Navbar(currentPath string, authenticated bool) g.Node {
 func MyFooter() g.Node {
 	return h.Footer(
 		c.Classes{
-			"text-sm text-gray-800 max-w-prose": true,
+			"text-sm text-gray-800 max-w-prose flex flex-col gap-2": true,
 		},
 		h.P(g.Text("This web server is written in Go. It uses Gomponents and Tailwind for the UI. It's hosted in a Kubernetes (k3s) cluster on Hetzner cloud, using Traefik as a reverse proxy. The DNS, static asset caching and basic protection is handled on Cloudflare.")),
+		h.A(
+			h.Href("https://www.abuseipdb.com/user/244214"),
+			h.Title("AbuseIPDB is an IP address blacklist for webmasters and sysadmins to report IP addresses engaging in abusive behavior on their networks"),
+			h.Img(h.Src("https://www.abuseipdb.com/contributor/244214.svg"), h.Loading("lazy"), h.Class("h-15"), h.Alt("AbuseIPDB Contributor Badge")),
+		),
+		h.A(
+			h.Class("flex gap-1 items-center hover:underline font-sans"),
+			h.Href("https://github.com/fredrikaugust/my-website"),
+			h.Img(h.Src("/static/images/github-mark.svg"), h.Class("h-3"), h.Alt("github logo")),
+			h.Target("_blank"),
+			h.Rel("noreferrer"),
+			g.Text("Source code"),
+		),
 	)
 }
