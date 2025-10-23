@@ -44,10 +44,10 @@ func Page(title, path string, authenticated bool, body ...g.Node) g.Node {
 			h.Link(h.Rel("manifest"), h.Href("/static/site.webmanifest")),
 		},
 		Body: []g.Node{
-			h.Body(c.Classes{"bg-[#fdf4e3] max-w-prose": true},
+			h.Body(c.Classes{"bg-[#fdf4e3] w-screen": true},
 				h.Main(
 					c.Classes{
-						"grid grid-rows-[auto_1fr] py-2 px-4 gap-2 font-serif": true,
+						"grid grid-rows-[auto_1fr] py-2 px-4 gap-2 font-serif max-w-prose mx-auto": true,
 					},
 					Navbar(path, authenticated),
 					g.Group(body),

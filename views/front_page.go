@@ -35,7 +35,7 @@ func FrontPage(authenticated bool, comments []model.GuestbookEntry, turnstileSit
 			h.Img(c.Classes{"w-30": true}, h.Src("/static/images/guestbook.gif"), h.Alt("an old man writing in a guestbook")),
 			h.Div(
 				c.Classes{
-					"flex flex-col border border-gray-300 px-2 py-1 gap-1 h-80 overflow-y-auto": true,
+					"flex flex-col border border-gray-300 px-2 py-1 gap-1 h-80 overflow-y-scroll shadow-sm": true,
 				},
 				g.Map(comments, func(comment model.GuestbookEntry) g.Node {
 					timeAgo, err := timeago.Parse(comment.CreatedAt)
