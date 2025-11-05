@@ -27,7 +27,6 @@ type Server struct {
 
 	cmsClient   *storage.CMSClient
 	database    *storage.PostgresDatabase
-	blobStorage storage.BlobStorage
 	emailClient email.EmailClient
 
 	sessionStore storage.SessionStore
@@ -48,7 +47,6 @@ type Options struct {
 	TurnstileOptions *security.TurnstileFrontendOptions
 
 	CmsClient       *storage.CMSClient
-	BlobStorage     storage.BlobStorage
 	EmailClient     email.EmailClient
 	TurnstileClient security.TurnstileClient
 }
@@ -68,7 +66,6 @@ func New(opts Options) *Server {
 		address:         address,
 		database:        opts.Database,
 		cmsClient:       opts.CmsClient,
-		blobStorage:     opts.BlobStorage,
 		emailClient:     opts.EmailClient,
 		sessionStore:    opts.SessionStore,
 		turnstileConfig: opts.TurnstileOptions,
@@ -93,11 +90,6 @@ func (s *Server) Start(ctx context.Context) error {
 	err := s.database.MigrateUp()
 	if err != nil {
 		return fmt.Errorf("failed to run up migration: %w", err)
-	}
-
-	err = s.blobStorage.Connect(ctx, s.log)
-	if err != nil {
-		return fmt.Errorf("failed to connect to s3 client: %w", err)
 	}
 
 	s.SetupRoutes()
