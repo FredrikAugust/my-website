@@ -20,10 +20,9 @@ func (s *Server) SetupRoutes() {
 	handlers.PostComment(s.mux, s.database, s.emailClient, s.turnstileClient, s.log)
 	handlers.DeleteComment(s.mux, s.database, s.sessionStore, s.log)
 	handlers.SignIn(s.mux, s.database, s.sessionStore, s.log)
-	handlers.CreateAlbum(s.mux, s.sessionStore, s.database, s.log)
 
 	// Views
 	handlers.FrontPage(s.mux, s.database, s.sessionStore, s.log, s.turnstileConfig)
-	handlers.Photography(s.mux, s.database, s.sessionStore, s.log)
+	handlers.Photography(s.mux, s.cmsClient, s.sessionStore, s.log)
 	handlers.Login(s.mux, s.sessionStore)
 }

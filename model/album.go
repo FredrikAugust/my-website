@@ -1,6 +1,13 @@
 package model
 
 type Album struct {
-	AlbumID int    `db:"album_id"`
-	Name    string `db:"name"`
+	ID          int    `json:"id"`
+	Description string `json:"description"`
+	Name        string `json:"name"`
+}
+
+type AlbumWithPhotos struct {
+	Album
+
+	Photos []Photo `json:"photos"`
 }

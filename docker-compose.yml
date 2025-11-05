@@ -24,5 +24,12 @@ services:
     ports:
       - "6379:6379"
 
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    command: server /data --console-address ":9001"
+
 volumes:
   postgres_data:

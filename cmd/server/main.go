@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -65,12 +66,15 @@ func start() int {
 
 	sessionStore := createSessionStore(log)
 
+	cmsClient := createCMSClient(log)
+
 	s := server.New(server.Options{
 		Database:         db,
 		BlobStorage:      s3Client,
 		TurnstileOptions: turnstileOptions,
 		SessionStore:     sessionStore,
 		TurnstileClient:  turnstileClient,
+		CmsClient:        cmsClient,
 		EmailClient:      emailClient,
 		Host:             host,
 		Log:              log,
@@ -152,6 +156,16 @@ func createSessionStore(logger *zap.Logger) storage.SessionStore {
 		logger.Panic("session store type does not exist", zap.String("type", sessionStoreType))
 		return nil
 	}
+}
+
+func createCMSClient(logger *zap.Logger) *storage.CMSClient {
+	cmsClient, err := storage.NewCMSClient(helpers.GetStringOrDefault("CMS_BASE_URL", "http://localhost:3000"))
+
+	if err != nil {
+		log.Panic(err)
+	}
+
+	return cmsClient
 }
 
 func createEmailClient(logger *zap.Logger) email.EmailClient {

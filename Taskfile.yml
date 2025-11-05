@@ -32,7 +32,6 @@ tasks:
     deps:
       - start:db:main
       - start:redis:main
-      - build:css
     desc: Start the server
     env:
       LOG_ENV: development
@@ -40,6 +39,14 @@ tasks:
       - .env.local
     cmds:
       - air
+
+  start:cms:
+    dir: cms/
+    cmd: pnpm dev
+
+  dev:
+    desc: Start go server, css building, cms and databases with live reload
+    cmd: task -p start:dev start:cms build:css:watch
 
   build:css:
     desc: Build CSS
@@ -63,6 +70,10 @@ tasks:
     cmds:
       - tailwindcss -i ./tailwind.css -o ./static/styles/style.min.css --minify --watch
 
+  build:docker:
+    desc: Build the Docker image
+    cmd: docker build -t website .
+
   migrate:up:
     desc: Run migrations up
     dotenv:
@@ -74,19 +85,6 @@ tasks:
     dotenv:
       - .env.local
     cmd: go run cmd/migrate/main.go down
-
-  build:docker:
-    desc: Build the Docker image
-    cmd: docker build -t website .
-
-  start:docker:
-    desc: Start the server in Docker
-    deps:
-      - build:docker
-      - start:db:main
-    dotenv:
-      - .env.local
-    cmd: docker run -p 8080:8080 --env-file .env.local -e HOST="" -e DB_HOST=host.docker.internal website
 
   migrate:add:
     desc: Add a new migration. Pass name with `migrate:add -- <name>`

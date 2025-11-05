@@ -41,7 +41,7 @@ func FrontPage(mux chi.Router, g guestbookGetter, rss requestSessionStore, logge
 
 type photoGetter interface {
 	GetAlbums(ctx context.Context) ([]model.Album, error)
-	GetPhotos(ctx context.Context, albumID int) ([]model.Photo, error)
+	GetAlbumWithPhotos(ctx context.Context, albumID int) (model.AlbumWithPhotos, error)
 }
 
 func Photography(mux chi.Router, p photoGetter, rss requestSessionStore, logger *zap.Logger) {
@@ -65,7 +65,7 @@ func Photography(mux chi.Router, p photoGetter, rss requestSessionStore, logger 
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		photos, err := p.GetPhotos(r.Context(), albumID)
+		album, err := p.GetAlbumWithPhotos(r.Context(), albumID)
 		if err != nil {
 			logger.Warn("failed to fetch photos", zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -74,7 +74,7 @@ func Photography(mux chi.Router, p photoGetter, rss requestSessionStore, logger 
 
 		_, err = rss.GetSessionFromRequest(r)
 
-		_ = views.Album(albumID, photos, err == nil).Render(w)
+		_ = views.Album(albumID, album, err == nil).Render(w)
 	})
 }
 

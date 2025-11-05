@@ -25,6 +25,7 @@ type Server struct {
 	mux     chi.Router
 	server  *http.Server
 
+	cmsClient   *storage.CMSClient
 	database    *storage.PostgresDatabase
 	blobStorage storage.BlobStorage
 	emailClient email.EmailClient
@@ -46,6 +47,7 @@ type Options struct {
 
 	TurnstileOptions *security.TurnstileFrontendOptions
 
+	CmsClient       *storage.CMSClient
 	BlobStorage     storage.BlobStorage
 	EmailClient     email.EmailClient
 	TurnstileClient security.TurnstileClient
@@ -61,15 +63,16 @@ func New(opts Options) *Server {
 	mux := chi.NewMux()
 
 	return &Server{
+		mux:             mux,
+		log:             opts.Log,
 		address:         address,
 		database:        opts.Database,
+		cmsClient:       opts.CmsClient,
 		blobStorage:     opts.BlobStorage,
 		emailClient:     opts.EmailClient,
 		sessionStore:    opts.SessionStore,
 		turnstileConfig: opts.TurnstileOptions,
 		turnstileClient: opts.TurnstileClient,
-		mux:             mux,
-		log:             opts.Log,
 
 		server: &http.Server{
 			Addr:              address,
