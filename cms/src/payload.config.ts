@@ -1,16 +1,16 @@
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 // storage-adapter-import-placeholder
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { payloadCloudPlugin } from '@payloadcms/payload-cloud'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
-import path from 'path'
-import { buildConfig } from 'payload'
-import { fileURLToPath } from 'url'
-import sharp from 'sharp'
 import { s3Storage } from '@payloadcms/storage-s3'
+import { buildConfig } from 'payload'
+import sharp from 'sharp'
 
-import { Users } from './collections/Users'
-import { Photo } from './collections/Photo'
 import { Album } from './collections/Album'
+import { Photo } from './collections/Photo'
+import { Users } from './collections/Users'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
