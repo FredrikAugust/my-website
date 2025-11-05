@@ -57,7 +57,6 @@ func start() int {
 	port := helpers.GetIntOrDefault("PORT", 8080)
 
 	db := createDatabase(log)
-	s3Client := storage.NewS3(helpers.GetStringOrDefault("S3_URL", "https://nbg1.your-objectstorage.com"))
 
 	emailClient := createEmailClient(log)
 
@@ -70,7 +69,6 @@ func start() int {
 
 	s := server.New(server.Options{
 		Database:         db,
-		BlobStorage:      s3Client,
 		TurnstileOptions: turnstileOptions,
 		SessionStore:     sessionStore,
 		TurnstileClient:  turnstileClient,
