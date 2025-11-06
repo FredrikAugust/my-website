@@ -25,7 +25,7 @@ type Server struct {
 	mux     chi.Router
 	server  *http.Server
 
-	cmsClient   *storage.CMSClient
+	cmsClient   storage.CMSClient
 	database    *storage.PostgresDatabase
 	emailClient email.EmailClient
 
@@ -46,7 +46,7 @@ type Options struct {
 
 	TurnstileOptions *security.TurnstileFrontendOptions
 
-	CmsClient       *storage.CMSClient
+	CmsClient       storage.CMSClient
 	EmailClient     email.EmailClient
 	TurnstileClient security.TurnstileClient
 }

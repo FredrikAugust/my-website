@@ -1,0 +1,18 @@
+package integrationtest
+
+import (
+	"context"
+	"website/model"
+)
+
+type mockCMSClient struct{}
+
+func (m *mockCMSClient) GetAlbums(ctx context.Context) ([]model.Album, error) {
+	return make([]model.Album, 0), nil
+}
+func (m *mockCMSClient) GetAlbumWithPhotos(ctx context.Context, albumID int) (model.AlbumWithPhotos, error) {
+	return model.AlbumWithPhotos{}, nil
+}
+func (m *mockCMSClient) GetRecentPhotos(ctx context.Context) ([]model.Photo, error) {
+	return make([]model.Photo, 0), nil
+}

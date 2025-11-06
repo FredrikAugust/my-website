@@ -65,14 +65,14 @@ func start() int {
 
 	sessionStore := createSessionStore(log)
 
-	cmsClient := createCMSClient(log)
+	payloadCMSClient := createPayloadCMSClient(log)
 
 	s := server.New(server.Options{
 		Database:         db,
 		TurnstileOptions: turnstileOptions,
 		SessionStore:     sessionStore,
 		TurnstileClient:  turnstileClient,
-		CmsClient:        cmsClient,
+		CmsClient:        payloadCMSClient,
 		EmailClient:      emailClient,
 		Host:             host,
 		Log:              log,
@@ -156,7 +156,7 @@ func createSessionStore(logger *zap.Logger) storage.SessionStore {
 	}
 }
 
-func createCMSClient(logger *zap.Logger) *storage.CMSClient {
+func createPayloadCMSClient(logger *zap.Logger) *storage.PayloadCMSClient {
 	cmsClient, err := storage.NewCMSClient(helpers.GetStringOrDefault("CMS_BASE_URL", "http://localhost:3000"))
 
 	if err != nil {

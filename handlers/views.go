@@ -7,6 +7,7 @@ import (
 
 	"website/model"
 	"website/security"
+	"website/storage"
 	"website/views"
 	"website/views/route"
 
@@ -22,11 +23,7 @@ type requestSessionStore interface {
 	GetSessionFromRequest(r *http.Request) (model.Email, error)
 }
 
-type recentPhotosGetter interface {
-	GetRecentPhotos(ctx context.Context) ([]model.Photo, error)
-}
-
-func FrontPage(mux chi.Router, g guestbookGetter, rss requestSessionStore, rpg recentPhotosGetter, logger *zap.Logger, turnstileOptions *security.TurnstileFrontendOptions) {
+func FrontPage(mux chi.Router, g guestbookGetter, rss requestSessionStore, cmsClient storage.CMSClient, logger *zap.Logger, turnstileOptions *security.TurnstileFrontendOptions) {
 	mux.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		comments, err := g.GetComments(r.Context())
 		if err != nil {
@@ -37,7 +34,7 @@ func FrontPage(mux chi.Router, g guestbookGetter, rss requestSessionStore, rpg r
 
 		logger.Info("guestbook comments fetched successfully", zap.Int("count", len(comments)))
 
-		recentPhotos, err := rpg.GetRecentPhotos(r.Context())
+		recentPhotos, err := cmsClient.GetRecentPhotos(r.Context())
 		if err != nil {
 			logger.Warn("failed ot get recent photos")
 			recentPhotos = make([]model.Photo, 0)

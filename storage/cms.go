@@ -12,11 +12,17 @@ const (
 	collectionPhoto = "photo"
 )
 
-type CMSClient struct {
+type CMSClient interface {
+	GetAlbums(ctx context.Context) ([]model.Album, error)
+	GetAlbumWithPhotos(ctx context.Context, albumID int) (model.AlbumWithPhotos, error)
+	GetRecentPhotos(ctx context.Context) ([]model.Photo, error)
+}
+
+type PayloadCMSClient struct {
 	client *payloadcms.Client
 }
 
-func NewCMSClient(baseURL string) (*CMSClient, error) {
+func NewCMSClient(baseURL string) (*PayloadCMSClient, error) {
 	client, err := payloadcms.New(
 		payloadcms.WithBaseURL(baseURL),
 	)
@@ -25,12 +31,12 @@ func NewCMSClient(baseURL string) (*CMSClient, error) {
 		return nil, err
 	}
 
-	return &CMSClient{
+	return &PayloadCMSClient{
 		client: client,
 	}, nil
 }
 
-func (c *CMSClient) GetAlbums(ctx context.Context) ([]model.Album, error) {
+func (c *PayloadCMSClient) GetAlbums(ctx context.Context) ([]model.Album, error) {
 	var albums payloadcms.ListResponse[model.Album]
 	_, err := c.client.Collections.List(ctx, collectionAlbum, payloadcms.ListParams{}, &albums, payloadcms.WithDepth(0))
 
@@ -41,7 +47,7 @@ func (c *CMSClient) GetAlbums(ctx context.Context) ([]model.Album, error) {
 	return albums.Docs, nil
 }
 
-func (c *CMSClient) GetAlbumWithPhotos(ctx context.Context, albumID int) (model.AlbumWithPhotos, error) {
+func (c *PayloadCMSClient) GetAlbumWithPhotos(ctx context.Context, albumID int) (model.AlbumWithPhotos, error) {
 	var album model.AlbumWithPhotos
 	_, err := c.client.Collections.FindByID(ctx, collectionAlbum, albumID, &album)
 
@@ -53,7 +59,7 @@ func (c *CMSClient) GetAlbumWithPhotos(ctx context.Context, albumID int) (model.
 }
 
 // GetRecentPhotos implements handlers.recentPhotosGetter.
-func (c *CMSClient) GetRecentPhotos(ctx context.Context) ([]model.Photo, error) {
+func (c *PayloadCMSClient) GetRecentPhotos(ctx context.Context) ([]model.Photo, error) {
 	var photos payloadcms.ListResponse[model.Photo]
 	_, err := c.client.Collections.List(ctx, collectionPhoto, payloadcms.ListParams{Sort: "-createdAt", Limit: 3}, &photos)
 

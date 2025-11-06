@@ -16,6 +16,7 @@ func CreateServer(ctx context.Context) func() {
 	s := server.New(server.Options{
 		Host:         "localhost",
 		SessionStore: storage.NewInMemorySessionStore(),
+		CmsClient:    &mockCMSClient{},
 		TurnstileOptions: &security.TurnstileFrontendOptions{
 			Sitekey: security.AlwaysBlocksInvisibleSitekey,
 		},
