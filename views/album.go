@@ -42,9 +42,9 @@ func Album(albumID int, album model.AlbumWithPhotos, authenticated bool) g.Node 
 				g.Map(album.Photos, func(photo model.Photo) g.Node {
 					return h.Div(
 						h.Class("flex flex-col md:flex-row gap-2"),
-						h.A(h.Target("_blank"), h.Rel("noreferer"), h.Href(photo.Sizes.Large.URL), h.Img(c.Classes{"w-full h-auto object-cover cursor-zoom-in": true}, h.Src(photo.Sizes.Small.URL), h.Loading("lazy"))),
+						h.A(h.Class("basis-128"), h.Target("_blank"), h.Rel("noreferer"), h.Href(photo.Sizes.Large.URL), h.Img(h.Class("w-full h-auto object-cover cursor-zoom-in"), h.Src(photo.Sizes.Large.URL), h.Loading("lazy"))),
 						h.Div(
-							h.Class("flex flex-col gap-1 text-sm"),
+							h.Class("flex flex-col gap-1 text-sm md:basis-64"),
 							h.Div(
 								h.H3(h.Class("text-lg font-semibold"), g.Text(photo.Alt)),
 								g.If(photo.Description != "", h.P(h.Class("text-gray-600"), g.Text(photo.Description))),
