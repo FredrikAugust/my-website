@@ -3,6 +3,7 @@ import type { CollectionConfig } from 'payload'
 export const Album: CollectionConfig = {
   slug: 'album',
   labels: { singular: 'Album', plural: 'Albums' },
+  admin: { useAsTitle: 'name' },
   access: {
     read: () => true,
   },
@@ -21,6 +22,9 @@ export const Album: CollectionConfig = {
       type: 'relationship',
       relationTo: 'photo',
       hasMany: true, // allows multiple selections
+      admin: {
+        description: 'Select photos to include in this album',
+      },
     },
   ],
 }

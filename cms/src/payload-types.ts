@@ -153,13 +153,36 @@ export interface Photo {
   id: number;
   alt: string;
   description?: string | null;
+  /**
+   * Auto-populated from EXIF data if available
+   */
   taken_at?: string | null;
-  location?: string | null;
+  /**
+   * Automatically extracted from photo
+   */
+  exif?: {
+    cameraMake?: string | null;
+    cameraModel?: string | null;
+    lensMake?: string | null;
+    lensModel?: string | null;
+    focalLength?: string | null;
+    aperture?: string | null;
+    shutterSpeed?: string | null;
+    iso?: number | null;
+  };
+  /**
+   * Automatically extracted from photo EXIF data
+   */
+  gps?: {
+    latitude?: number | null;
+    longitude?: number | null;
+  };
   album?: {
     docs?: (number | Album)[];
     hasNextPage?: boolean;
     totalDocs?: number;
   };
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -198,6 +221,9 @@ export interface Album {
   id: number;
   name: string;
   description?: string | null;
+  /**
+   * Select photos to include in this album
+   */
   photos?: (number | Photo)[] | null;
   updatedAt: string;
   createdAt: string;
@@ -310,8 +336,26 @@ export interface PhotoSelect<T extends boolean = true> {
   alt?: T;
   description?: T;
   taken_at?: T;
-  location?: T;
+  exif?:
+    | T
+    | {
+        cameraMake?: T;
+        cameraModel?: T;
+        lensMake?: T;
+        lensModel?: T;
+        focalLength?: T;
+        aperture?: T;
+        shutterSpeed?: T;
+        iso?: T;
+      };
+  gps?:
+    | T
+    | {
+        latitude?: T;
+        longitude?: T;
+      };
   album?: T;
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
