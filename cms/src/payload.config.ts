@@ -42,7 +42,9 @@ export default buildConfig({
     payloadCloudPlugin({}),
     s3Storage({
       collections: {
-        photo: true,
+        photo: {
+          prefix: 'photo-uploads',
+        },
       },
       bucket: process.env.S3_BUCKET!,
       config: {
