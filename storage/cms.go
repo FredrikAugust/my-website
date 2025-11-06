@@ -51,3 +51,15 @@ func (c *CMSClient) GetAlbumWithPhotos(ctx context.Context, albumID int) (model.
 
 	return album, nil
 }
+
+// GetRecentPhotos implements handlers.recentPhotosGetter.
+func (c *CMSClient) GetRecentPhotos(ctx context.Context) ([]model.Photo, error) {
+	var photos payloadcms.ListResponse[model.Photo]
+	_, err := c.client.Collections.List(ctx, collectionPhoto, payloadcms.ListParams{Sort: "-createdAt", Limit: 3}, &photos)
+
+	if err != nil {
+		return make([]model.Photo, 0), err
+	}
+
+	return photos.Docs, nil
+}

@@ -22,7 +22,7 @@ func (s *Server) SetupRoutes() {
 	handlers.SignIn(s.mux, s.database, s.sessionStore, s.log)
 
 	// Views
-	handlers.FrontPage(s.mux, s.database, s.sessionStore, s.log, s.turnstileConfig)
+	handlers.FrontPage(s.mux, s.database, s.sessionStore, s.cmsClient, s.log, s.turnstileConfig)
 	handlers.Photography(s.mux, s.cmsClient, s.sessionStore, s.log)
 	handlers.Login(s.mux, s.sessionStore)
 }

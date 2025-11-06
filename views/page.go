@@ -44,10 +44,10 @@ func Page(title, path string, authenticated bool, body ...g.Node) g.Node {
 			h.Link(h.Rel("manifest"), h.Href("/static/site.webmanifest")),
 		},
 		Body: []g.Node{
-			h.Body(c.Classes{"bg-[#fdf4e3] w-screen": true},
+			h.Body(c.Classes{"bg-[#fdf4e3] mx-auto container min-h-dvh flex flex-col": true},
 				h.Main(
 					c.Classes{
-						"grid grid-rows-[auto_1fr] py-2 px-4 gap-2 font-serif max-w-prose mx-auto": true,
+						"grid grid-rows-[auto_1fr_auto] py-2 px-4 gap-2 font-serif grow": true,
 					},
 					Navbar(path, authenticated),
 					g.Group(body),
@@ -82,14 +82,13 @@ func Navbar(currentPath string, authenticated bool) g.Node {
 
 func MyFooter() g.Node {
 	return h.Footer(
-		c.Classes{
-			"text-sm text-gray-800 max-w-prose flex flex-col gap-2": true,
-		},
-		h.P(g.Text("This web server is written in Go. It uses Gomponents and Tailwind for the UI. It's hosted in a Kubernetes (k3s) cluster on Hetzner cloud, using Traefik as a reverse proxy. The DNS, static asset caching and basic protection is handled on Cloudflare.")),
+		h.Class("text-xs text-gray-800 flex flex-col gap-2"),
+		h.Hr(),
+		h.P(h.Class("max-w-prose"), g.Text("This web server is written in Go. It uses Gomponents and Tailwind for the UI. It's hosted in a Kubernetes (k3s) cluster on Hetzner cloud, using Traefik as a reverse proxy. The DNS, static asset caching and basic protection is handled on Cloudflare.")),
 		h.A(
 			h.Href("https://www.abuseipdb.com/user/244214"),
 			h.Title("AbuseIPDB is an IP address blacklist for webmasters and sysadmins to report IP addresses engaging in abusive behavior on their networks"),
-			h.Img(h.Src("https://www.abuseipdb.com/contributor/244214.svg"), h.Loading("lazy"), h.Class("h-15"), h.Alt("AbuseIPDB Contributor Badge")),
+			h.Img(h.Src("https://www.abuseipdb.com/contributor/244214.svg"), h.Loading("lazy"), h.Class("h-8"), h.Alt("AbuseIPDB Contributor Badge")),
 		),
 		h.A(
 			h.Class("flex gap-1 items-center hover:underline font-sans"),
