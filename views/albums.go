@@ -1,10 +1,7 @@
 package views
 
 import (
-	"net/http"
-
 	"website/model"
-	"website/views/components"
 	"website/views/route"
 
 	g "maragu.dev/gomponents"
@@ -26,14 +23,6 @@ func Albums(albums []model.Album, authenticated bool) g.Node {
 					h.P(h.Class("text-xs teext-gray-700"), g.Text(album.Description)),
 				)
 			})),
-			g.If(authenticated, h.Form(
-				h.Action(route.Albums),
-				h.Method(http.MethodPost),
-				h.Div(h.Class("flex gap-2 items-center mt-2 text-sm"),
-					components.Input(h.Placeholder("Album name"), h.Name("name")),
-					components.Button(h.Type("submit"), g.Text("Create album")),
-				),
-			)),
 		),
 	)
 }
