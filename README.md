@@ -7,6 +7,7 @@ The website is developed partially following the guide from [golang.dk](https://
 ## Prerequisites
 
 - **Go** (1.21+) - [Download](https://go.dev/dl/) or `brew install go`
+- **Node** (22) - Use `nvm` or similar
 - **Docker** - [Download](https://docs.docker.com/get-docker/) or
   `brew install --cask docker`
 - **Task** - Task runner for executing common tasks
@@ -44,22 +45,23 @@ The website is developed partially following the guide from [golang.dk](https://
    Edit `.env.local` with your actual database credentials,
    S3 keys, and Resend API key.
 
-3. Install Go dependencies:
+   Same goes for the `cms/` directory
+
+3. Install Go and Node dependencies:
 
    ```bash
    go mod download
+   cd cms
+   pnpm i
    ```
 
 4. Run the development server and tailwind CLI:
 
    ```bash
-   task -p start:dev build:css:watch
+   task dev
    ```
 
-   This will:
-   - Start the PostgreSQL database via Docker
-   - Build the CSS with Tailwind CLI and rebuild it on change
-   - Start the web server with "live" reload (you have to manually refresh the browser)
+   Starts cms, databases, redis, go dev server, css building.
 
 ## Run tests
 
