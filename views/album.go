@@ -38,7 +38,7 @@ func Album(albumID int, album model.AlbumWithPhotos, authenticated bool) g.Node 
 				g.If(album.Description != "", h.P(g.Text(album.Description))),
 			),
 			h.Div(
-				c.Classes{"flex flex-col gap-1": true},
+				c.Classes{"flex flex-col gap-4": true},
 				g.Map(album.Photos, func(photo model.Photo) g.Node {
 					return h.Div(
 						h.Class("flex flex-col md:flex-row gap-2"),
