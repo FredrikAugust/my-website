@@ -11,6 +11,7 @@ import sharp from 'sharp'
 import { Album } from './collections/Album'
 import { Photo } from './collections/Photo'
 import { Users } from './collections/Users'
+import { migrations } from './migrations'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -33,6 +34,7 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URI!,
     },
+    prodMigrations: migrations,
     migrationDir: path.resolve(dirname, 'migrations'),
   }),
   sharp,
