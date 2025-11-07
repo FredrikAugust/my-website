@@ -51,6 +51,8 @@ func unmarshalChild(rawChild json.RawMessage) g.Node {
 		return unmarshalText(rawChild)
 	case "paragraph":
 		return unmarshalParagraph(rawChild)
+	case "link":
+		return unmarshalLink(rawChild)
 	case "heading":
 		return unmarshalHeading(rawChild)
 	case "upload":
@@ -58,6 +60,27 @@ func unmarshalChild(rawChild json.RawMessage) g.Node {
 	}
 
 	return g.Text("unknown child: " + typeCheck.Type)
+}
+
+func unmarshalLink(rawChild json.RawMessage) g.Node {
+	var link struct {
+		Children []json.RawMessage `json:"children"`
+		Fields   struct {
+			URL string `json:"url"`
+		} `json:"fields"`
+	}
+	err := json.Unmarshal(rawChild, &link)
+	if err != nil {
+		zap.L().Warn("failed to unmarshal link", zap.Error(err), zap.ByteString("child", rawChild))
+	}
+	return h.A(
+		h.Href(link.Fields.URL),
+		h.Rel("noreferer"),
+		h.Target("_blank"),
+		g.Map(link.Children, func(child json.RawMessage) g.Node {
+			return unmarshalChild(child)
+		}),
+	)
 }
 
 func unmarshalHeading(rawChild json.RawMessage) g.Node {
