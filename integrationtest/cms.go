@@ -16,3 +16,6 @@ func (m *mockCMSClient) GetAlbumWithPhotos(ctx context.Context, albumID int) (mo
 func (m *mockCMSClient) GetRecentPhotos(ctx context.Context) ([]model.Photo, error) {
 	return make([]model.Photo, 0), nil
 }
+func (m *mockCMSClient) GetBlogPosts(ctx context.Context) ([]model.BlogPost, error) {
+	return make([]model.BlogPost, 0), nil
+}

@@ -18,7 +18,7 @@ func Album(albumID int, album model.AlbumWithPhotos, authenticated bool) g.Node 
 			h.A(g.Text("← Back to all albums"), h.Href(route.Albums), h.Class("text-sm text-blue-700 hover:underline font-sans")),
 			h.Div(
 				h.H1(h.Class("text-xl font-sans font-semibold"), g.Text(album.Name)),
-				g.If(album.Description != "", h.P(g.Text(album.Description))),
+				g.If(album.Description != "", h.P(h.Class("max-w-prose"), g.Text(album.Description))),
 			),
 			h.Div(
 				c.Classes{"flex flex-col gap-4": true},

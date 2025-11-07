@@ -9,6 +9,8 @@ import { buildConfig } from 'payload'
 import sharp from 'sharp'
 
 import { Album } from './collections/Album'
+import { Blog } from './collections/Blog'
+import { BlogImage } from './collections/BlogImage'
 import { Photo } from './collections/Photo'
 import { Users } from './collections/Users'
 import { migrations } from './migrations'
@@ -24,7 +26,7 @@ export default buildConfig({
     },
   },
   serverURL: process.env.SERVER_URL!,
-  collections: [Users, Photo, Album],
+  collections: [Users, Photo, Album, Blog, BlogImage],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET!,
   typescript: {
@@ -44,6 +46,9 @@ export default buildConfig({
       collections: {
         photo: {
           prefix: 'photo-uploads',
+        },
+        'blog-image': {
+          prefix: 'blog-uploads',
         },
       },
       bucket: process.env.S3_BUCKET!,

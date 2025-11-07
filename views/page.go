@@ -2,6 +2,7 @@
 package views
 
 import (
+	"website/helpers"
 	"website/views/components"
 	"website/views/route"
 
@@ -18,8 +19,8 @@ func Page(title, path string, authenticated bool, body ...g.Node) g.Node {
 		Head: []g.Node{
 			h.Meta(h.Charset("UTF-8")),
 			h.Meta(h.Name("viewport"), h.Content("width=device-width, initial-scale=1.0")),
-			h.Meta(h.Name("keywords"), h.Content("Fredrik, homepage, software, development, programming, k3s")),
-			h.Meta(h.Name("author"), h.Content("Fredrik August")),
+			h.Meta(h.Name("keywords"), h.Content("Fredrik August Madsen-Malmo, homepage, software, development, programming, k3s")),
+			h.Meta(h.Name("author"), h.Content("Fredrik August Madsen-Malmo")),
 
 			components.TurnstileScript(),
 
@@ -61,21 +62,26 @@ func Page(title, path string, authenticated bool, body ...g.Node) g.Node {
 func Navbar(currentPath string, authenticated bool) g.Node {
 	return h.Nav(
 		c.Classes{
-			"flex items-center gap-2 py-1 text-sm font-sans": true,
+			"flex items-center gap-2 py-1 text-sm font-sans [&_a]:hover:underline": true,
 		},
-		h.A(c.Classes{"underline": route.Root == currentPath, "hover:underline": true}, h.Href(route.Root), g.Text("Home")),
-		h.A(c.Classes{"underline": route.Albums == currentPath, "hover:underline": true}, h.Href(route.Albums), g.Text("Photography")),
+		h.A(c.Classes{"underline": route.Root == currentPath}, h.Href(route.Root), g.Text("Home")),
+		h.A(c.Classes{"underline": route.Albums == currentPath}, h.Href(route.Albums), g.Text("Photography")),
+		h.A(c.Classes{"underline": route.Blog == currentPath}, h.Href(route.Blog), g.Text("Blog")),
 		g.If(
 			!authenticated,
 			h.A(
-				c.Classes{"underline": route.Login == currentPath, "hover:underline ml-auto": true},
+				c.Classes{"underline": route.Login == currentPath, "ml-auto": true},
 				h.Href(route.Login),
 				g.Text("Login"),
 			),
 		),
 		g.If(
 			authenticated,
-			h.Span(h.Class("ml-auto"), g.Text("Signed in")),
+			h.Div(
+				h.Class("contents"),
+				h.Span(h.Class("ml-auto"), g.Text("Signed in")),
+				h.A(h.Href(helpers.GetStringOrDefault("CMS_BASE_URL", "localhost:3000")+"/admin"), h.Target("_blank"), g.Text("CMS")),
+			),
 		),
 	)
 }

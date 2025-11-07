@@ -23,7 +23,7 @@ type requestSessionStore interface {
 	GetSessionFromRequest(r *http.Request) (model.Email, error)
 }
 
-func FrontPage(mux chi.Router, g guestbookGetter, rss requestSessionStore, cmsClient storage.CMSClient, logger *zap.Logger, turnstileOptions *security.TurnstileFrontendOptions) {
+func FrontPage(mux chi.Router, g guestbookGetter, cmsClient storage.CMSClient, logger *zap.Logger, turnstileOptions *security.TurnstileFrontendOptions) {
 	mux.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		comments, err := g.GetComments(r.Context())
 		if err != nil {
@@ -40,9 +40,7 @@ func FrontPage(mux chi.Router, g guestbookGetter, rss requestSessionStore, cmsCl
 			recentPhotos = make([]model.Photo, 0)
 		}
 
-		_, err = rss.GetSessionFromRequest(r)
-
-		_ = views.FrontPage(err == nil, comments, turnstileOptions.Sitekey, recentPhotos).Render(w)
+		_ = views.FrontPage(r.Context().Value("authenticated").(bool), comments, turnstileOptions.Sitekey, recentPhotos).Render(w)
 	})
 }
 
@@ -51,8 +49,8 @@ type photoGetter interface {
 	GetAlbumWithPhotos(ctx context.Context, albumID int) (model.AlbumWithPhotos, error)
 }
 
-func Photography(mux chi.Router, p photoGetter, rss requestSessionStore, logger *zap.Logger) {
-	mux.Get("/albums", func(w http.ResponseWriter, r *http.Request) {
+func Photography(mux chi.Router, p photoGetter, logger *zap.Logger) {
+	mux.Get(route.Albums, func(w http.ResponseWriter, r *http.Request) {
 		albums, err := p.GetAlbums(r.Context())
 		if err != nil {
 			logger.Warn("failed to fetch photos", zap.Error(err))
@@ -60,9 +58,7 @@ func Photography(mux chi.Router, p photoGetter, rss requestSessionStore, logger 
 			return
 		}
 
-		_, err = rss.GetSessionFromRequest(r)
-
-		_ = views.Albums(albums, err == nil).Render(w)
+		_ = views.Albums(albums, r.Context().Value("authenticated").(bool)).Render(w)
 	})
 
 	mux.Get("/albums/{albumId:[0-9]+}", func(w http.ResponseWriter, r *http.Request) {
@@ -79,15 +75,25 @@ func Photography(mux chi.Router, p photoGetter, rss requestSessionStore, logger 
 			return
 		}
 
-		_, err = rss.GetSessionFromRequest(r)
-
-		_ = views.Album(albumID, album, err == nil).Render(w)
+		_ = views.Album(albumID, album, r.Context().Value("authenticated").(bool)).Render(w)
 	})
 }
 
-func Login(mux chi.Router, rss requestSessionStore) {
+func Blog(mux chi.Router, cms storage.CMSClient, logger *zap.Logger) {
+	mux.Get(route.Blog, func(w http.ResponseWriter, r *http.Request) {
+		blogPosts, err := cms.GetBlogPosts(r.Context())
+		if err != nil {
+			logger.Warn("failed to get blog posts", zap.Error(err))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		_ = views.Blog(r.Context().Value("authenticated").(bool), blogPosts).Render(w)
+	})
+}
+
+func Login(mux chi.Router) {
 	mux.Get(route.Login, func(w http.ResponseWriter, r *http.Request) {
-		_, err := rss.GetSessionFromRequest(r)
-		_ = views.Login(err == nil).Render(w)
+		_ = views.Login(r.Context().Value("authenticated").(bool)).Render(w)
 	})
 }

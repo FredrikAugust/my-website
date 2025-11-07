@@ -100,9 +100,8 @@ func TestPostComment(t *testing.T) {
 func TestDeleteComment(t *testing.T) {
 	mux := chi.NewMux()
 	g := &guestbookMock{}
-	ssm := &sessionStoreMock{}
 
-	handlers.DeleteComment(mux, g, ssm, zap.NewNop())
+	handlers.DeleteComment(mux, g, zap.NewNop())
 
 	t.Run("invalid comment id", func(t *testing.T) {
 		is := is.New(t)
@@ -110,21 +109,5 @@ func TestDeleteComment(t *testing.T) {
 		header.Add("Cookie", "session=pass")
 		code, _, _ := integrationtest.MakePostRequest(mux, route.GuestbookDelete, header, strings.NewReader("comment_id=dog"))
 		is.Equal(code, http.StatusBadRequest)
-	})
-
-	t.Run("no authentication", func(t *testing.T) {
-		is := is.New(t)
-		header := integrationtest.CreateFormHeader()
-		header.Add("Cookie", "session=fail")
-		code, _, _ := integrationtest.MakePostRequest(mux, route.GuestbookDelete, header, strings.NewReader("comment_id=4"))
-		is.Equal(code, http.StatusUnauthorized)
-	})
-
-	t.Run("authentication", func(t *testing.T) {
-		is := is.New(t)
-		header := integrationtest.CreateFormHeader()
-		header.Add("Cookie", "session=pass")
-		code, _, _ := integrationtest.MakePostRequest(mux, route.GuestbookDelete, header, strings.NewReader("comment_id=4"))
-		is.Equal(code, http.StatusFound)
 	})
 }

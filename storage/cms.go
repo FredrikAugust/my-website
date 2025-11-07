@@ -8,14 +8,16 @@ import (
 )
 
 const (
-	collectionAlbum = "album"
-	collectionPhoto = "photo"
+	collectionAlbum     = "album"
+	collectionPhoto     = "photo"
+	collectionBlogPosts = "blog"
 )
 
 type CMSClient interface {
 	GetAlbums(ctx context.Context) ([]model.Album, error)
 	GetAlbumWithPhotos(ctx context.Context, albumID int) (model.AlbumWithPhotos, error)
 	GetRecentPhotos(ctx context.Context) ([]model.Photo, error)
+	GetBlogPosts(ctx context.Context) ([]model.BlogPost, error)
 }
 
 type PayloadCMSClient struct {
@@ -68,4 +70,15 @@ func (c *PayloadCMSClient) GetRecentPhotos(ctx context.Context) ([]model.Photo, 
 	}
 
 	return photos.Docs, nil
+}
+
+func (c *PayloadCMSClient) GetBlogPosts(ctx context.Context) ([]model.BlogPost, error) {
+	var posts payloadcms.ListResponse[model.BlogPost]
+	_, err := c.client.Collections.List(ctx, collectionBlogPosts, payloadcms.ListParams{}, &posts)
+
+	if err != nil {
+		return make([]model.BlogPost, 0), err
+	}
+
+	return posts.Docs, nil
 }

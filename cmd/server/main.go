@@ -31,6 +31,7 @@ func main() {
 func start() int {
 	logEnv := helpers.GetStringOrDefault("LOG_ENV", "development")
 	log, err := createLogger(logEnv)
+	zap.ReplaceGlobals(log)
 	if err != nil {
 		fmt.Println("error setting up the logger:", err)
 		return 1
