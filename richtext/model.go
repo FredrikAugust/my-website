@@ -221,7 +221,8 @@ func unmarshalCodeBlock(rawChild json.RawMessage) g.Node {
 	if err != nil {
 		zap.L().Warn("failed to unmarshal code block", zap.Error(err), zap.ByteString("child", rawChild))
 	}
-	return h.Pre(
+	return h.Div(
+		h.Class("overflow-x-auto font-mono whitespace-pre"),
 		g.Text(codeBlock.Fields.Code),
 	)
 }

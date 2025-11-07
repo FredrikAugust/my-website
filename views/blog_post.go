@@ -24,7 +24,7 @@ func BlogPost(authenticated bool, post model.BlogPost) g.Node {
 		route.BlogPost(post.Slug),
 		authenticated,
 		h.Section(
-			h.Class("flex flex-col gap-2"),
+			h.Class("flex flex-col gap-2 overflow-x-hidden"),
 			h.A(g.Text("← Back to all blog posts"), h.Href(route.Blog), h.Class("text-sm")),
 			h.Div(
 				h.Class("flex flex-col"),
