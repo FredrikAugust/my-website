@@ -15,10 +15,10 @@ func Album(albumID int, album model.AlbumWithPhotos, authenticated bool) g.Node 
 		authenticated,
 		h.Div(
 			c.Classes{"flex flex-col gap-2": true},
-			h.A(g.Text("← Back to all albums"), h.Href(route.Albums), h.Class("text-sm text-blue-700 hover:underline font-sans")),
+			h.A(g.Text("← Back to all albums"), h.Href(route.Albums), h.Class("text-sm")),
 			h.Div(
-				h.H1(h.Class("text-xl font-sans font-semibold"), g.Text(album.Name)),
-				g.If(album.Description != "", h.P(h.Class("max-w-prose"), g.Text(album.Description))),
+				h.H1(g.Text(album.Name)),
+				g.If(album.Description != "", h.P(g.Text(album.Description))),
 			),
 			h.Div(
 				c.Classes{"flex flex-col gap-4": true},

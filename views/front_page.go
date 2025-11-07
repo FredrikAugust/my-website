@@ -22,9 +22,9 @@ func FrontPage(authenticated bool, comments []model.GuestbookEntry, turnstileSit
 		authenticated,
 		h.Div(
 			h.Class("flex flex-col gap-1"),
-			h.H1(c.Classes{
-				"text-4xl leading-[1.3] font-bold font-display text-transparent bg-clip-text bg-contain bg-[url('/static/images/sparkles.gif')]": true,
-			}, g.Text("Fredrik's Homepage")),
+			h.H1(h.Class(
+				"!text-4xl !leading-[1.3] !font-bold !font-display text-transparent bg-clip-text bg-contain bg-[url('/static/images/sparkles.gif')]",
+			), g.Text("Fredrik's Homepage")),
 			h.Div(
 				c.Classes{
 					"text-gray-800 text-sm": true,
@@ -36,11 +36,11 @@ func FrontPage(authenticated bool, comments []model.GuestbookEntry, turnstileSit
 				h.Class("grid gap-4 lg:grid-cols-[2fr_1fr]"),
 				h.Div(
 					h.Class("flex flex-col gap-2"),
-					h.H2(h.Class("text-xl font-semibold font-sans"), g.Text("Recent photos")),
+					h.H2(g.Text("Recent photos")),
 					h.Div(
 						h.Class("flex flex-col gap-2 [&>div>a]:max-w-sm"),
 						g.Map(recentPhotos, components.PhotoWithDetails),
-						h.A(h.Href(route.Albums), g.Text("See more →"), h.Class("text-blue-700 hover:underline font-sans")),
+						h.A(h.Href(route.Albums), g.Text("See more →")),
 					),
 				),
 				h.Div(

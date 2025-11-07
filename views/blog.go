@@ -17,10 +17,8 @@ func Blog(authenticated bool, blogPosts []model.BlogPost) g.Node {
 			h.H1(g.Text("Blog posts")),
 			g.Map(blogPosts, func(bp model.BlogPost) g.Node {
 				return h.Div(
-					g.Text(bp.Title),
-					h.Div(
-						bp.Content.RenderToGomponents(),
-					),
+					h.A(g.Text(bp.Title)),
+					h.P(h.Class("max-w-prose"), g.Text(bp.Excerpt)),
 				)
 			}),
 		),

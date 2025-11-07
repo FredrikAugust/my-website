@@ -97,7 +97,7 @@ func MyFooter() g.Node {
 			h.Img(h.Src("https://www.abuseipdb.com/contributor/244214.svg"), h.Loading("lazy"), h.Class("h-8"), h.Alt("AbuseIPDB Contributor Badge")),
 		),
 		h.A(
-			h.Class("flex gap-1 items-center hover:underline font-sans"),
+			h.Class("flex gap-1 items-center font-sans"),
 			h.Href("https://github.com/fredrikaugust/my-website"),
 			h.Img(h.Src("/static/images/github-mark.svg"), h.Class("h-3"), h.Alt("github logo")),
 			h.Target("_blank"),

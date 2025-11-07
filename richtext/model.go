@@ -51,11 +51,30 @@ func unmarshalChild(rawChild json.RawMessage) g.Node {
 		return unmarshalText(rawChild)
 	case "paragraph":
 		return unmarshalParagraph(rawChild)
+	case "heading":
+		return unmarshalHeading(rawChild)
 	case "upload":
 		return unmarshalUpload(rawChild)
 	}
 
 	return g.Text("unknown child: " + typeCheck.Type)
+}
+
+func unmarshalHeading(rawChild json.RawMessage) g.Node {
+	var heading struct {
+		Tag      string            `json:"tag"`
+		Children []json.RawMessage `json:"children"`
+	}
+	err := json.Unmarshal(rawChild, &heading)
+	if err != nil {
+		zap.L().Warn("failed to unmarshal heading", zap.Error(err), zap.ByteString("child", rawChild))
+	}
+	return g.El(
+		heading.Tag,
+		g.Map(heading.Children, func(child json.RawMessage) g.Node {
+			return unmarshalChild(child)
+		}),
+	)
 }
 
 func unmarshalUpload(rawChild json.RawMessage) g.Node {

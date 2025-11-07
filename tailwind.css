@@ -18,3 +18,23 @@
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/preflight.css" layer(base);
 @import "tailwindcss/utilities.css" layer(utilities);
+
+h1 {
+  @apply text-2xl font-semibold font-sans;
+}
+
+h2 {
+  @apply text-xl font-sans;
+}
+
+h3 {
+  @apply text-lg font-sans;
+}
+
+a {
+  @apply hover:underline text-blue-700 font-sans;
+}
+
+p {
+  @apply max-w-prose;
+}
