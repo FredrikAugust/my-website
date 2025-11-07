@@ -1,6 +1,9 @@
 package model
 
-import "website/richtext"
+import (
+	"time"
+	"website/richtext"
+)
 
 type BlogPostStatus string
 
@@ -12,7 +15,7 @@ type BlogPost struct {
 	ID            int               `json:"id"`
 	Title         string            `json:"title"`
 	Slug          string            `json:"slug"`
-	PublishedAt   string            `json:"publishedAt"`
+	PublishedAt   time.Time         `json:"publishedAt"`
 	Status        BlogPostStatus    `json:"status"`
 	Excerpt       string            `json:"excerpt"`
 	FeaturedImage *Photo            `json:"featuredImage"`
@@ -23,6 +26,6 @@ type BlogPost struct {
 		Tag string `json:"tag"`
 	} `json:"tags"`
 
-	UpdatedAt string `json:"updatedAt"`
-	CreatedAt string `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+	CreatedAt time.Time `json:"createdAt"`
 }

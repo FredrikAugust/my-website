@@ -90,7 +90,7 @@ func MyFooter() g.Node {
 	return h.Footer(
 		h.Class("text-xs text-gray-800 flex flex-col gap-2"),
 		h.Hr(),
-		h.P(h.Class("max-w-prose"), g.Text("This web server is written in Go. It uses Gomponents and Tailwind for the UI. It's hosted in a Kubernetes (k3s) cluster on Hetzner cloud, using Traefik as a reverse proxy. The DNS, static asset caching and basic protection is handled on Cloudflare.")),
+		h.P(g.Text("This web server is written in Go. It uses Gomponents and Tailwind for the UI. It's hosted in a Kubernetes (k3s) cluster on Hetzner cloud, using Traefik as a reverse proxy. The DNS, static asset caching and basic protection is handled on Cloudflare.")),
 		h.A(
 			h.Href("https://www.abuseipdb.com/user/244214"),
 			h.Title("AbuseIPDB is an IP address blacklist for webmasters and sysadmins to report IP addresses engaging in abusive behavior on their networks"),

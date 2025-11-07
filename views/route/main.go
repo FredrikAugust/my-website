@@ -12,3 +12,7 @@ const Login = "/login"
 func Album(id int) string {
 	return fmt.Sprintf("albums/%d", id)
 }
+
+func BlogPost(slug string) string {
+	return fmt.Sprintf("blog/%v", slug)
+}

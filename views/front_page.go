@@ -15,7 +15,7 @@ import (
 	"github.com/SerhiiCho/timeago/v3"
 )
 
-func FrontPage(authenticated bool, comments []model.GuestbookEntry, turnstileSitekey string, recentPhotos []model.Photo) g.Node {
+func FrontPage(authenticated bool, comments []model.GuestbookEntry, turnstileSitekey string, recentPhotos []model.Photo, recentBlogPosts []model.BlogPost) g.Node {
 	return Page(
 		"Fredrik",
 		route.Root,
@@ -33,9 +33,24 @@ func FrontPage(authenticated bool, comments []model.GuestbookEntry, turnstileSit
 				h.P(g.Text("I hope you enjoy your visit. Please leave a message in the guestbook if you did.")),
 			),
 			h.Div(
-				h.Class("grid gap-4 lg:grid-cols-[2fr_1fr]"),
+				h.Class("grid mt-4 gap-4 lg:grid-cols-[2fr_1fr]"),
 				h.Div(
 					h.Class("flex flex-col gap-2"),
+					h.H2(g.Text("Recent blog posts")),
+					h.Div(
+						h.Class("flex flex-col gap-2"),
+						g.Map(recentBlogPosts, func(blogPost model.BlogPost) g.Node {
+							published, _ := timeago.Parse(blogPost.PublishedAt)
+							return h.Div(
+								h.Class("flex flex-col"),
+								h.A(h.Href(route.BlogPost(blogPost.Slug)), g.Text(blogPost.Title)),
+								h.P(g.Text(blogPost.Excerpt)),
+								h.Small(g.Textf("Published %v", published)),
+							)
+						}),
+						h.A(h.Href(route.Blog), g.Text("See more →")),
+					),
+					h.Hr(),
 					h.H2(g.Text("Recent photos")),
 					h.Div(
 						h.Class("flex flex-col gap-2 [&>div>a]:max-w-sm"),
@@ -58,8 +73,7 @@ func FrontPage(authenticated bool, comments []model.GuestbookEntry, turnstileSit
 									h.Div(
 										c.Classes{"flex gap-1 items-center": true},
 										h.Span(c.Classes{"font-bold": true}, g.Text(comment.Name)),
-										h.Span(
-											h.Class("text-xs text-gray-600"),
+										h.Small(
 											h.Title(comment.CreatedAt.Format(time.RFC3339)),
 											g.Text(timeAgo),
 										),

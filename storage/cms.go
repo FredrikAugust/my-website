@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"errors"
 	"website/model"
 
 	"github.com/ainsleyclark/go-payloadcms"
@@ -18,6 +19,8 @@ type CMSClient interface {
 	GetAlbumWithPhotos(ctx context.Context, albumID int) (model.AlbumWithPhotos, error)
 	GetRecentPhotos(ctx context.Context) ([]model.Photo, error)
 	GetBlogPosts(ctx context.Context) ([]model.BlogPost, error)
+	GetBlogPost(ctx context.Context, slug string) (model.BlogPost, error)
+	GetRecentBlogPosts(ctx context.Context) ([]model.BlogPost, error)
 }
 
 type PayloadCMSClient struct {
@@ -81,4 +84,41 @@ func (c *PayloadCMSClient) GetBlogPosts(ctx context.Context) ([]model.BlogPost, 
 	}
 
 	return posts.Docs, nil
+}
+
+func (c *PayloadCMSClient) GetBlogPost(ctx context.Context, slug string) (model.BlogPost, error) {
+	var posts payloadcms.ListResponse[model.BlogPost]
+	_, err := c.client.Collections.List(ctx, collectionBlogPosts, payloadcms.ListParams{
+		Where: payloadcms.Query().Equals("slug", slug),
+		Limit: 1,
+	}, &posts)
+
+	if err != nil {
+		return model.BlogPost{}, err
+	}
+
+	if len(posts.Docs) == 0 {
+		return model.BlogPost{}, errors.New("no document found for slug")
+	}
+
+	return posts.Docs[0], nil
+}
+
+func (c *PayloadCMSClient) GetRecentBlogPosts(ctx context.Context) ([]model.BlogPost, error) {
+	var blogPosts payloadcms.ListResponse[model.BlogPost]
+	_, err := c.client.Collections.List(
+		ctx,
+		collectionBlogPosts,
+		payloadcms.ListParams{
+			Sort:  "-publishedAt",
+			Limit: 3,
+		},
+		&blogPosts,
+	)
+
+	if err != nil {
+		return make([]model.BlogPost, 0), err
+	}
+
+	return blogPosts.Docs, nil
 }

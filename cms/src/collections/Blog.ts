@@ -14,7 +14,13 @@ export const Blog: CollectionConfig = {
     defaultColumns: ['title', 'author', 'publishedAt', 'status'],
   },
   access: {
-    read: () => true,
+    read: ({ req: { user } }) => {
+      if (user) return true
+
+      return {
+        status: { equals: 'published' },
+      }
+    },
   },
   fields: [
     {

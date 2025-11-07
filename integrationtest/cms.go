@@ -19,3 +19,9 @@ func (m *mockCMSClient) GetRecentPhotos(ctx context.Context) ([]model.Photo, err
 func (m *mockCMSClient) GetBlogPosts(ctx context.Context) ([]model.BlogPost, error) {
 	return make([]model.BlogPost, 0), nil
 }
+func (m *mockCMSClient) GetBlogPost(ctx context.Context, slug string) (model.BlogPost, error) {
+	return model.BlogPost{}, nil
+}
+func (m *mockCMSClient) GetRecentBlogPosts(ctx context.Context) ([]model.BlogPost, error) {
+	return make([]model.BlogPost, 0), nil
+}

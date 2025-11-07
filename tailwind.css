@@ -38,3 +38,7 @@ a {
 p {
   @apply max-w-prose;
 }
+
+small {
+  @apply text-gray-700 text-xs;
+}

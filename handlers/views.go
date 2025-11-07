@@ -36,11 +36,17 @@ func FrontPage(mux chi.Router, g guestbookGetter, cmsClient storage.CMSClient, l
 
 		recentPhotos, err := cmsClient.GetRecentPhotos(r.Context())
 		if err != nil {
-			logger.Warn("failed ot get recent photos")
+			logger.Warn("failed to get recent photos", zap.Error(err))
 			recentPhotos = make([]model.Photo, 0)
 		}
 
-		_ = views.FrontPage(r.Context().Value("authenticated").(bool), comments, turnstileOptions.Sitekey, recentPhotos).Render(w)
+		recentBlogPosts, err := cmsClient.GetRecentBlogPosts(r.Context())
+		if err != nil {
+			logger.Warn("failed to get recent blog posts", zap.Error(err))
+			recentBlogPosts = make([]model.BlogPost, 0)
+		}
+
+		_ = views.FrontPage(r.Context().Value("authenticated").(bool), comments, turnstileOptions.Sitekey, recentPhotos, recentBlogPosts).Render(w)
 	})
 }
 
@@ -89,6 +95,17 @@ func Blog(mux chi.Router, cms storage.CMSClient, logger *zap.Logger) {
 		}
 
 		_ = views.Blog(r.Context().Value("authenticated").(bool), blogPosts).Render(w)
+	})
+
+	mux.Get("/blog/{slug}", func(w http.ResponseWriter, r *http.Request) {
+		blogPost, err := cms.GetBlogPost(r.Context(), chi.URLParam(r, "slug"))
+		if err != nil {
+			logger.Warn("failed to fetch blog post", zap.Error(err))
+			http.NotFound(w, r)
+			return
+		}
+
+		_ = views.BlogPost(r.Context().Value("authenticated").(bool), blogPost).Render(w)
 	})
 }
 

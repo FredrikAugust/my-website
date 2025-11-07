@@ -112,13 +112,23 @@ func unmarshalParagraph(rawChild json.RawMessage) g.Node {
 
 func unmarshalText(rawChild json.RawMessage) g.Node {
 	var text struct {
-		Text string `json:"text"`
+		Text   string `json:"text"`
+		Format int    `json:"format"`
 	}
 	err := json.Unmarshal(rawChild, &text)
 	if err != nil {
 		zap.L().Warn("failed to unmarshal text", zap.Error(err), zap.ByteString("child", rawChild))
 	}
-	return g.Text(text.Text)
+
+	switch text.Format {
+	case 1:
+		return h.Strong(g.Text(text.Text))
+	case 2:
+		return h.Em(g.Text(text.Text))
+	default:
+		return g.Text(text.Text)
+	}
+
 }
 
 func unmarshalListItem(rawChild json.RawMessage) g.Node {
@@ -195,6 +205,7 @@ func unmarshalCodeBlock(rawChild json.RawMessage) g.Node {
 
 func (r RootNode) RenderToGomponents() g.Node {
 	return h.Div(
-		r.Children...,
+		h.Class("flex flex-col gap-1"),
+		g.Group(r.Children),
 	)
 }
