@@ -2,7 +2,6 @@
 package views
 
 import (
-	"website/helpers"
 	"website/views/components"
 	"website/views/route"
 
@@ -80,7 +79,6 @@ func Navbar(currentPath string, authenticated bool) g.Node {
 			h.Div(
 				h.Class("contents"),
 				h.Span(h.Class("ml-auto"), g.Text("Signed in")),
-				h.A(h.Href(helpers.GetStringOrDefault("CMS_BASE_URL", "localhost:3000")+"/admin"), h.Target("_blank"), g.Text("CMS")),
 			),
 		),
 	)
