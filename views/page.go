@@ -18,7 +18,7 @@ func Page(title, path string, authenticated bool, body ...g.Node) g.Node {
 		Head: []g.Node{
 			h.Meta(h.Charset("UTF-8")),
 			h.Meta(h.Name("viewport"), h.Content("width=device-width, initial-scale=1.0")),
-			h.Meta(h.Name("keywords"), h.Content("Fredrik August Madsen-Malmo, homepage, software, development, programming, k3s")),
+			h.Meta(h.Name("keywords"), h.Content("Fredrik August Madsen-Malmo, homepage, software, development, programming, k3s, golang, rust, typescript")),
 			h.Meta(h.Name("author"), h.Content("Fredrik August Madsen-Malmo")),
 
 			components.TurnstileScript(),
