@@ -29,9 +29,14 @@ func BlogPost(authenticated bool, post model.BlogPost) g.Node {
 			h.Div(
 				h.Class("flex flex-col"),
 				h.H1(h.Class("!text-4xl"), g.Text(post.Title)),
-				h.Small(h.Title(post.PublishedAt.String()), g.Textf("Published %v", published)),
+				h.Small(h.Class("mt-1"), h.Title(post.PublishedAt.String()), g.Textf("Published %v", published)),
 				g.If(published != updated, h.Small(h.Title(post.UpdatedAt.String()), g.Textf("Updated %v", updated))),
-				h.Hr(),
+				h.Hr(h.Class("mt-2")),
+			),
+			h.Div(
+				h.Class("border-gray-500 border-l py-1 px-2 w-fit flex flex-col"),
+				h.Span(h.Class("font-sans"), g.Text("Abstract")),
+				h.P(h.Class("text-sm text-gray-700 max-w-full"), g.Text(post.Excerpt)),
 			),
 			post.Content.RenderToGomponents(),
 		),
