@@ -144,10 +144,14 @@ func unmarshalText(rawChild json.RawMessage) g.Node {
 	}
 
 	switch text.Format {
+	case 0:
+		return g.Text(text.Text)
 	case 1:
 		return h.Strong(g.Text(text.Text))
 	case 2:
 		return h.Em(g.Text(text.Text))
+	case 16:
+		return h.Code(h.Class("bg-gray-100 border border-gray-200 text-[0.9rem] rounded-sm p-0.5"), g.Text(text.Text))
 	default:
 		return g.Text(text.Text)
 	}
