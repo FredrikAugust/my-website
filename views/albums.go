@@ -10,9 +10,11 @@ import (
 )
 
 func Albums(albums []model.Album, authenticated bool) g.Node {
-	return Page("Photography", route.Albums,
-		authenticated,
-		h.Section(
+	return Page(PageOptions{
+		Title:         "Photography",
+		Path:          route.Albums,
+		Authenticated: authenticated,
+		Body: []g.Node{h.Section(
 			h.H1(g.Text("Albums")),
 			h.Div(c.Classes{"flex flex-col gap-2": true}, g.Map(albums, func(album model.Album) g.Node {
 				return h.Div(h.Class("flex flex-col"),
@@ -20,6 +22,6 @@ func Albums(albums []model.Album, authenticated bool) g.Node {
 					h.P(g.Text(album.Description)),
 				)
 			})),
-		),
-	)
+		)},
+	})
 }

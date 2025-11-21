@@ -19,11 +19,12 @@ func BlogPost(authenticated bool, post model.BlogPost) g.Node {
 		updated = "Unknown"
 	}
 
-	return Page(
-		"Blog",
-		route.BlogPost(post.Slug),
-		authenticated,
-		h.Section(
+	return Page(PageOptions{
+		Title:         post.Title,
+		Description:   post.Excerpt,
+		Path:          route.BlogPost(post.Slug),
+		Authenticated: authenticated,
+		Body: []g.Node{h.Section(
 			h.Class("flex flex-col gap-2 overflow-x-hidden [&_a]:!text-black [&_a]:underline [&_a]:!font-serif"),
 			h.A(g.Text("← Back to all blog posts"), h.Href(route.Blog), h.Class("text-sm")),
 			h.Div(
@@ -39,6 +40,6 @@ func BlogPost(authenticated bool, post model.BlogPost) g.Node {
 				h.P(h.Class("text-sm text-gray-700 max-w-full"), g.Text(post.Excerpt)),
 			),
 			post.Content.RenderToGomponents(),
-		),
-	)
+		)},
+	})
 }

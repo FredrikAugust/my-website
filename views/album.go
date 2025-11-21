@@ -11,9 +11,12 @@ import (
 )
 
 func Album(albumID int, album model.AlbumWithPhotos, authenticated bool) g.Node {
-	return Page("Album", route.Album(albumID),
-		authenticated,
-		h.Div(
+	return Page(PageOptions{
+		Title:         album.Name,
+		Description:   album.Description,
+		Path:          route.Album(albumID),
+		Authenticated: authenticated,
+		Body: []g.Node{h.Div(
 			c.Classes{"flex flex-col gap-2": true},
 			h.A(g.Text("← Back to all albums"), h.Href(route.Albums), h.Class("text-sm")),
 			h.Div(
@@ -24,6 +27,6 @@ func Album(albumID int, album model.AlbumWithPhotos, authenticated bool) g.Node 
 				c.Classes{"flex flex-col gap-4": true},
 				g.Map(album.Photos, components.PhotoWithDetails),
 			),
-		),
-	)
+		)},
+	})
 }

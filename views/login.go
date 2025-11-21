@@ -9,11 +9,11 @@ import (
 )
 
 func Login(authenticated bool) g.Node {
-	return Page(
-		"Login",
-		route.Login,
-		authenticated,
-		h.Form(
+	return Page(PageOptions{
+		Title:         "Login",
+		Path:          route.Login,
+		Authenticated: authenticated,
+		Body: []g.Node{h.Form(
 			c.Classes{"font-sans text-sm": true},
 			h.Action(route.Login),
 			h.Method("POST"),
@@ -37,6 +37,6 @@ func Login(authenticated bool) g.Node {
 				),
 				h.Button(c.Classes{"font-sans self-start bg-gray-800 text-white px-2 py-1": true}, h.Type("submit"), g.Text("Login")),
 			),
-		),
-	)
+		)},
+	})
 }

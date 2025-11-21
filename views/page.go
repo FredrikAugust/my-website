@@ -10,15 +10,49 @@ import (
 	h "maragu.dev/gomponents/html"
 )
 
-func Page(title, path string, authenticated bool, body ...g.Node) g.Node {
+// PageOptions contains configuration for rendering a page
+type PageOptions struct {
+	Title           string
+	Description     string
+	Path            string
+	Authenticated   bool
+	Keywords        string
+	OGTitle         string
+	OGDescription   string
+	TwitterTitle    string
+	TwitterDescription string
+	Body            []g.Node
+}
+
+func Page(opts PageOptions) g.Node {
+	// Set defaults
+	if opts.Description == "" {
+		opts.Description = "Fredrik's homepage about software, development, sports and photography"
+	}
+	if opts.Keywords == "" {
+		opts.Keywords = "Fredrik August Madsen-Malmo, homepage, software, development, programming, k3s, golang, rust, typescript"
+	}
+	if opts.OGTitle == "" {
+		opts.OGTitle = opts.Title
+	}
+	if opts.OGDescription == "" {
+		opts.OGDescription = opts.Description
+	}
+	if opts.TwitterTitle == "" {
+		opts.TwitterTitle = opts.OGTitle
+	}
+	if opts.TwitterDescription == "" {
+		opts.TwitterDescription = opts.OGDescription
+	}
+
 	return c.HTML5(c.HTML5Props{
-		Title:       title,
-		Description: "Fredrik's homepage about software, development, sports and photography",
+		Title:       opts.Title,
+		Description: opts.Description,
 		Language:    "en",
 		Head: []g.Node{
 			h.Meta(h.Charset("UTF-8")),
 			h.Meta(h.Name("viewport"), h.Content("width=device-width, initial-scale=1.0")),
-			h.Meta(h.Name("keywords"), h.Content("Fredrik August Madsen-Malmo, homepage, software, development, programming, k3s, golang, rust, typescript")),
+			h.Meta(h.Name("keywords"), h.Content(opts.Keywords)),
 			h.Meta(h.Name("author"), h.Content("Fredrik August Madsen-Malmo")),
 
 			components.TurnstileScript(),
@@ -28,14 +62,14 @@ func Page(title, path string, authenticated bool, body ...g.Node) g.Node {
 
 			// Open Graph / Facebook
 			h.Meta(g.Attr("property", "og:type"), h.Content("website")),
-			h.Meta(g.Attr("property", "og:title"), h.Content("Fredrik's Homepage")),
-			h.Meta(g.Attr("property", "og:description"), h.Content("Fredrik's personal homepage - hosted on k3s")),
+			h.Meta(g.Attr("property", "og:title"), h.Content(opts.OGTitle)),
+			h.Meta(g.Attr("property", "og:description"), h.Content(opts.OGDescription)),
 			h.Meta(g.Attr("property", "og:site_name"), h.Content("Fredrik's Homepage")),
 
 			// Twitter
 			h.Meta(h.Name("twitter:card"), h.Content("summary")),
-			h.Meta(h.Name("twitter:title"), h.Content("Fredrik's Homepage")),
-			h.Meta(h.Name("twitter:description"), h.Content("Fredrik's personal homepage - hosted on k3s")),
+			h.Meta(h.Name("twitter:title"), h.Content(opts.TwitterTitle)),
+			h.Meta(h.Name("twitter:description"), h.Content(opts.TwitterDescription)),
 
 			// Favicon
 			h.Link(h.Rel("apple-touch-icon"), g.Attr("sizes", "180x180"), h.Href("/static/apple-touch-icon.png")),
@@ -49,8 +83,8 @@ func Page(title, path string, authenticated bool, body ...g.Node) g.Node {
 					c.Classes{
 						"grid grid-rows-[auto_1fr_auto] py-2 px-4 gap-2 font-serif grow": true,
 					},
-					Navbar(path, authenticated),
-					g.Group(body),
+					Navbar(opts.Path, opts.Authenticated),
+					g.Group(opts.Body),
 					MyFooter(),
 				),
 			),

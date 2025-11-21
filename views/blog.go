@@ -9,11 +9,11 @@ import (
 )
 
 func Blog(authenticated bool, blogPosts []model.BlogPost) g.Node {
-	return Page(
-		"Blog",
-		route.Blog,
-		authenticated,
-		h.Section(
+	return Page(PageOptions{
+		Title:         "Blog",
+		Path:          route.Blog,
+		Authenticated: authenticated,
+		Body: []g.Node{h.Section(
 			h.H1(g.Text("Blog posts")),
 			g.Map(blogPosts, func(bp model.BlogPost) g.Node {
 				return h.Div(
@@ -21,6 +21,6 @@ func Blog(authenticated bool, blogPosts []model.BlogPost) g.Node {
 					h.P(g.Text(bp.Excerpt)),
 				)
 			}),
-		),
-	)
+		)},
+	})
 }

@@ -16,11 +16,11 @@ import (
 )
 
 func FrontPage(authenticated bool, comments []model.GuestbookEntry, turnstileSitekey string, recentPhotos []model.Photo, recentBlogPosts []model.BlogPost) g.Node {
-	return Page(
-		"Fredrik",
-		route.Root,
-		authenticated,
-		h.Div(
+	return Page(PageOptions{
+		Title:         "Fredrik",
+		Path:          route.Root,
+		Authenticated: authenticated,
+		Body: []g.Node{h.Div(
 			h.Class("flex flex-col gap-1"),
 			h.H1(h.Class(
 				"!text-4xl !leading-[1.3] !font-bold !font-display text-transparent bg-clip-text bg-contain bg-[url('/static/images/sparkles.gif')]",
@@ -122,6 +122,6 @@ func FrontPage(authenticated bool, comments []model.GuestbookEntry, turnstileSit
 					),
 				),
 			),
-		),
-	)
+		)},
+	})
 }
