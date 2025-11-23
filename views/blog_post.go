@@ -29,6 +29,9 @@ func BlogPost(authenticated bool, post model.BlogPost) g.Node {
 			h.A(g.Text("← Back to all blog posts"), h.Href(route.Blog), h.Class("text-sm")),
 			h.Div(
 				h.Class("flex flex-col"),
+				g.Iff(post.FeaturedImage != nil, func() g.Node {
+					return h.Img(h.Class("max-h-[30svh] object-contain self-start mb-2"), h.Src(post.FeaturedImage.Sizes.Large.URL))
+				}),
 				h.H1(h.Class("!text-4xl"), g.Text(post.Title)),
 				h.Small(h.Class("mt-1"), h.Title(post.PublishedAt.String()), g.Textf("Published %v", published)),
 				g.If(published != updated, h.Small(h.Title(post.UpdatedAt.String()), g.Textf("Updated %v", updated))),

@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -161,7 +160,7 @@ func createPayloadCMSClient(logger *zap.Logger) *storage.PayloadCMSClient {
 	cmsClient, err := storage.NewCMSClient(helpers.GetStringOrDefault("CMS_BASE_URL", "http://localhost:3000"))
 
 	if err != nil {
-		log.Panic(err)
+		logger.Panic("failed to create payload cms client", zap.Error(err))
 	}
 
 	return cmsClient
