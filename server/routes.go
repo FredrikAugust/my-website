@@ -56,4 +56,7 @@ func (s *Server) SetupRoutes() {
 	handlers.Photography(s.mux, s.cmsClient, s.log)
 	handlers.Login(s.mux)
 	handlers.Blog(s.mux, s.cmsClient, s.log)
+
+	// Atom feed
+	handlers.Feeds(s.mux, s.cmsClient, s.log)
 }

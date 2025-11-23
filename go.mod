@@ -48,6 +48,7 @@ require (
 	github.com/ainsleyclark/go-payloadcms v0.0.8
 	github.com/golang-migrate/migrate/v4 v4.19.0
 	github.com/google/uuid v1.6.0
+	github.com/gorilla/feeds v1.2.0
 	github.com/joho/godotenv v1.5.1
 	github.com/redis/go-redis/v9 v9.14.0
 	github.com/resend/resend-go/v2 v2.25.0

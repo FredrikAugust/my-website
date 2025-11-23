@@ -64,6 +64,7 @@ func Photography(mux chi.Router, p photoGetter, logger *zap.Logger) {
 			return
 		}
 
+		w.Header().Set("Cache-Control", "public, max-age=300")
 		_ = views.Albums(albums, r.Context().Value("authenticated").(bool)).Render(w)
 	})
 
@@ -81,6 +82,7 @@ func Photography(mux chi.Router, p photoGetter, logger *zap.Logger) {
 			return
 		}
 
+		w.Header().Set("Cache-Control", "public, max-age=300")
 		_ = views.Album(albumID, album, r.Context().Value("authenticated").(bool)).Render(w)
 	})
 }
@@ -94,6 +96,7 @@ func Blog(mux chi.Router, cms storage.CMSClient, logger *zap.Logger) {
 			return
 		}
 
+		w.Header().Set("Cache-Control", "public, max-age=300")
 		_ = views.Blog(r.Context().Value("authenticated").(bool), blogPosts).Render(w)
 	})
 
@@ -105,6 +108,7 @@ func Blog(mux chi.Router, cms storage.CMSClient, logger *zap.Logger) {
 			return
 		}
 
+		w.Header().Set("Cache-Control", "public, max-age=300")
 		_ = views.BlogPost(r.Context().Value("authenticated").(bool), blogPost).Render(w)
 	})
 }
