@@ -137,10 +137,18 @@ func MyFooter() g.Node {
 			h.Rel("noreferrer"),
 			g.Text("Source code"),
 		),
-		h.A(
-			h.Rel("me"),
-			h.Href("https://mastodon.social/@fredrikmalmo"),
-			g.Text("Mastodon"),
+		h.Div(
+			h.Class("flex gap-1"),
+			h.A(
+				h.Rel("me"),
+				h.Href("https://mastodon.social/@fredrikmalmo"),
+				g.Text("Mastodon"),
+			),
+			g.Text("•"),
+			h.A(
+				h.Href("/feed.xml"),
+				g.Text("RSS Feed (Atom)"),
+			),
 		),
 	)
 }

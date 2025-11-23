@@ -40,7 +40,7 @@ func Feeds(mux chi.Router, cms storage.CMSClient, logger *zap.Logger) {
 				Title:   post.Title,
 				Content: post.Excerpt,
 				Created: post.PublishedAt.UTC(),
-				Updated: post.UpdatedAt.UTC(),
+				Updated: post.PublishedAt.UTC(),
 				Source:  &feeds.Link{Href: url},
 				Link:    &feeds.Link{Href: url},
 			}
