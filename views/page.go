@@ -12,16 +12,16 @@ import (
 
 // PageOptions contains configuration for rendering a page
 type PageOptions struct {
-	Title           string
-	Description     string
-	Path            string
-	Authenticated   bool
-	Keywords        string
-	OGTitle         string
-	OGDescription   string
-	TwitterTitle    string
+	Title              string
+	Description        string
+	Path               string
+	Authenticated      bool
+	Keywords           string
+	OGTitle            string
+	OGDescription      string
+	TwitterTitle       string
 	TwitterDescription string
-	Body            []g.Node
+	Body               []g.Node
 }
 
 func Page(opts PageOptions) g.Node {
@@ -54,6 +54,7 @@ func Page(opts PageOptions) g.Node {
 			h.Meta(h.Name("viewport"), h.Content("width=device-width, initial-scale=1.0")),
 			h.Meta(h.Name("keywords"), h.Content(opts.Keywords)),
 			h.Meta(h.Name("author"), h.Content("Fredrik August Madsen-Malmo")),
+			h.Meta(h.Name("fediverse:creator"), h.Content("@fredrikmalmo@mastodon.social")),
 
 			components.TurnstileScript(),
 
@@ -135,6 +136,11 @@ func MyFooter() g.Node {
 			h.Target("_blank"),
 			h.Rel("noreferrer"),
 			g.Text("Source code"),
+		),
+		h.A(
+			h.Rel("me"),
+			h.Href("https://mastodon.social/@fredrikmalmo"),
+			g.Text("Mastodon"),
 		),
 	)
 }
