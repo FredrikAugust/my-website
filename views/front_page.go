@@ -53,8 +53,13 @@ func FrontPage(authenticated bool, comments []model.GuestbookEntry, turnstileSit
 					h.Hr(),
 					h.H2(g.Text("Recent photos")),
 					h.Div(
-						h.Class("flex flex-col gap-2 [&>div>a]:max-w-sm"),
-						g.Map(recentPhotos, components.PhotoWithDetails),
+						h.Class("flex flex-col gap-2"),
+						h.Div(
+							h.Class("grid grid-cols-1 md:grid-cols-3 gap-2"),
+							g.Map(recentPhotos, func(img model.Photo) g.Node {
+								return h.Img(h.Class("min-h-[200px] object-contain"), h.Src(img.Sizes.Small.URL))
+							}),
+						),
 						h.A(h.Href(route.Albums), g.Text("See more →")),
 					),
 				),
