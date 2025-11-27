@@ -57,9 +57,15 @@ func unmarshalChild(rawChild json.RawMessage) g.Node {
 		return unmarshalHeading(rawChild)
 	case "upload":
 		return unmarshalUpload(rawChild)
+	case "horizontalrule":
+		return unmarshalHorizontalRule()
 	}
 
 	return g.Text("unknown child: " + typeCheck.Type)
+}
+
+func unmarshalHorizontalRule() g.Node {
+	return h.Hr(h.Class("my-2 border-t-[3px] border-double max-w-prose"))
 }
 
 func unmarshalLink(rawChild json.RawMessage) g.Node {
@@ -225,9 +231,9 @@ func unmarshalCodeBlock(rawChild json.RawMessage) g.Node {
 	if err != nil {
 		zap.L().Warn("failed to unmarshal code block", zap.Error(err), zap.ByteString("child", rawChild))
 	}
-	return h.Div(
-		h.Class("overflow-x-auto font-mono whitespace-pre"),
-		g.Text(codeBlock.Fields.Code),
+	return h.Pre(
+		h.Class("max-w-prose"),
+		h.Code(h.Style("tab-size: 2"), g.Text(codeBlock.Fields.Code)),
 	)
 }
 

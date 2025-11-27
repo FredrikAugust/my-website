@@ -42,6 +42,9 @@ func BlogPost(authenticated bool, post model.BlogPost) g.Node {
 				h.Span(h.Class("font-sans"), g.Text("Abstract")),
 				h.P(h.Class("text-sm text-gray-700 max-w-full"), g.Text(post.Excerpt)),
 			),
+			h.Link(h.Rel("stylesheet"), h.Href("https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/default.min.css")),
+			h.Script(g.Text("function highlight() { hljs.highlightAll(); }")),
+			h.Script(h.Src("https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"), h.Async(), g.Attr("onload", "highlight()")),
 			post.Content.RenderToGomponents(),
 		)},
 	})
