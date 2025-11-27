@@ -2,6 +2,7 @@
 package views
 
 import (
+	"website/helpers"
 	"website/views/components"
 	"website/views/route"
 
@@ -88,6 +89,22 @@ func Page(opts PageOptions) g.Node {
 					g.Group(opts.Body),
 					MyFooter(),
 				),
+				h.Script(g.Rawf(`window.dash0 = window.dash0 || function() {
+  (window.dash0._q = window.dash0._q || []).push(arguments);
+};
+
+dash0('init', {
+  serviceName: 'fredrik-homepage',
+	environment: '%s',
+  endpoint: {
+    url: 'https://ingress.europe-west4.gcp.dash0.com',
+    authToken: '%s'
+  }
+});`,
+					helpers.GetStringOrDefault("DASH0_WEBSITE_MONITORING_ENVIRONMENT", "development"),
+					helpers.GetStringOrDefault("DASH0_WEBSITE_MONITORING_INGEST_TOKEN", "INVALID_TOKEN"),
+				)),
+				h.Script(h.Src("https://unpkg.com/@dash0/sdk-web@0.18.0/dist/dash0.iife.js"), h.Defer()),
 			),
 		},
 	})
@@ -123,7 +140,7 @@ func MyFooter() g.Node {
 	return h.Footer(
 		h.Class("text-xs text-gray-800 flex flex-col gap-2"),
 		h.Hr(),
-		h.P(g.Text("This web server is written in Go. It uses Gomponents and Tailwind for the UI. It's hosted in a Kubernetes (k3s) cluster on Hetzner cloud, using Traefik as a reverse proxy. The DNS, static asset caching and basic protection is handled on Cloudflare.")),
+		h.P(g.Text("This web server is written in Go. It uses Gomponents and Tailwind for the UI. It's hosted in a Kubernetes (k3s) cluster on Hetzner cloud, using Traefik as a reverse proxy. The DNS, static asset caching and basic protection is handled on Cloudflare. Observability is all done on Dash0.")),
 		h.A(
 			h.Href("https://www.abuseipdb.com/user/244214"),
 			h.Title("AbuseIPDB is an IP address blacklist for webmasters and sysadmins to report IP addresses engaging in abusive behavior on their networks"),

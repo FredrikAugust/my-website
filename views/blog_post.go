@@ -44,7 +44,7 @@ func BlogPost(authenticated bool, post model.BlogPost) g.Node {
 			),
 			h.Link(h.Rel("stylesheet"), h.Href("https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/default.min.css")),
 			h.Script(g.Text("function highlight() { hljs.highlightAll(); }")),
-			h.Script(h.Src("https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"), h.Async(), g.Attr("onload", "highlight()")),
+			h.Script(h.Src("https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"), h.Defer(), g.Attr("onload", "highlight()")),
 			post.Content.RenderToGomponents(),
 		)},
 	})
