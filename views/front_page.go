@@ -57,7 +57,7 @@ func FrontPage(authenticated bool, comments []model.GuestbookEntry, turnstileSit
 						h.Div(
 							h.Class("grid grid-cols-1 md:grid-cols-3 gap-2"),
 							g.Map(recentPhotos, func(img model.Photo) g.Node {
-								return h.Img(h.Class("min-h-[200px] object-contain"), h.Src(img.Sizes.Small.URL))
+								return h.Img(h.Class("min-h-[200px] object-contain"), h.Loading("lazy"), h.Src(img.Sizes.Large.URL))
 							}),
 						),
 						h.A(h.Href(route.Albums), g.Text("See more →")),
