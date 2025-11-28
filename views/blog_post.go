@@ -46,6 +46,11 @@ func BlogPost(authenticated bool, post model.BlogPost) g.Node {
 			h.Script(g.Text("function highlight() { hljs.highlightAll(); }")),
 			h.Script(h.Src("https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"), h.Defer(), g.Attr("onload", "highlight()")),
 			post.Content.RenderToGomponents(),
+			h.Div(
+				h.Class("mt-4"),
+				h.H3(g.Text("Comments")),
+				// todo
+			),
 		)},
 	})
 }

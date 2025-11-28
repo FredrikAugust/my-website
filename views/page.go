@@ -104,7 +104,8 @@ dash0('init', {
 					helpers.GetStringOrDefault("DASH0_WEBSITE_MONITORING_ENVIRONMENT", "development"),
 					helpers.GetStringOrDefault("DASH0_WEBSITE_MONITORING_INGEST_TOKEN", "INVALID_TOKEN"),
 				)),
-				h.Script(h.Src("https://unpkg.com/@dash0/sdk-web@0.18.0/dist/dash0.iife.js"), h.Defer()),
+				h.Script(h.Src("https://unpkg.com/@dash0/sdk-web@0.18.0/dist/dash0.iife.js"), h.Defer(), h.CrossOrigin("anonymous")),
+				h.Script(h.Src("https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js"), h.Defer(), h.CrossOrigin("anonymous"), h.Integrity("sha384-/TgkGk7p307TH7EXJDuUlgG3Ce1UVolAOFopFekQkkXihi5u/6OCvVKyz1W+idaz")),
 			),
 		},
 	})
