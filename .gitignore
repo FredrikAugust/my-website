@@ -1,8 +1,6 @@
-.claude/*.local.json
-website.out
+node_modules/
+.next/
+.env
 *.local
-bin/
-tmp/
-static/styles/style.min.css
-.task
 .DS_Store
+.opencode/

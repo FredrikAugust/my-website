@@ -6,30 +6,16 @@ services:
       POSTGRES_PASSWORD: supersecret
       POSTGRES_DB: website
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
-  postgres-test:
-    image: postgres:17
-    environment:
-      POSTGRES_USER: test
-      POSTGRES_PASSWORD: 123
-      POSTGRES_DB: template1
-    ports:
-      - "5433:5432"
-
-  redis:
-    image: redis:8
-    ports:
-      - "6379:6379"
 
   minio:
     image: minio/minio:latest
     ports:
-      - "9000:9000"
-      - "9001:9001"
-    command: server /data --console-address ":9001"
+      - '9000:9000'
+      - '9001:9001'
+    command: server /data --console-address ':9001'
 
 volumes:
   postgres_data:

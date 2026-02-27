@@ -1,2 +1,0 @@
-ALTER TABLE photo DROP COLUMN album_id;
-DROP TABLE IF EXISTS album;
