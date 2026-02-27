@@ -41,7 +41,7 @@ const richTextConverters: JSXConvertersFunction = ({ defaultConverters }) => ({
   ...defaultConverters,
   blocks: {
     ...defaultConverters.blocks,
-    codeblock: ({ node }: { node: { fields: { code: string; language?: string } } }) => {
+    Code: ({ node }: { node: { fields: { code: string; language?: string } } }) => {
       const { code, language } = node.fields as { code: string; language?: string };
       return <CodeBlock code={code} language={language} />;
     },
