@@ -2,6 +2,7 @@ import config from '@payload-config'
 import { Feed } from 'feed'
 import { getPayload } from 'payload'
 
+export const dynamic = 'force-dynamic'
 export const revalidate = 300
 
 export async function GET() {
