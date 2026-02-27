@@ -104,7 +104,7 @@ export default async function BlogPostPage({ params }: Props) {
       )}
 
       <FadeIn delay={0.2}>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col [&_p]:leading-7 [&_p]:mb-4 [&_p:last-child]:mb-0">
           <RichText data={post.content} converters={richTextConverters} />
         </div>
       </FadeIn>

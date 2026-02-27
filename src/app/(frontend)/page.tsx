@@ -40,15 +40,11 @@ export default async function HomePage() {
           <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight font-display text-transparent bg-clip-text bg-contain bg-[url('/images/sparkles.gif')] dark:bg-linear-to-r dark:from-amber-200 dark:to-orange-300">
             Fredrik&apos;s Homepage
           </h1>
-          <div className="text-muted-foreground text-sm mt-1 space-y-1">
-            <p className="leading-7">
-              Welcome! I&apos;m Fredrik &mdash; a software engineer who enjoys tinkering with
-              infrastructure, programming languages, and whatever else catches my curiosity.
-            </p>
-            <p className="leading-7">
-              Have a look around and feel free to leave a note in the guestbook.
-            </p>
-          </div>
+          <p className="text-muted-foreground text-sm mt-1 leading-7">
+            Welcome! I&apos;m Fredrik &mdash; a software engineer who enjoys tinkering with
+            infrastructure, programming languages, and whatever else catches my curiosity. Have a
+            look around and feel free to leave a note in the guestbook.
+          </p>
         </div>
       </FadeUp>
 

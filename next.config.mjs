@@ -9,6 +9,7 @@ const nextConfig = {
     remotePatterns: [
       ...(s3Hostname ? [{ protocol: /** @type {const} */ ("https"), hostname: s3Hostname }] : []),
       { protocol: "http", hostname: "localhost" },
+      { protocol: "https", hostname: "fredrikmalmo.com" },
     ],
   },
 };
