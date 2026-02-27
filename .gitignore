@@ -4,3 +4,4 @@ node_modules/
 *.local
 .DS_Store
 .opencode/
+opencode.json

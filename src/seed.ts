@@ -1,5 +1,5 @@
-import { getPayload } from 'payload'
 import config from '@payload-config'
+import { getPayload } from 'payload'
 import sharp from 'sharp'
 
 // ── Helpers ──────────────────────────────────────────────────
@@ -34,12 +34,7 @@ function makeLexicalContent(paragraphs: string[]) {
   }
 }
 
-async function generateImage(
-  label: string,
-  r: number,
-  g: number,
-  b: number,
-): Promise<Buffer> {
+async function generateImage(label: string, r: number, g: number, b: number): Promise<Buffer> {
   // Create an SVG with a colored background and white text label
   const svg = `
     <svg width="1920" height="1080" xmlns="http://www.w3.org/2000/svg">
@@ -58,7 +53,7 @@ const blogPosts = [
   {
     title: 'Getting Started with Next.js 15',
     slug: 'getting-started-nextjs-15',
-    status: 'published' as const,
+    _status: 'published' as const,
     excerpt:
       'A beginner-friendly guide to building modern web applications with Next.js 15 and the App Router.',
     tags: [{ tag: 'nextjs' }, { tag: 'react' }, { tag: 'tutorial' }],
@@ -75,7 +70,7 @@ const blogPosts = [
   {
     title: 'Why I Switched to Payload CMS',
     slug: 'why-i-switched-to-payload-cms',
-    status: 'published' as const,
+    _status: 'published' as const,
     excerpt:
       'After years of using various headless CMS platforms, I finally found one that feels like it was built for developers.',
     tags: [{ tag: 'payload' }, { tag: 'cms' }, { tag: 'typescript' }],
@@ -92,7 +87,7 @@ const blogPosts = [
   {
     title: 'My Terminal Setup in 2025',
     slug: 'my-terminal-setup-2025',
-    status: 'published' as const,
+    _status: 'published' as const,
     excerpt:
       'A tour of my current terminal configuration, including shell, editor, and all the tools I use daily.',
     tags: [{ tag: 'tools' }, { tag: 'terminal' }, { tag: 'productivity' }],
@@ -109,7 +104,7 @@ const blogPosts = [
   {
     title: 'Building a Guestbook with Server Actions',
     slug: 'building-guestbook-server-actions',
-    status: 'published' as const,
+    _status: 'published' as const,
     excerpt:
       'How I built the guestbook feature on this site using Next.js server actions and Payload CMS.',
     tags: [{ tag: 'nextjs' }, { tag: 'server-actions' }, { tag: 'tutorial' }],
@@ -126,9 +121,8 @@ const blogPosts = [
   {
     title: 'Draft: Exploring Rust for Web Development',
     slug: 'exploring-rust-web-dev',
-    status: 'draft' as const,
-    excerpt:
-      'An early look at using Rust for building web backends. Still a work in progress.',
+    _status: 'draft' as const,
+    excerpt: 'An early look at using Rust for building web backends. Still a work in progress.',
     tags: [{ tag: 'rust' }, { tag: 'webdev' }],
     content: makeLexicalContent([
       'This is a draft post exploring Rust as a language for web backend development. I have been experimenting with Axum and Actix-web.',
@@ -142,11 +136,20 @@ const blogPosts = [
 
 const guestbookEntries = [
   { name: 'Alice', message: 'Love the minimal design of this site! Great work.' },
-  { name: 'Bob', message: 'Interesting blog posts. Looking forward to more content about Next.js.' },
+  {
+    name: 'Bob',
+    message: 'Interesting blog posts. Looking forward to more content about Next.js.',
+  },
   { name: 'Charlie', message: 'The guestbook is a fun throwback to the old web. Nice touch!' },
-  { name: 'Diana', message: 'Found your terminal setup post super helpful. Switched to Ghostty because of it.' },
+  {
+    name: 'Diana',
+    message: 'Found your terminal setup post super helpful. Switched to Ghostty because of it.',
+  },
   { name: 'Erik', message: 'Fellow Norwegian developer here. Hei hei!' },
-  { name: 'Fatima', message: 'Your Payload CMS article convinced me to try it for my next project.' },
+  {
+    name: 'Fatima',
+    message: 'Your Payload CMS article convinced me to try it for my next project.',
+  },
   { name: 'George', message: 'Clean code, clean design. Bookmarked.' },
   { name: 'Hannah', message: 'Would love to see a post about your deployment setup!' },
   { name: 'Ivan', message: 'The warm parchment color scheme is really unique. Feels cozy.' },
@@ -250,17 +253,18 @@ const seed = async () => {
       data: {
         title: post.title,
         slug: post.slug,
-        status: post.status,
         excerpt: post.excerpt,
         publishedAt: publishedAt.toISOString(),
         featuredImage: imageIds[i],
         content: post.content,
         tags: post.tags,
+        _status: post._status,
       },
+      draft: post._status === 'draft',
       overrideAccess: true,
     })
 
-    payload.logger.info(`  Created post: "${post.title}" [${post.status}]`)
+    payload.logger.info(`  Created post: "${post.title}" [${post._status}]`)
   }
 
   // ── Create guestbook entries ──
@@ -289,7 +293,9 @@ const seed = async () => {
   payload.logger.info('')
   payload.logger.info('Seed complete!')
   payload.logger.info('  - 1 admin user (admin@example.com / password123)')
-  payload.logger.info(`  - ${blogPosts.length} blog posts (${blogPosts.filter((p) => p.status === 'published').length} published, ${blogPosts.filter((p) => p.status === 'draft').length} draft)`)
+  payload.logger.info(
+    `  - ${blogPosts.length} blog posts (${blogPosts.filter((p) => p._status === 'published').length} published, ${blogPosts.filter((p) => p._status === 'draft').length} draft)`,
+  )
   payload.logger.info(`  - ${blogPosts.length} blog images`)
   payload.logger.info(`  - ${guestbookEntries.length} guestbook entries`)
 

@@ -9,16 +9,17 @@ import type { CollectionConfig } from 'payload'
 export const Blog: CollectionConfig = {
   slug: 'blog',
   labels: { singular: 'Blog Post', plural: 'Blog Posts' },
+  versions: { drafts: true },
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'author', 'publishedAt', 'status'],
+    defaultColumns: ['title', 'author', 'publishedAt', '_status'],
   },
   access: {
     read: ({ req: { user } }) => {
       if (user) return true
 
       return {
-        status: { equals: 'published' },
+        _status: { equals: 'published' },
       }
     },
   },
@@ -48,22 +49,6 @@ export const Blog: CollectionConfig = {
           pickerAppearance: 'dayAndTime',
         },
       },
-    },
-    {
-      name: 'status',
-      type: 'select',
-      required: true,
-      defaultValue: 'draft',
-      options: [
-        {
-          label: 'Draft',
-          value: 'draft',
-        },
-        {
-          label: 'Published',
-          value: 'published',
-        },
-      ],
     },
     {
       name: 'excerpt',

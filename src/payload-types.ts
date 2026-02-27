@@ -155,7 +155,6 @@ export interface Blog {
    */
   slug: string;
   publishedAt?: string | null;
-  status: 'draft' | 'published';
   /**
    * Short summary of the blog post
    */
@@ -187,6 +186,7 @@ export interface Blog {
     | null;
   updatedAt: string;
   createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -349,7 +349,6 @@ export interface BlogSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   publishedAt?: T;
-  status?: T;
   excerpt?: T;
   featuredImage?: T;
   content?: T;
@@ -361,6 +360,7 @@ export interface BlogSelect<T extends boolean = true> {
       };
   updatedAt?: T;
   createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

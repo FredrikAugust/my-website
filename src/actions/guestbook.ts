@@ -1,12 +1,12 @@
 'use server'
 
-import { getPayload } from 'payload'
-import config from '@payload-config'
-import { headers } from 'next/headers'
-import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
-import { verifyTurnstile } from '@/lib/turnstile'
 import { sendGuestbookNotification } from '@/lib/email'
+import { verifyTurnstile } from '@/lib/turnstile'
+import config from '@payload-config'
+import { revalidatePath } from 'next/cache'
+import { headers } from 'next/headers'
+import { redirect } from 'next/navigation'
+import { getPayload } from 'payload'
 
 export async function postComment(formData: FormData) {
   const token = formData.get('cf-turnstile-response') as string
@@ -23,6 +23,7 @@ export async function postComment(formData: FormData) {
   await payload.create({
     collection: 'guestbook-entry',
     data: { name, message },
+    overrideAccess: true,
   })
 
   sendGuestbookNotification(name, message).catch(() => {})

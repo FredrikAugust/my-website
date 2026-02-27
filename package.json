@@ -5,17 +5,18 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "build": "cross-env NODE_OPTIONS=--no-deprecation next build",
-    "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev --turbopack",
-    "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
+    "build": "NODE_OPTIONS=--no-deprecation next build",
+    "dev": "NODE_OPTIONS=--no-deprecation next dev --turbopack",
+    "start": "NODE_OPTIONS=--no-deprecation next start",
     "lint": "biome check .",
     "format": "biome format --write .",
-    "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
-    "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
-    "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
-    "seed": "cross-env NODE_OPTIONS=--no-deprecation payload run src/seed.ts"
+    "generate:types": "NODE_OPTIONS=--no-deprecation payload generate:types",
+    "generate:importmap": "NODE_OPTIONS=--no-deprecation payload generate:importmap",
+    "payload": "NODE_OPTIONS=--no-deprecation payload",
+    "seed": "NODE_OPTIONS=--no-deprecation payload run src/seed.ts"
   },
   "dependencies": {
+    "@marsidev/react-turnstile": "^1.4.2",
     "@payloadcms/db-postgres": "^3.74.0",
     "@payloadcms/next": "^3.74.0",
     "@payloadcms/richtext-lexical": "^3.74.0",
@@ -24,10 +25,7 @@
     "@tailwindcss/postcss": "^4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "cross-env": "^7.0.3",
-    "date-fns": "^4.1.0",
     "feed": "^5.2.0",
-    "graphql": "^16.11.0",
     "lucide-react": "^0.575.0",
     "next": "^15.4.4",
     "payload": "^3.74.0",
@@ -54,10 +52,6 @@
     "pnpm": ">=10"
   },
   "pnpm": {
-    "onlyBuiltDependencies": [
-      "sharp",
-      "esbuild",
-      "unrs-resolver"
-    ]
+    "onlyBuiltDependencies": ["sharp", "esbuild", "unrs-resolver"]
   }
 }

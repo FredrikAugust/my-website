@@ -1,14 +1,12 @@
-@import 'tailwindcss';
-@import 'tw-animate-css';
-@import 'shadcn/tailwind.css';
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
 
 @font-face {
-  font-family: 'ruigslay';
-  src:
-    url('/fonts/ruigslay.otf') format('opentype'),
-    url('/fonts/ruigslay.ttf') format('truetype');
+  font-family: "ruigslay";
+  src: url("/fonts/ruigslay.otf") format("opentype"), url("/fonts/ruigslay.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -17,27 +15,7 @@
 @theme {
   --font-display: ruigslay, system-ui, sans-serif;
   --font-sans: system-ui, sans-serif;
-  --font-serif: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif;
-}
-
-/* Base element styles matching original site */
-h1 {
-  @apply text-2xl font-semibold font-sans;
-}
-h2 {
-  @apply text-xl font-sans;
-}
-h3 {
-  @apply text-lg font-sans;
-}
-a {
-  @apply hover:underline text-blue-700 font-sans;
-}
-p {
-  @apply max-w-prose;
-}
-small {
-  @apply text-muted-foreground text-xs;
+  --font-serif: Charter, "Bitstream Charter", "Sitka Text", Cambria, serif;
 }
 
 @theme inline {

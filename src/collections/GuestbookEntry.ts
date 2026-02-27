@@ -9,7 +9,7 @@ export const GuestbookEntry: CollectionConfig = {
   },
   access: {
     read: () => true,
-    create: () => true,
+    create: ({ req: { user } }) => !!user,
     update: ({ req: { user } }) => !!user,
     delete: ({ req: { user } }) => !!user,
   },

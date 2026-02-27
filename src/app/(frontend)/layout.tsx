@@ -1,12 +1,9 @@
-export const dynamic = 'force-dynamic'
-
+import { Navbar } from '@/components/Navbar'
+import { Separator } from '@/components/ui/separator'
 import type { Metadata } from 'next'
+import { cookies } from 'next/headers'
 import Link from 'next/link'
 import Script from 'next/script'
-import { headers } from 'next/headers'
-import { getPayload } from 'payload'
-import config from '@payload-config'
-import { Separator } from '@/components/ui/separator'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -39,44 +36,27 @@ export const metadata: Metadata = {
   manifest: '/site.webmanifest',
 }
 
-async function Navbar() {
-  const payload = await getPayload({ config })
-  const { user } = await payload.auth({ headers: await headers() })
-
-  return (
-    <nav className="flex items-center gap-3 py-2 text-sm font-sans">
-      <Link href="/" className="hover:underline">
-        Home
-      </Link>
-      <Link href="/blog" className="hover:underline">
-        Blog
-      </Link>
-      {user ? (
-        <span className="ml-auto text-muted-foreground">Signed in</span>
-      ) : (
-        <Link href="/login" className="ml-auto hover:underline">
-          Login
-        </Link>
-      )}
-    </nav>
-  )
+async function NavbarWrapper() {
+  const cookieStore = await cookies()
+  const isLoggedIn = cookieStore.has('payload-token')
+  return <Navbar isLoggedIn={isLoggedIn} />
 }
 
 function Footer() {
   return (
     <footer className="text-xs text-muted-foreground flex flex-col gap-2 pb-4">
       <Separator />
-      <p>
+      <p className="leading-7">
         This website is built with Next.js and Payload CMS, styled with Tailwind CSS and shadcn/ui.
         It&apos;s hosted in a Kubernetes (k3s) cluster on Hetzner cloud, using Traefik as a reverse
-        proxy. DNS, static asset caching and basic protection is handled on Cloudflare. Observability
-        is done on Dash0.
+        proxy. DNS, static asset caching and basic protection is handled on Cloudflare.
+        Observability is done on Dash0.
       </p>
       <a
+        className="text-blue-700 font-sans hover:underline"
         href="https://www.abuseipdb.com/user/244214"
         title="AbuseIPDB is an IP address blacklist for webmasters and sysadmins to report IP addresses engaging in abusive behavior on their networks"
       >
-        {/* biome-ignore lint: external image */}
         <img
           src="https://www.abuseipdb.com/contributor/244214.svg"
           loading="lazy"
@@ -85,7 +65,7 @@ function Footer() {
         />
       </a>
       <a
-        className="flex gap-1 items-center font-sans"
+        className="flex gap-1 items-center font-sans text-blue-700 hover:underline"
         href="https://github.com/fredrikaugust/my-website"
         target="_blank"
         rel="noreferrer"
@@ -94,11 +74,11 @@ function Footer() {
         Source code
       </a>
       <div className="flex gap-1">
-        <a rel="me" href="https://mastodon.social/@fredrikmalmo">
+        <a className="text-blue-700 font-sans hover:underline" rel="me" href="https://mastodon.social/@fredrikmalmo">
           Mastodon
         </a>
         <span>&bull;</span>
-        <a href="/feed.xml">RSS Feed (Atom)</a>
+        <a className="text-blue-700 font-sans hover:underline" href="/feed.xml">RSS Feed (Atom)</a>
       </div>
     </footer>
   )
@@ -111,7 +91,7 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
   return (
     <html lang="en">
       <body className="mx-auto container max-w-3xl min-h-dvh flex flex-col font-serif px-4">
-        <Navbar />
+        <NavbarWrapper />
         <main className="flex-1 py-4">{children}</main>
         <Footer />
         <Script id="dash0-init" strategy="afterInteractive">

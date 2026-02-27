@@ -1,15 +1,17 @@
 export const dynamic = 'force-dynamic'
 
-import Link from 'next/link'
-import { headers } from 'next/headers'
-import { getPayload } from 'payload'
-import config from '@payload-config'
-import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
-import { GuestbookForm } from '@/components/GuestbookForm'
 import { deleteComment } from '@/actions/guestbook'
+import { BlogPostCard } from '@/components/BlogPostCard'
+import { GuestbookForm } from '@/components/GuestbookForm'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { timeAgo } from '@/lib/time'
+import config from '@payload-config'
+import { headers } from 'next/headers'
+import Image from 'next/image'
+import Link from 'next/link'
+import { getPayload } from 'payload'
 
 export default async function HomePage() {
   const payload = await getPayload({ config })
@@ -20,7 +22,7 @@ export default async function HomePage() {
       collection: 'blog',
       sort: '-publishedAt',
       limit: 3,
-      where: { status: { equals: 'published' } },
+      where: { _status: { equals: 'published' } },
     }),
     payload.find({
       collection: 'guestbook-entry',
@@ -34,61 +36,61 @@ export default async function HomePage() {
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <h1 className="!text-4xl !leading-[1.3] !font-bold !font-display text-transparent bg-clip-text bg-contain bg-[url('/images/sparkles.gif')]">
+        <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight font-display text-transparent bg-clip-text bg-contain bg-[url('/images/sparkles.gif')]">
           Fredrik&apos;s Homepage
         </h1>
         <div className="text-muted-foreground text-sm mt-1 space-y-1">
-          <p>
-            Here you can read about my experiments and experiences with various technologies.
-          </p>
-          <p>I hope you enjoy your visit. Please leave a message in the guestbook if you did.</p>
+          <p className="leading-7">Here you can read about my experiments and experiences with various technologies.</p>
+          <p className="leading-7">I hope you enjoy your visit. Please leave a message in the guestbook if you did.</p>
         </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
         {/* Blog posts */}
         <section className="flex flex-col gap-3">
-          <h2>Recent blog posts</h2>
+          <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight">Recent blog posts</h2>
           <div className="flex flex-col gap-3">
             {blogPosts.docs.map((post) => (
-              <div key={post.id} className="flex flex-col">
-                <Link href={`/blog/${post.slug}`}>{post.title}</Link>
-                <p className="text-sm">{post.excerpt}</p>
-                <small>Published {timeAgo(post.publishedAt!)}</small>
-              </div>
+              <BlogPostCard key={post.id} post={post} />
             ))}
-            <Link href="/blog">See more &rarr;</Link>
+            <Link href="/blog" className="text-blue-700 font-sans hover:underline">See more &rarr;</Link>
           </div>
         </section>
 
         {/* Guestbook */}
         <section>
-          <img className="w-30" src="/images/guestbook.gif" alt="an old man writing in a guestbook" />
-          <Card className="border-border shadow-sm bg-[url('/images/paper.jpg')] bg-cover">
-            <CardContent className="h-80 overflow-y-auto p-3 flex flex-col gap-1.5">
-              {guestbookEntries.docs.map((entry) => (
-                <div key={entry.id} className="text-sm">
-                  <div className="flex gap-1 items-center flex-wrap">
-                    <span className="font-bold">{entry.name}</span>
-                    <small title={new Date(entry.createdAt).toISOString()}>
-                      {timeAgo(entry.createdAt)}
-                    </small>
-                    {user && (
-                      <form action={deleteComment}>
-                        <input type="hidden" name="comment_id" value={entry.id} />
-                        <button
-                          type="submit"
-                          className="text-destructive text-xs font-sans cursor-pointer hover:underline"
-                        >
-                          Delete
-                        </button>
-                      </form>
-                    )}
+          <Image
+            className="w-30"
+            src="/images/guestbook.gif"
+            alt="an old man writing in a guestbook"
+            width={120}
+            height={120}
+            unoptimized
+          />
+          <Card className="border-border shadow-sm bg-[url('/images/paper.jpg')] bg-cover p-2">
+            <ScrollArea className="h-80">
+              <div className="flex flex-col gap-1.5">
+                {guestbookEntries.docs.map((entry) => (
+                  <div key={entry.id} className="text-sm">
+                    <div className="flex gap-1 items-center flex-wrap">
+                      <span className="font-bold">{entry.name}</span>
+                      <small className="text-sm leading-none font-medium text-muted-foreground" title={new Date(entry.createdAt).toISOString()}>
+                        {timeAgo(entry.createdAt)}
+                      </small>
+                      {user && (
+                        <form action={deleteComment}>
+                          <input type="hidden" name="comment_id" value={entry.id} />
+                          <Button type="submit" variant="destructive" size="xs">
+                            Delete
+                          </Button>
+                        </form>
+                      )}
+                    </div>
+                    <span className="whitespace-pre-wrap">{entry.message}</span>
                   </div>
-                  <span className="whitespace-pre-wrap">{entry.message}</span>
-                </div>
-              ))}
-            </CardContent>
+                ))}
+              </div>
+            </ScrollArea>
           </Card>
           <GuestbookForm turnstileSitekey={turnstileSitekey} />
         </section>
