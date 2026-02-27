@@ -1,23 +1,15 @@
 import { withPayload } from '@payloadcms/next/withPayload'
 
+const s3Hostname = process.env.S3_ENDPOINT ? new URL(process.env.S3_ENDPOINT).hostname : undefined
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Your Next.js config here
   output: 'standalone',
   images: {
     remotePatterns: [
-      { protocol: 'https', hostname: '**' },
+      ...(s3Hostname ? [{ protocol: /** @type {const} */ ('https'), hostname: s3Hostname }] : []),
       { protocol: 'http', hostname: 'localhost' },
     ],
-  },
-  webpack: (webpackConfig) => {
-    webpackConfig.resolve.extensionAlias = {
-      '.cjs': ['.cts', '.cjs'],
-      '.js': ['.ts', '.tsx', '.js', '.jsx'],
-      '.mjs': ['.mts', '.mjs'],
-    }
-
-    return webpackConfig
   },
 }
 

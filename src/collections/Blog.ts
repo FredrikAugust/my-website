@@ -9,10 +9,23 @@ import type { CollectionConfig } from 'payload'
 export const Blog: CollectionConfig = {
   slug: 'blog',
   labels: { singular: 'Blog Post', plural: 'Blog Posts' },
-  versions: { drafts: true },
+  versions: { drafts: true, maxPerDoc: 25 },
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'author', 'publishedAt', '_status'],
+  },
+  hooks: {
+    beforeValidate: [
+      ({ data, operation }) => {
+        if (data?.title && (operation === 'create' || !data.slug)) {
+          data.slug = data.title
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/(^-|-$)/g, '')
+        }
+        return data
+      },
+    ],
   },
   access: {
     read: ({ req: { user } }) => {
@@ -35,6 +48,7 @@ export const Blog: CollectionConfig = {
       type: 'text',
       required: true,
       unique: true,
+      index: true,
       label: 'Slug',
       admin: {
         description: 'URL-friendly version of the title',
@@ -43,6 +57,7 @@ export const Blog: CollectionConfig = {
     {
       name: 'publishedAt',
       type: 'date',
+      index: true,
       label: 'Published At',
       admin: {
         date: {

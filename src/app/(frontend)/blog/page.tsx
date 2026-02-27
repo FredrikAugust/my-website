@@ -3,6 +3,8 @@ import config from '@payload-config'
 import type { Metadata } from 'next'
 import { getPayload } from 'payload'
 
+export const revalidate = 60
+
 export const metadata: Metadata = {
   title: 'Blog',
 }

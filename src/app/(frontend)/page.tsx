@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic'
+export const revalidate = 60
 
 import { deleteComment } from '@/actions/guestbook'
 import { BlogPostCard } from '@/components/BlogPostCard'
@@ -40,8 +40,12 @@ export default async function HomePage() {
           Fredrik&apos;s Homepage
         </h1>
         <div className="text-muted-foreground text-sm mt-1 space-y-1">
-          <p className="leading-7">Here you can read about my experiments and experiences with various technologies.</p>
-          <p className="leading-7">I hope you enjoy your visit. Please leave a message in the guestbook if you did.</p>
+          <p className="leading-7">
+            Here you can read about my experiments and experiences with various technologies.
+          </p>
+          <p className="leading-7">
+            I hope you enjoy your visit. Please leave a message in the guestbook if you did.
+          </p>
         </div>
       </div>
 
@@ -53,7 +57,9 @@ export default async function HomePage() {
             {blogPosts.docs.map((post) => (
               <BlogPostCard key={post.id} post={post} />
             ))}
-            <Link href="/blog" className="text-blue-700 font-sans hover:underline">See more &rarr;</Link>
+            <Link href="/blog" className="text-blue-700 font-sans hover:underline">
+              See more &rarr;
+            </Link>
           </div>
         </section>
 
@@ -74,7 +80,10 @@ export default async function HomePage() {
                   <div key={entry.id} className="text-sm">
                     <div className="flex gap-1 items-center flex-wrap">
                       <span className="font-bold">{entry.name}</span>
-                      <small className="text-sm leading-none font-medium text-muted-foreground" title={new Date(entry.createdAt).toISOString()}>
+                      <small
+                        className="text-sm leading-none font-medium text-muted-foreground"
+                        title={new Date(entry.createdAt).toISOString()}
+                      >
                         {timeAgo(entry.createdAt)}
                       </small>
                       {user && (

@@ -12,6 +12,8 @@ import { notFound } from 'next/navigation'
 import { getPayload } from 'payload'
 import { cache } from 'react'
 
+export const revalidate = 60
+
 type Props = { params: Promise<{ slug: string }> }
 
 const getPost = cache(async (slug: string) => {
@@ -68,11 +70,16 @@ export default async function BlogPostPage({ params }: Props) {
             alt={featuredImage.alt}
             width={featuredImage.sizes?.large?.width ?? featuredImage.width ?? 800}
             height={featuredImage.sizes?.large?.height ?? featuredImage.height ?? 400}
+            priority
           />
         )}
         <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight">{post.title}</h1>
-        {published && <small className="text-sm leading-none font-medium text-muted-foreground mt-1">{`Published ${published}`}</small>}
-        {published !== updated && <small className="text-sm leading-none font-medium text-muted-foreground">{`Updated ${updated}`}</small>}
+        {published && (
+          <small className="text-sm leading-none font-medium text-muted-foreground mt-1">{`Published ${published}`}</small>
+        )}
+        {published !== updated && (
+          <small className="text-sm leading-none font-medium text-muted-foreground">{`Updated ${updated}`}</small>
+        )}
         <Separator className="mt-2" />
       </div>
 
