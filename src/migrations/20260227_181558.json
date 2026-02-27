@@ -74,8 +74,12 @@
           "name": "users_sessions_parent_id_fk",
           "tableFrom": "users_sessions",
           "tableTo": "users",
-          "columnsFrom": ["_parent_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "_parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -274,8 +278,12 @@
           "name": "blog_tags_parent_id_fk",
           "tableFrom": "blog_tags",
           "tableTo": "blog",
-          "columnsFrom": ["_parent_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "_parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -371,6 +379,21 @@
           "method": "btree",
           "with": {}
         },
+        "blog_published_at_idx": {
+          "name": "blog_published_at_idx",
+          "columns": [
+            {
+              "expression": "published_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
         "blog_featured_image_idx": {
           "name": "blog_featured_image_idx",
           "columns": [
@@ -437,8 +460,12 @@
           "name": "blog_featured_image_id_blog_image_id_fk",
           "tableFrom": "blog",
           "tableTo": "blog_image",
-          "columnsFrom": ["featured_image_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "featured_image_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -521,8 +548,12 @@
           "name": "_blog_v_version_tags_parent_id_fk",
           "tableFrom": "_blog_v_version_tags",
           "tableTo": "_blog_v",
-          "columnsFrom": ["_parent_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "_parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -657,6 +688,21 @@
           "method": "btree",
           "with": {}
         },
+        "_blog_v_version_version_published_at_idx": {
+          "name": "_blog_v_version_version_published_at_idx",
+          "columns": [
+            {
+              "expression": "version_published_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
         "_blog_v_version_version_featured_image_idx": {
           "name": "_blog_v_version_version_featured_image_idx",
           "columns": [
@@ -768,8 +814,12 @@
           "name": "_blog_v_parent_id_blog_id_fk",
           "tableFrom": "_blog_v",
           "tableTo": "blog",
-          "columnsFrom": ["parent_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -777,8 +827,12 @@
           "name": "_blog_v_version_featured_image_id_blog_image_id_fk",
           "tableFrom": "_blog_v",
           "tableTo": "blog_image",
-          "columnsFrom": ["version_featured_image_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "version_featured_image_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -1410,8 +1464,12 @@
           "name": "payload_locked_documents_rels_parent_fk",
           "tableFrom": "payload_locked_documents_rels",
           "tableTo": "payload_locked_documents",
-          "columnsFrom": ["parent_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1419,8 +1477,12 @@
           "name": "payload_locked_documents_rels_users_fk",
           "tableFrom": "payload_locked_documents_rels",
           "tableTo": "users",
-          "columnsFrom": ["users_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "users_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1428,8 +1490,12 @@
           "name": "payload_locked_documents_rels_blog_fk",
           "tableFrom": "payload_locked_documents_rels",
           "tableTo": "blog",
-          "columnsFrom": ["blog_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "blog_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1437,8 +1503,12 @@
           "name": "payload_locked_documents_rels_blog_image_fk",
           "tableFrom": "payload_locked_documents_rels",
           "tableTo": "blog_image",
-          "columnsFrom": ["blog_image_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "blog_image_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1446,8 +1516,12 @@
           "name": "payload_locked_documents_rels_guestbook_entry_fk",
           "tableFrom": "payload_locked_documents_rels",
           "tableTo": "guestbook_entry",
-          "columnsFrom": ["guestbook_entry_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "guestbook_entry_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1651,8 +1725,12 @@
           "name": "payload_preferences_rels_parent_fk",
           "tableFrom": "payload_preferences_rels",
           "tableTo": "payload_preferences",
-          "columnsFrom": ["parent_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1660,8 +1738,12 @@
           "name": "payload_preferences_rels_users_fk",
           "tableFrom": "payload_preferences_rels",
           "tableTo": "users",
-          "columnsFrom": ["users_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "users_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1753,12 +1835,18 @@
     "public.enum_blog_status": {
       "name": "enum_blog_status",
       "schema": "public",
-      "values": ["draft", "published"]
+      "values": [
+        "draft",
+        "published"
+      ]
     },
     "public.enum__blog_v_version_status": {
       "name": "enum__blog_v_version_status",
       "schema": "public",
-      "values": ["draft", "published"]
+      "values": [
+        "draft",
+        "published"
+      ]
     }
   },
   "schemas": {},
@@ -1771,6 +1859,6 @@
     "tables": {},
     "columns": {}
   },
-  "id": "c7f7eddc-d148-4f75-838a-1974c655b4c5",
+  "id": "2c3a12d2-d343-4102-9ecb-10b3f53537c4",
   "prevId": "00000000-0000-0000-0000-000000000000"
 }
