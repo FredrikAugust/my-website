@@ -18,14 +18,12 @@ export const metadata: Metadata = {
     type: "website",
     siteName: "Fredrik's Homepage",
     title: "Fredrik",
-    description:
-      "Fredrik's homepage about software, development, and technology",
+    description: "Fredrik's homepage about software, development, and technology",
   },
   twitter: {
     card: "summary",
     title: "Fredrik",
-    description:
-      "Fredrik's homepage about software, development, and technology",
+    description: "Fredrik's homepage about software, development, and technology",
   },
   other: {
     "fediverse:creator": "@fredrikmalmo@mastodon.social",
@@ -49,8 +47,8 @@ async function Footer() {
       <Separator className="mb-4" />
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-end">
         <p className="leading-relaxed max-w-lg">
-          Built with Next.js &amp; Payload CMS, hosted on k3s (Hetzner) behind
-          Traefik. DNS and caching via Cloudflare. Observability on Dash0.
+          Built with Next.js &amp; Payload CMS, hosted on k3s (Hetzner) behind Traefik. DNS and
+          caching via Cloudflare. Observability on Dash0.
         </p>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 shrink-0">
           <ThemeToggle />
@@ -72,11 +70,7 @@ async function Footer() {
             target="_blank"
             rel="noreferrer"
           >
-            <img
-              src="/images/github-mark.svg"
-              className="h-3 dark:invert"
-              alt="github logo"
-            />
+            <img src="/images/github-mark.svg" className="h-3 dark:invert" alt="github logo" />
             Source
           </a>
           <a
@@ -86,28 +80,15 @@ async function Footer() {
           >
             Mastodon
           </a>
-          <a
-            className="hover:text-foreground hover:underline transition-colors"
-            href="/feed.xml"
-          >
+          <a className="hover:text-foreground hover:underline transition-colors" href="/feed.xml">
             RSS
           </a>
           {isLoggedIn ? (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-auto p-0 text-xs"
-              asChild
-            >
+            <Button variant="ghost" size="sm" className="h-auto p-0 text-xs" asChild>
               <Link href="/admin">Admin</Link>
             </Button>
           ) : (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-auto p-0 text-xs"
-              asChild
-            >
+            <Button variant="ghost" size="sm" className="h-auto p-0 text-xs" asChild>
               <Link href="/login">Login</Link>
             </Button>
           )}
@@ -117,15 +98,9 @@ async function Footer() {
   );
 }
 
-export default function FrontendLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const dash0Env =
-    process.env.DASH0_WEBSITE_MONITORING_ENVIRONMENT ?? "development";
-  const dash0Token =
-    process.env.DASH0_WEBSITE_MONITORING_INGEST_TOKEN ?? "INVALID_TOKEN";
+export default function FrontendLayout({ children }: { children: React.ReactNode }) {
+  const dash0Env = process.env.DASH0_WEBSITE_MONITORING_ENVIRONMENT ?? "development";
+  const dash0Token = process.env.DASH0_WEBSITE_MONITORING_INGEST_TOKEN ?? "INVALID_TOKEN";
 
   return (
     <html lang="en" suppressHydrationWarning>

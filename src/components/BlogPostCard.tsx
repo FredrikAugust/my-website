@@ -1,6 +1,6 @@
-import { timeAgo } from '@/lib/time'
-import type { Blog } from '@/payload-types'
-import Link from 'next/link'
+import { timeAgo } from "@/lib/time";
+import type { Blog } from "@/payload-types";
+import Link from "next/link";
 
 export function BlogPostCard({ post }: { post: Blog }) {
   return (
@@ -18,5 +18,5 @@ export function BlogPostCard({ post }: { post: Blog }) {
         </small>
       )}
     </Link>
-  )
+  );
 }

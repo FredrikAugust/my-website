@@ -1,16 +1,16 @@
-import { withPayload } from '@payloadcms/next/withPayload'
+import { withPayload } from "@payloadcms/next/withPayload";
 
-const s3Hostname = process.env.S3_ENDPOINT ? new URL(process.env.S3_ENDPOINT).hostname : undefined
+const s3Hostname = process.env.S3_ENDPOINT ? new URL(process.env.S3_ENDPOINT).hostname : undefined;
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone',
+  output: "standalone",
   images: {
     remotePatterns: [
-      ...(s3Hostname ? [{ protocol: /** @type {const} */ ('https'), hostname: s3Hostname }] : []),
-      { protocol: 'http', hostname: 'localhost' },
+      ...(s3Hostname ? [{ protocol: /** @type {const} */ ("https"), hostname: s3Hostname }] : []),
+      { protocol: "http", hostname: "localhost" },
     ],
   },
-}
+};
 
-export default withPayload(nextConfig, { devBundleServerPackages: false })
+export default withPayload(nextConfig, { devBundleServerPackages: false });

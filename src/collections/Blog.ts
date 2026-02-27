@@ -3,112 +3,112 @@ import {
   CodeBlock,
   UploadFeature,
   lexicalEditor,
-} from '@payloadcms/richtext-lexical'
-import type { CollectionConfig } from 'payload'
+} from "@payloadcms/richtext-lexical";
+import type { CollectionConfig } from "payload";
 
 export const Blog: CollectionConfig = {
-  slug: 'blog',
-  labels: { singular: 'Blog Post', plural: 'Blog Posts' },
+  slug: "blog",
+  labels: { singular: "Blog Post", plural: "Blog Posts" },
   versions: { drafts: true, maxPerDoc: 25 },
   admin: {
-    useAsTitle: 'title',
-    defaultColumns: ['title', 'author', 'publishedAt', '_status'],
+    useAsTitle: "title",
+    defaultColumns: ["title", "author", "publishedAt", "_status"],
   },
   hooks: {
     beforeValidate: [
       ({ data, operation }) => {
-        if (data?.title && (operation === 'create' || !data.slug)) {
+        if (data?.title && (operation === "create" || !data.slug)) {
           data.slug = data.title
             .toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/(^-|-$)/g, '')
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/(^-|-$)/g, "");
         }
-        return data
+        return data;
       },
     ],
   },
   access: {
     read: ({ req: { user } }) => {
-      if (user) return true
+      if (user) return true;
 
       return {
-        _status: { equals: 'published' },
-      }
+        _status: { equals: "published" },
+      };
     },
   },
   fields: [
     {
-      name: 'title',
-      type: 'text',
+      name: "title",
+      type: "text",
       required: true,
-      label: 'Title',
+      label: "Title",
     },
     {
-      name: 'slug',
-      type: 'text',
+      name: "slug",
+      type: "text",
       required: true,
       unique: true,
       index: true,
-      label: 'Slug',
+      label: "Slug",
       admin: {
-        description: 'URL-friendly version of the title',
+        description: "URL-friendly version of the title",
       },
     },
     {
-      name: 'publishedAt',
-      type: 'date',
+      name: "publishedAt",
+      type: "date",
       index: true,
-      label: 'Published At',
+      label: "Published At",
       admin: {
         date: {
-          pickerAppearance: 'dayAndTime',
+          pickerAppearance: "dayAndTime",
         },
       },
     },
     {
-      name: 'excerpt',
-      type: 'textarea',
-      label: 'Excerpt',
+      name: "excerpt",
+      type: "textarea",
+      label: "Excerpt",
       admin: {
-        description: 'Short summary of the blog post',
+        description: "Short summary of the blog post",
       },
     },
     {
-      name: 'featuredImage',
-      type: 'upload',
-      relationTo: 'blog-image',
-      label: 'Featured Image',
+      name: "featuredImage",
+      type: "upload",
+      relationTo: "blog-image",
+      label: "Featured Image",
       admin: {
-        description: 'Main image for the blog post',
+        description: "Main image for the blog post",
       },
     },
     {
-      name: 'content',
-      type: 'richText',
-      label: 'Content',
+      name: "content",
+      type: "richText",
+      label: "Content",
       required: true,
       editor: lexicalEditor({
         features: ({ defaultFeatures }) => [
           ...defaultFeatures,
           BlocksFeature({
-            blocks: [CodeBlock({ defaultLanguage: 'bash' })],
+            blocks: [CodeBlock({ defaultLanguage: "bash" })],
           }),
           UploadFeature({
-            enabledCollections: ['blog-image'],
+            enabledCollections: ["blog-image"],
           }),
         ],
       }),
     },
     {
-      name: 'tags',
-      type: 'array',
-      label: 'Tags',
+      name: "tags",
+      type: "array",
+      label: "Tags",
       fields: [
         {
-          name: 'tag',
-          type: 'text',
+          name: "tag",
+          type: "text",
         },
       ],
     },
   ],
-}
+};

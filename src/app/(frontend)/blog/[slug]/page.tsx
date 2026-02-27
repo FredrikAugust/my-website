@@ -1,40 +1,40 @@
-import { CodeBlock } from '@/components/HighlightJS'
-import { FadeIn, FadeUp } from '@/components/Motion'
-import { Separator } from '@/components/ui/separator'
-import { timeAgo } from '@/lib/time'
-import type { BlogImage } from '@/payload-types'
-import config from '@payload-config'
-import { RichText } from '@payloadcms/richtext-lexical/react'
-import type { JSXConvertersFunction } from '@payloadcms/richtext-lexical/react'
-import type { Metadata } from 'next'
-import Image from 'next/image'
-import Link from 'next/link'
-import { notFound } from 'next/navigation'
-import { getPayload } from 'payload'
-import { cache } from 'react'
+import { CodeBlock } from "@/components/HighlightJS";
+import { FadeIn, FadeUp } from "@/components/Motion";
+import { Separator } from "@/components/ui/separator";
+import { timeAgo } from "@/lib/time";
+import type { BlogImage } from "@/payload-types";
+import config from "@payload-config";
+import { RichText } from "@payloadcms/richtext-lexical/react";
+import type { JSXConvertersFunction } from "@payloadcms/richtext-lexical/react";
+import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { getPayload } from "payload";
+import { cache } from "react";
 
-export const revalidate = 60
+export const revalidate = 60;
 
-type Props = { params: Promise<{ slug: string }> }
+type Props = { params: Promise<{ slug: string }> };
 
 const getPost = cache(async (slug: string) => {
-  const payload = await getPayload({ config })
+  const payload = await getPayload({ config });
   const result = await payload.find({
-    collection: 'blog',
+    collection: "blog",
     where: { slug: { equals: slug } },
     limit: 1,
-  })
-  return result.docs[0] ?? null
-})
+  });
+  return result.docs[0] ?? null;
+});
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const post = await getPost((await params).slug)
-  if (!post) return {}
+  const post = await getPost((await params).slug);
+  if (!post) return {};
   return {
     title: post.title,
     description: post.excerpt ?? undefined,
     openGraph: { title: post.title, description: post.excerpt ?? undefined },
-  }
+  };
 }
 
 const richTextConverters: JSXConvertersFunction = ({ defaultConverters }) => ({
@@ -42,23 +42,23 @@ const richTextConverters: JSXConvertersFunction = ({ defaultConverters }) => ({
   blocks: {
     ...defaultConverters.blocks,
     codeblock: ({ node }: { node: { fields: { code: string; language?: string } } }) => {
-      const { code, language } = node.fields as { code: string; language?: string }
-      return <CodeBlock code={code} language={language} />
+      const { code, language } = node.fields as { code: string; language?: string };
+      return <CodeBlock code={code} language={language} />;
     },
   },
-})
+});
 
 export default async function BlogPostPage({ params }: Props) {
-  const post = await getPost((await params).slug)
-  if (!post) notFound()
+  const post = await getPost((await params).slug);
+  if (!post) notFound();
 
-  const published = post.publishedAt ? timeAgo(post.publishedAt) : null
-  const updated = timeAgo(post.updatedAt)
+  const published = post.publishedAt ? timeAgo(post.publishedAt) : null;
+  const updated = timeAgo(post.updatedAt);
   const featuredImage =
-    typeof post.featuredImage === 'object' && post.featuredImage !== null
+    typeof post.featuredImage === "object" && post.featuredImage !== null
       ? (post.featuredImage as BlogImage)
-      : null
-  const imageUrl = featuredImage?.sizes?.large?.url ?? featuredImage?.url
+      : null;
+  const imageUrl = featuredImage?.sizes?.large?.url ?? featuredImage?.url;
 
   return (
     <article className="flex flex-col gap-3 overflow-x-hidden [&_a]:text-foreground [&_a]:underline [&_a]:font-serif">
@@ -109,5 +109,5 @@ export default async function BlogPostPage({ params }: Props) {
         </div>
       </FadeIn>
     </article>
-  )
+  );
 }

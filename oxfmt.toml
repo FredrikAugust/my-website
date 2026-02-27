@@ -1,0 +1,12 @@
+[formatter]
+indent_style = "space"
+indent_width = 2
+line_width = 100
+
+[formatter.javascript]
+quote_style = "single"
+trailing_commas = "all"
+semicolons = "as_needed"
+
+[formatter.json]
+trailing_commas = "none"

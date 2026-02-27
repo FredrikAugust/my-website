@@ -1,28 +1,28 @@
-'use client'
+"use client";
 
-import { logoutAction } from '@/actions/login'
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { logoutAction } from "@/actions/login";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const links = [
-  { href: '/', label: 'Home' },
-  { href: '/blog', label: 'Blog' },
-]
+  { href: "/", label: "Home" },
+  { href: "/blog", label: "Blog" },
+];
 
 export function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   return (
     <nav className="flex items-center py-3 font-sans">
       <div className="flex items-center gap-1">
         {links.map(({ href, label }) => {
-          const isActive = href === '/' ? pathname === '/' : pathname.startsWith(href)
+          const isActive = href === "/" ? pathname === "/" : pathname.startsWith(href);
           return (
-            <Button key={href} variant={isActive ? 'secondary' : 'ghost'} size="sm" asChild>
+            <Button key={href} variant={isActive ? "secondary" : "ghost"} size="sm" asChild>
               <Link href={href}>{label}</Link>
             </Button>
-          )
+          );
         })}
       </div>
       {isLoggedIn ? (
@@ -33,7 +33,7 @@ export function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
         </form>
       ) : (
         <Button
-          variant={pathname === '/login' ? 'secondary' : 'ghost'}
+          variant={pathname === "/login" ? "secondary" : "ghost"}
           size="sm"
           className="ml-auto"
           asChild
@@ -42,5 +42,5 @@ export function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
         </Button>
       )}
     </nav>
-  )
+  );
 }

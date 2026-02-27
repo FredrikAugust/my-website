@@ -1,18 +1,20 @@
-import { loginAction } from '@/actions/login'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import type { Metadata } from 'next'
+import { loginAction } from "@/actions/login";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: 'Login',
-}
+  title: "Login",
+};
 
 export default async function LoginPage({
   searchParams,
-}: { searchParams: Promise<{ error?: string }> }) {
-  const { error } = await searchParams
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error } = await searchParams;
 
   return (
     <form action={loginAction} className="font-sans text-sm">
@@ -39,5 +41,5 @@ export default async function LoginPage({
         <Button type="submit">Login</Button>
       </div>
     </form>
-  )
+  );
 }

@@ -1,10 +1,10 @@
-import { codeToHtml } from 'shiki'
+import { codeToHtml } from "shiki";
 
 export async function CodeBlock({ code, language }: { code: string; language?: string }) {
   const html = await codeToHtml(code, {
-    lang: language || 'text',
-    theme: 'github-light',
-  })
+    lang: language || "text",
+    theme: "github-light",
+  });
 
   return (
     <div
@@ -12,5 +12,5 @@ export async function CodeBlock({ code, language }: { code: string; language?: s
       // biome-ignore lint: shiki generates safe HTML
       dangerouslySetInnerHTML={{ __html: html }}
     />
-  )
+  );
 }

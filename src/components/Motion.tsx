@@ -1,16 +1,16 @@
-'use client'
+"use client";
 
-import * as m from 'motion/react-client'
-import type { ReactNode } from 'react'
+import * as m from "motion/react-client";
+import type { ReactNode } from "react";
 
 export function FadeUp({
   children,
   delay = 0,
   className,
 }: {
-  children: ReactNode
-  delay?: number
-  className?: string
+  children: ReactNode;
+  delay?: number;
+  className?: string;
 }) {
   return (
     <m.div
@@ -21,7 +21,7 @@ export function FadeUp({
     >
       {children}
     </m.div>
-  )
+  );
 }
 
 export function FadeIn({
@@ -29,20 +29,20 @@ export function FadeIn({
   delay = 0,
   className,
 }: {
-  children: ReactNode
-  delay?: number
-  className?: string
+  children: ReactNode;
+  delay?: number;
+  className?: string;
 }) {
   return (
     <m.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.4, ease: 'easeOut', delay }}
+      transition={{ duration: 0.4, ease: "easeOut", delay }}
       className={className}
     >
       {children}
     </m.div>
-  )
+  );
 }
 
 export function StaggerContainer({
@@ -50,9 +50,9 @@ export function StaggerContainer({
   className,
   stagger = 0.06,
 }: {
-  children: ReactNode
-  className?: string
-  stagger?: number
+  children: ReactNode;
+  className?: string;
+  stagger?: number;
 }) {
   return (
     <m.div
@@ -66,16 +66,10 @@ export function StaggerContainer({
     >
       {children}
     </m.div>
-  )
+  );
 }
 
-export function StaggerItem({
-  children,
-  className,
-}: {
-  children: ReactNode
-  className?: string
-}) {
+export function StaggerItem({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <m.div
       variants={{
@@ -86,5 +80,5 @@ export function StaggerItem({
     >
       {children}
     </m.div>
-  )
+  );
 }

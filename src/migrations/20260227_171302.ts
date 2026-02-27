@@ -1,10 +1,10 @@
-import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
+import { MigrateUpArgs, MigrateDownArgs, sql } from "@payloadcms/db-postgres";
 
 export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   // 1. Create the version enum type (enum_blog_status already exists from the old schema)
   await db.execute(sql`
     CREATE TYPE "public"."enum__blog_v_version_status" AS ENUM('draft', 'published');
-  `)
+  `);
 
   // 2. Add the new _status column, copy data from old status column, then drop old column
   await db.execute(sql`
@@ -12,7 +12,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
     CREATE INDEX "blog__status_idx" ON "blog" USING btree ("_status");
     UPDATE "blog" SET "_status" = "status";
     ALTER TABLE "blog" DROP COLUMN "status";
-  `)
+  `);
 
   // 3. Create guestbook_entry table (new in the unified app)
   await db.execute(sql`
@@ -25,7 +25,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
     );
     CREATE INDEX IF NOT EXISTS "guestbook_entry_updated_at_idx" ON "guestbook_entry" USING btree ("updated_at");
     CREATE INDEX IF NOT EXISTS "guestbook_entry_created_at_idx" ON "guestbook_entry" USING btree ("created_at");
-  `)
+  `);
 
   // 5. Create the versions table for Payload's draft system
   await db.execute(sql`
@@ -69,7 +69,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
     CREATE INDEX "_blog_v_created_at_idx" ON "_blog_v" USING btree ("created_at");
     CREATE INDEX "_blog_v_updated_at_idx" ON "_blog_v" USING btree ("updated_at");
     CREATE INDEX "_blog_v_latest_idx" ON "_blog_v" USING btree ("latest");
-  `)
+  `);
 
   // 6. Seed the versions table with an initial version for each existing blog post
   //    This ensures Payload's versioning system recognizes the existing posts
@@ -86,7 +86,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
       "updated_at", "created_at", "_status",
       now(), now(), true
     FROM "blog";
-  `)
+  `);
 
   // 7. Seed version tags from existing blog tags
   await db.execute(sql`
@@ -99,7 +99,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
     FROM "blog_tags" bt
     JOIN "_blog_v" bv ON bv."parent_id" = bt."_parent_id"
     WHERE bv."latest" = true;
-  `)
+  `);
 }
 
 export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {
@@ -109,17 +109,17 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
     UPDATE "blog" SET "status" = "_status";
     ALTER TABLE "blog" DROP COLUMN "_status";
     DROP INDEX IF EXISTS "blog__status_idx";
-  `)
+  `);
 
   // 2. Drop versioning infrastructure
   await db.execute(sql`
     DROP TABLE "_blog_v_version_tags" CASCADE;
     DROP TABLE "_blog_v" CASCADE;
     DROP TYPE "public"."enum__blog_v_version_status";
-  `)
+  `);
 
   // 3. Drop guestbook_entry table
   await db.execute(sql`
     DROP TABLE IF EXISTS "guestbook_entry" CASCADE;
-  `)
+  `);
 }

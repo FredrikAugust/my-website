@@ -1,41 +1,41 @@
-import config from '@payload-config'
-import type { MetadataRoute } from 'next'
-import { getPayload } from 'payload'
+import config from "@payload-config";
+import type { MetadataRoute } from "next";
+import { getPayload } from "payload";
 
-export const dynamic = 'force-dynamic'
-export const revalidate = 3600
+export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.SERVER_URL ?? 'http://localhost:3000'
-  const payload = await getPayload({ config })
+  const baseUrl = process.env.SERVER_URL ?? "http://localhost:3000";
+  const payload = await getPayload({ config });
 
   const posts = await payload.find({
-    collection: 'blog',
-    where: { _status: { equals: 'published' } },
-    sort: '-publishedAt',
+    collection: "blog",
+    where: { _status: { equals: "published" } },
+    sort: "-publishedAt",
     limit: 1000,
-  })
+  });
 
   const blogEntries: MetadataRoute.Sitemap = posts.docs.map((post) => ({
     url: `${baseUrl}/blog/${post.slug}`,
     lastModified: post.updatedAt ? new Date(post.updatedAt) : new Date(),
-    changeFrequency: 'weekly',
+    changeFrequency: "weekly",
     priority: 0.7,
-  }))
+  }));
 
   return [
     {
       url: baseUrl,
       lastModified: new Date(),
-      changeFrequency: 'daily',
+      changeFrequency: "daily",
       priority: 1,
     },
     {
       url: `${baseUrl}/blog`,
       lastModified: new Date(),
-      changeFrequency: 'daily',
+      changeFrequency: "daily",
       priority: 0.8,
     },
     ...blogEntries,
-  ]
+  ];
 }

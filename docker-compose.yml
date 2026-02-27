@@ -6,15 +6,15 @@ services:
       POSTGRES_PASSWORD: supersecret
       POSTGRES_DB: website
     ports:
-      - '5432:5432'
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
   minio:
     image: minio/minio:latest
     ports:
-      - '9000:9000'
-      - '9001:9001'
+      - "9000:9000"
+      - "9001:9001"
     command: server /data --console-address ':9001'
 
 volumes:

@@ -1,15 +1,15 @@
-'use client'
+"use client";
 
-import { postComment } from '@/actions/guestbook'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Turnstile } from '@marsidev/react-turnstile'
-import { useState } from 'react'
+import { postComment } from "@/actions/guestbook";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Turnstile } from "@marsidev/react-turnstile";
+import { useState } from "react";
 
 export function GuestbookForm({ turnstileSitekey }: { turnstileSitekey: string }) {
-  const [ready, setReady] = useState(false)
+  const [ready, setReady] = useState(false);
 
   return (
     <form action={postComment} className="flex flex-col gap-2 text-sm mt-2">
@@ -42,5 +42,5 @@ export function GuestbookForm({ turnstileSitekey }: { turnstileSitekey: string }
         Post comment
       </Button>
     </form>
-  )
+  );
 }

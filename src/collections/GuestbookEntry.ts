@@ -1,11 +1,11 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig } from "payload";
 
 export const GuestbookEntry: CollectionConfig = {
-  slug: 'guestbook-entry',
-  labels: { singular: 'Guestbook Entry', plural: 'Guestbook Entries' },
+  slug: "guestbook-entry",
+  labels: { singular: "Guestbook Entry", plural: "Guestbook Entries" },
   admin: {
-    useAsTitle: 'name',
-    defaultColumns: ['name', 'message', 'createdAt'],
+    useAsTitle: "name",
+    defaultColumns: ["name", "message", "createdAt"],
   },
   access: {
     read: () => true,
@@ -15,16 +15,16 @@ export const GuestbookEntry: CollectionConfig = {
   },
   fields: [
     {
-      name: 'name',
-      type: 'text',
+      name: "name",
+      type: "text",
       required: true,
       maxLength: 100,
     },
     {
-      name: 'message',
-      type: 'textarea',
+      name: "message",
+      type: "textarea",
       required: true,
       maxLength: 1000,
     },
   ],
-}
+};

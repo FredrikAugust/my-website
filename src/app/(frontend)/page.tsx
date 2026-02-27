@@ -3,12 +3,7 @@ export const revalidate = 60;
 import { deleteComment } from "@/actions/guestbook";
 import { BlogPostCard } from "@/components/BlogPostCard";
 import { GuestbookForm } from "@/components/GuestbookForm";
-import {
-  FadeIn,
-  FadeUp,
-  StaggerContainer,
-  StaggerItem,
-} from "@/components/Motion";
+import { FadeIn, FadeUp, StaggerContainer, StaggerItem } from "@/components/Motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -47,9 +42,8 @@ export default async function HomePage() {
           </h1>
           <div className="text-muted-foreground text-sm mt-1 space-y-1">
             <p className="leading-7">
-              Welcome! I&apos;m Fredrik &mdash; a software engineer who enjoys
-              tinkering with infrastructure, programming languages, and whatever
-              else catches my curiosity.
+              Welcome! I&apos;m Fredrik &mdash; a software engineer who enjoys tinkering with
+              infrastructure, programming languages, and whatever else catches my curiosity.
             </p>
             <p className="leading-7">
               Have a look around and feel free to leave a note in the guestbook.
@@ -62,9 +56,7 @@ export default async function HomePage() {
         {/* Blog posts */}
         <section className="flex flex-col gap-3">
           <FadeUp>
-            <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight">
-              Blog posts
-            </h2>
+            <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight">Blog posts</h2>
           </FadeUp>
           <StaggerContainer className="flex flex-col gap-3">
             {blogPosts.docs.map((post) => (
@@ -101,24 +93,14 @@ export default async function HomePage() {
                         </small>
                         {user && (
                           <form action={deleteComment}>
-                            <input
-                              type="hidden"
-                              name="comment_id"
-                              value={entry.id}
-                            />
-                            <Button
-                              type="submit"
-                              variant="destructive"
-                              size="xs"
-                            >
+                            <input type="hidden" name="comment_id" value={entry.id} />
+                            <Button type="submit" variant="destructive" size="xs">
                               Delete
                             </Button>
                           </form>
                         )}
                       </div>
-                      <span className="whitespace-pre-wrap">
-                        {entry.message}
-                      </span>
+                      <span className="whitespace-pre-wrap">{entry.message}</span>
                     </div>
                   ))}
                 </div>
