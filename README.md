@@ -45,6 +45,9 @@ The website is developed partially following the guide from [golang.dk](https://
    Edit `.env.local` with your actual database credentials,
    S3 keys, and Resend API key.
 
+   Postgres TLS certificate verification is currently disabled in app config
+   (`rejectUnauthorized: false`), so `DATABASE_CA_PEM` is optional and not used.
+
    Same goes for the `cms/` directory
 
 3. Install Go and Node dependencies:
