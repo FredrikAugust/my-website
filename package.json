@@ -4,6 +4,7 @@
   "description": "Fredrik's personal website — Next.js + Payload CMS",
   "license": "MIT",
   "type": "module",
+  "packageManager": "pnpm@10.28.1",
   "scripts": {
     "build": "NODE_OPTIONS=--no-deprecation next build",
     "dev": "NODE_OPTIONS=--no-deprecation next dev",
@@ -66,7 +67,8 @@
     "onlyBuiltDependencies": [
       "sharp",
       "esbuild",
-      "unrs-resolver"
+      "unrs-resolver",
+      "msw"
     ]
   }
 }
