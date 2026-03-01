@@ -5,7 +5,6 @@ import { Separator } from "@/components/ui/separator";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import Script from "next/script";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -99,9 +98,6 @@ async function Footer() {
 }
 
 export default function FrontendLayout({ children }: { children: React.ReactNode }) {
-  const dash0Env = process.env.DASH0_WEBSITE_MONITORING_ENVIRONMENT ?? "development";
-  const dash0Token = process.env.DASH0_WEBSITE_MONITORING_INGEST_TOKEN ?? "INVALID_TOKEN";
-
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="mx-auto container max-w-5xl min-h-dvh flex flex-col font-serif px-4 pt-4">
@@ -114,14 +110,6 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
           <main className="flex-1 py-4">{children}</main>
           <Footer />
         </ThemeProvider>
-        <Script id="dash0-init" strategy="afterInteractive">
-          {`window.dash0=window.dash0||function(){(window.dash0._q=window.dash0._q||[]).push(arguments)};dash0('init',{serviceName:'fredrik-homepage',environment:'${dash0Env}',endpoint:{url:'https://ingress.europe-west4.gcp.dash0.com',authToken:'${dash0Token}'}});`}
-        </Script>
-        <Script
-          src="https://unpkg.com/@dash0/sdk-web@0.18.0/dist/dash0.iife.js"
-          strategy="afterInteractive"
-          crossOrigin="anonymous"
-        />
       </body>
     </html>
   );
