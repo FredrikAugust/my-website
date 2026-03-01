@@ -13,6 +13,7 @@ import { Users } from "./collections/Users";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
+const databaseCa = process.env.DATABASE_CA_CERT?.replace(/\\n/g, "\n");
 
 export default buildConfig({
   admin: {
@@ -32,6 +33,12 @@ export default buildConfig({
     push: true,
     pool: {
       connectionString: process.env.DATABASE_URI!,
+      ssl: databaseCa
+        ? {
+            ca: databaseCa,
+            rejectUnauthorized: true,
+          }
+        : undefined,
     },
   }),
   sharp,
