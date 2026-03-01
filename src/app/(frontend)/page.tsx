@@ -1,33 +1,33 @@
 export const revalidate = 60;
 
-import { deleteComment } from "@/actions/guestbook";
 import { BlogPostCard } from "@/components/BlogPostCard";
+import { GuestbookEntries } from "@/components/GuestbookEntries";
 import { GuestbookForm } from "@/components/GuestbookForm";
 import { FadeIn, FadeUp, StaggerContainer, StaggerItem } from "@/components/Motion";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { timeAgo } from "@/lib/time";
 import config from "@payload-config";
-import { headers } from "next/headers";
 import Image from "next/image";
 import { getPayload } from "payload";
 
 export default async function HomePage() {
   const payload = await getPayload({ config });
-  const { user } = await payload.auth({ headers: await headers() });
 
   const [blogPosts, guestbookEntries] = await Promise.all([
     payload.find({
       collection: "blog",
+      draft: false,
       sort: "-publishedAt",
       limit: 0,
       where: { _status: { equals: "published" } },
+      select: { id: true, slug: true, title: true, excerpt: true, publishedAt: true },
     }),
     payload.find({
       collection: "guestbook-entry",
       sort: "-createdAt",
       limit: 100,
+      pagination: false,
+      select: { id: true, name: true, message: true, createdAt: true },
     }),
   ]);
 
@@ -76,30 +76,7 @@ export default async function HomePage() {
             />
             <Card className="border-border shadow-sm bg-[url('/images/paper.jpg')] bg-cover dark:bg-none dark:bg-card p-2">
               <ScrollArea className="h-80">
-                <div className="flex flex-col gap-1.5">
-                  {guestbookEntries.docs.map((entry) => (
-                    <div key={entry.id} className="text-sm">
-                      <div className="flex gap-1 items-center flex-wrap">
-                        <span className="font-bold">{entry.name}</span>
-                        <small
-                          className="text-sm leading-none font-medium text-muted-foreground"
-                          title={new Date(entry.createdAt).toISOString()}
-                        >
-                          {timeAgo(entry.createdAt)}
-                        </small>
-                        {user && (
-                          <form action={deleteComment}>
-                            <input type="hidden" name="comment_id" value={entry.id} />
-                            <Button type="submit" variant="destructive" size="xs">
-                              Delete
-                            </Button>
-                          </form>
-                        )}
-                      </div>
-                      <span className="whitespace-pre-wrap">{entry.message}</span>
-                    </div>
-                  ))}
-                </div>
+                <GuestbookEntries entries={guestbookEntries.docs} />
               </ScrollArea>
             </Card>
             <GuestbookForm turnstileSitekey={turnstileSitekey} />

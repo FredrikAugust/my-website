@@ -21,11 +21,28 @@ const getPost = cache(async (slug: string) => {
   const payload = await getPayload({ config });
   const result = await payload.find({
     collection: "blog",
+    draft: false,
     where: { slug: { equals: slug } },
     limit: 1,
+    depth: 1,
+    pagination: false,
   });
   return result.docs[0] ?? null;
 });
+
+export async function generateStaticParams() {
+  const payload = await getPayload({ config });
+  const posts = await payload.find({
+    collection: "blog",
+    draft: false,
+    where: { _status: { equals: "published" } },
+    limit: 1000,
+    pagination: false,
+    select: { slug: true },
+  });
+
+  return posts.docs.map((post) => ({ slug: post.slug }));
+}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const post = await getPost((await params).slug);
