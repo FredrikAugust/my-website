@@ -1,4 +1,5 @@
 import path from "node:path";
+import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { postgresAdapter } from "@payloadcms/db-postgres";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
@@ -13,7 +14,20 @@ import { Users } from "./collections/Users";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
-const databaseCa = process.env.DATABASE_CA_CERT?.replace(/\\n/g, "\n");
+const databaseCaFromFilePath = path.resolve(dirname, "../certs/rds-global-bundle.pem");
+const databaseCaFromEnv = process.env.DATABASE_CA_CERT?.replace(/\\n/g, "\n");
+const databaseCaFromFile = (() => {
+  try {
+    return readFileSync(databaseCaFromFilePath, "utf8");
+  } catch {
+    return undefined;
+  }
+})();
+const databaseCa = databaseCaFromFile ?? databaseCaFromEnv;
+const databaseUri = process.env.DATABASE_URI!;
+const databaseConnectionString = databaseUri
+  .replace(/([?&])sslmode=[^&]*&?/i, "$1")
+  .replace(/[?&]$/, "");
 
 export default buildConfig({
   admin: {
@@ -32,7 +46,7 @@ export default buildConfig({
   db: postgresAdapter({
     push: true,
     pool: {
-      connectionString: process.env.DATABASE_URI!,
+      connectionString: databaseConnectionString,
       ssl: databaseCa
         ? {
             ca: databaseCa,
@@ -52,7 +66,9 @@ export default buildConfig({
       bucket: process.env.S3_BUCKET!,
       config: {
         endpoint: process.env.S3_ENDPOINT!,
-        forcePathStyle: process.env.S3_ENDPOINT!.startsWith("http://localhost:9000"),
+        forcePathStyle: process.env.S3_ENDPOINT!.startsWith(
+          "http://localhost:9000",
+        ),
         credentials: {
           accessKeyId: process.env.S3_ACCESS_KEY_ID!,
           secretAccessKey: process.env.S3_SECRET_ACCESS_KEY!,
