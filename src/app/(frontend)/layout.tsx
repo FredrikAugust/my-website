@@ -1,10 +1,8 @@
+import { FooterAuthLink } from "@/components/FooterAuthLink";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
-import Link from "next/link";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -37,10 +35,7 @@ export const metadata: Metadata = {
   manifest: "/site.webmanifest",
 };
 
-async function Footer() {
-  const cookieStore = await cookies();
-  const isLoggedIn = cookieStore.has("payload-token");
-
+function Footer() {
   return (
     <footer className="text-xs text-muted-foreground pb-6 pt-2 font-sans">
       <Separator className="mb-4" />
@@ -82,15 +77,7 @@ async function Footer() {
           <a className="hover:text-foreground hover:underline transition-colors" href="/feed.xml">
             RSS
           </a>
-          {isLoggedIn ? (
-            <Button variant="ghost" size="sm" className="h-auto p-0 text-xs" asChild>
-              <Link href="/admin">Admin</Link>
-            </Button>
-          ) : (
-            <Button variant="ghost" size="sm" className="h-auto p-0 text-xs" asChild>
-              <Link href="/login">Login</Link>
-            </Button>
-          )}
+          <FooterAuthLink />
         </div>
       </div>
     </footer>
