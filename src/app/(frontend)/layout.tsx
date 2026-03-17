@@ -2,6 +2,7 @@ import { FooterAuthLink } from "@/components/FooterAuthLink";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Separator } from "@/components/ui/separator";
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import "./globals.css";
 
@@ -42,7 +43,7 @@ function Footer() {
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-end">
         <p className="leading-relaxed max-w-lg">
           Built with Next.js &amp; Payload CMS, hosted on k3s (Hetzner) behind Traefik. DNS and
-          caching via Cloudflare. Observability on Dash0.
+          caching via Cloudflare. Analytics by Vercel.
         </p>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 shrink-0">
           <ThemeToggle />
@@ -97,6 +98,7 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
           <main className="flex-1 py-4">{children}</main>
           <Footer />
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
