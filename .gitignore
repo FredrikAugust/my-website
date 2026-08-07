@@ -1,9 +1,17 @@
 node_modules/
 .next/
 .env
+!.env.example
+!apps/**/.env.example
 *.local
 .DS_Store
 .opencode/
 opencode.json
 .vercel
 .env*.local
+IAM Access Key.csv
+apps/*/data/*
+!apps/*/data/.gitkeep
+*.db
+*.db-shm
+*.db-wal

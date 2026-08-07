@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+SCRIPT_DIRECTORY=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)
+
+temporary_directory=$(mktemp -d "${TMPDIR:-/tmp}/migration-safety-test.XXXXXX")
+trap 'rm -rf -- "$temporary_directory"' EXIT
+output_directory="$temporary_directory/archive"
+mkdir "$output_directory"
+for script in "$SCRIPT_DIRECTORY"/*; do
+  [[ -f "$script" ]] || continue
+  bash -n "$script"
+done
+
+if "$SCRIPT_DIRECTORY/init-run" --output-dir "/Users/fredrik/Code/github.com/fredrikaugust/my-website" --run-id unsafe >/dev/null 2>&1; then
+  printf 'expected repository output path to be rejected\n' >&2
+  exit 1
+fi
+
+run_directory=$("$SCRIPT_DIRECTORY/init-run" --output-dir "$output_directory" --run-id test-run)
+[[ -f "$run_directory/run.json" ]]
+if "$SCRIPT_DIRECTORY/init-run" --output-dir "$output_directory" --run-id test-run >/dev/null 2>&1; then
+  printf 'expected duplicate run to be rejected\n' >&2
+  exit 1
+fi
+
+sample="$temporary_directory/sample.txt"
+printf 'backup safety test\n' >"$sample"
+source "$SCRIPT_DIRECTORY/lib.sh"
+artifact="$run_directory/sample.txt"
+cp "$sample" "$artifact"
+write_checksum "$artifact"
+[[ -f "$artifact" && -f "$artifact.sha256" ]]
+"$SCRIPT_DIRECTORY/verify-run" --run-dir "$run_directory" >/dev/null
+
+printf 'migration safety tests passed\n'

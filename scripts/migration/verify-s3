@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+SCRIPT_DIRECTORY=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)
+# shellcheck source=lib.sh
+source "$SCRIPT_DIRECTORY/lib.sh"
+
+usage() {
+  printf 'usage: %s --run-dir DIRECTORY --source-id LABEL\n' "$(basename "$0")" >&2
+}
+
+run_directory=
+source_id=
+while (($#)); do
+  case "$1" in
+    --run-dir) run_directory=${2-}; shift 2 ;;
+    --source-id) source_id=${2-}; shift 2 ;;
+    -h|--help) usage; exit 0 ;;
+    *) usage; die "unknown argument: $1" ;;
+  esac
+done
+
+[[ -n "$run_directory" && -n "$source_id" ]] || { usage; exit 2; }
+require_command jq
+run_directory=$(assert_run_directory "$run_directory")
+assert_label "$source_id"
+source_directory="$run_directory/objects/$source_id"
+[[ -d "$source_directory" ]] || die "unknown object backup: $source_id"
+verification="$source_directory/verification.json"
+assert_new_path "$verification"
+
+temporary_directory=$(new_private_temp_directory)
+trap 'rm -rf -- "$temporary_directory"' EXIT
+manifest="$source_directory/manifest.jsonl"
+[[ -f "$manifest" ]] || die "object manifest is missing: $manifest"
+
+checked=0
+mismatches="$temporary_directory/mismatches.jsonl"
+: >"$mismatches"
+while IFS= read -r item; do
+  if [[ $(jq -r '.source.recordType' <<<"$item") == "delete-marker" ]]; then
+    continue
+  fi
+  object_id=$(jq -r '.objectId' <<<"$item")
+  expected_sha=$(jq -r '.plaintextSha256' <<<"$item")
+  expected_size=$(jq -r '.source.size' <<<"$item")
+  artifact="$source_directory/blobs/$object_id"
+  if [[ ! -f "$artifact" ]]; then
+    jq -cn --arg objectId "$object_id" --arg reason "missing" '{objectId: $objectId, reason: $reason}' >>"$mismatches"
+    continue
+  fi
+  actual_sha=$(sha256_file "$artifact")
+  actual_size=$(wc -c <"$artifact" | tr -d ' ')
+  if [[ "$actual_sha" != "$expected_sha" || "$actual_size" != "$expected_size" ]]; then
+    jq -cn --arg objectId "$object_id" --arg expectedSha "$expected_sha" --arg actualSha "$actual_sha" --argjson expectedSize "$expected_size" --argjson actualSize "$actual_size" \
+      '{objectId: $objectId, expectedSha256: $expectedSha, actualSha256: $actualSha, expectedSize: $expectedSize, actualSize: $actualSize}' >>"$mismatches"
+  fi
+  checked=$((checked + 1))
+done <"$manifest"
+
+mismatch_count=$(wc -l <"$mismatches" | tr -d ' ')
+jq -n \
+  --arg verifiedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+  --argjson checked "$checked" \
+  --argjson mismatchCount "$mismatch_count" \
+  --slurpfile mismatches "$mismatches" \
+  '{verifiedAt: $verifiedAt, checked: $checked, mismatchCount: $mismatchCount, mismatches: $mismatches}' \
+  >"$verification"
+
+[[ "$mismatch_count" == "0" ]] || die "object verification failed; see $verification"
+printf '%s\n' "$verification"

@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+SCRIPT_DIRECTORY=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)
+# shellcheck source=lib.sh
+source "$SCRIPT_DIRECTORY/lib.sh"
+
+usage() {
+  printf 'usage: %s [--output-dir DIRECTORY] [--run-id ID]\n' "$(basename "$0")" >&2
+}
+
+repository_parent=$(cd "$SCRIPT_DIRECTORY/../../.." && pwd -P)
+output_directory="$repository_parent/personal-websites-migration"
+run_id=$(date -u +%Y%m%dT%H%M%SZ)
+
+while (($#)); do
+  case "$1" in
+    --output-dir) output_directory=${2-}; shift 2 ;;
+    --run-id) run_id=${2-}; shift 2 ;;
+    -h|--help) usage; exit 0 ;;
+    *) usage; die "unknown argument: $1" ;;
+  esac
+done
+
+assert_label "$run_id"
+mkdir -p "$output_directory"
+output_directory=$(assert_external_directory "$output_directory")
+run_directory="$output_directory/$run_id"
+assert_new_path "$run_directory"
+
+umask 077
+mkdir "$run_directory"
+mkdir "$run_directory/databases" "$run_directory/objects" "$run_directory/repositories" "$run_directory/reports"
+
+jq -n \
+  --arg schemaVersion "1" \
+  --arg runId "$run_id" \
+  --arg startedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+  --arg status "initialized" \
+  '{schemaVersion: $schemaVersion, runId: $runId, startedAt: $startedAt, status: $status, perFileEncryption: false, independentCopy: false}' \
+  >"$run_directory/run.json"
+chmod 600 "$run_directory/run.json"
+
+printf '%s\n' "$run_directory"

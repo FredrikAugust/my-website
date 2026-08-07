@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+SCRIPT_DIRECTORY=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)
+# shellcheck source=lib.sh
+source "$SCRIPT_DIRECTORY/lib.sh"
+
+usage() {
+  printf 'usage: %s --run-dir DIRECTORY\n' "$(basename "$0")" >&2
+}
+
+run_directory=
+while (($#)); do
+  case "$1" in
+    --run-dir) run_directory=${2-}; shift 2 ;;
+    -h|--help) usage; exit 0 ;;
+    *) usage; die "unknown argument: $1" ;;
+  esac
+done
+
+[[ -n "$run_directory" ]] || { usage; exit 2; }
+require_command jq
+run_directory=$(assert_run_directory "$run_directory")
+verification="$run_directory/reports/artifact-verification.json"
+assert_new_path "$verification"
+
+checked=0
+failures=$(mktemp "${TMPDIR:-/tmp}/artifact-failures.XXXXXX")
+trap 'rm -f -- "$failures"' EXIT
+: >"$failures"
+while IFS= read -r checksum_file; do
+  artifact=${checksum_file%.sha256}
+  expected=$(awk '{print $1}' "$checksum_file")
+  if [[ ! -f "$artifact" ]]; then
+    jq -cn --arg artifact "${artifact#"$run_directory/"}" --arg reason "missing" '{artifact: $artifact, reason: $reason}' >>"$failures"
+    continue
+  fi
+  actual=$(sha256_file "$artifact")
+  if [[ "$actual" != "$expected" ]]; then
+    jq -cn --arg artifact "${artifact#"$run_directory/"}" --arg reason "checksum-mismatch" '{artifact: $artifact, reason: $reason}' >>"$failures"
+  fi
+  checked=$((checked + 1))
+done < <(find "$run_directory" -type f -name '*.sha256' -print | LC_ALL=C sort)
+
+failure_count=$(wc -l <"$failures" | tr -d ' ')
+jq -n \
+  --arg verifiedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+  --argjson checked "$checked" \
+  --argjson failureCount "$failure_count" \
+  --slurpfile failures "$failures" \
+  '{verifiedAt: $verifiedAt, checked: $checked, failureCount: $failureCount, failures: $failures}' \
+  >"$verification"
+
+[[ "$checked" -gt 0 ]] || die "no checksummed artifacts found"
+[[ "$failure_count" == "0" ]] || die "artifact verification failed; see $verification"
+printf '%s\n' "$verification"

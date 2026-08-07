@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+SCRIPT_DIRECTORY=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)
+# shellcheck source=lib.sh
+source "$SCRIPT_DIRECTORY/lib.sh"
+
+usage() {
+  cat >&2 <<'USAGE'
+usage: verify-postgres --run-dir DIRECTORY --source-id LABEL \
+  [--target-uri-env VARIABLE]
+
+The target database must be empty and its name must begin with
+"migration_verify_". The URI is read from VARIABLE (default TARGET_DATABASE_URI).
+USAGE
+}
+
+run_directory=
+source_id=
+target_uri_env=TARGET_DATABASE_URI
+
+while (($#)); do
+  case "$1" in
+    --run-dir) run_directory=${2-}; shift 2 ;;
+    --source-id) source_id=${2-}; shift 2 ;;
+    --target-uri-env) target_uri_env=${2-}; shift 2 ;;
+    -h|--help) usage; exit 0 ;;
+    *) usage; die "unknown argument: $1" ;;
+  esac
+done
+
+[[ -n "$run_directory" && -n "$source_id" ]] || { usage; exit 2; }
+require_command jq
+require_command pg_restore
+require_command psql
+run_directory=$(assert_run_directory "$run_directory")
+assert_label "$source_id"
+source_directory="$run_directory/databases/$source_id"
+[[ -d "$source_directory" ]] || die "unknown database backup: $source_id"
+target_uri=$(read_secret_env "$target_uri_env")
+target_name=$(psql --no-psqlrc --quiet --tuples-only --no-align --set ON_ERROR_STOP=1 --dbname "$target_uri" --command 'SELECT current_database();')
+[[ "$target_name" == migration_verify_* ]] || die "target database name must begin with migration_verify_: $target_name"
+existing_tables=$(psql --no-psqlrc --quiet --tuples-only --no-align --set ON_ERROR_STOP=1 --dbname "$target_uri" --command "SELECT count(*) FROM pg_tables WHERE schemaname NOT IN ('pg_catalog', 'information_schema');")
+[[ "$existing_tables" == "0" ]] || die "target database is not empty: $target_name"
+
+temporary_directory=$(new_private_temp_directory)
+trap 'rm -rf -- "$temporary_directory"' EXIT
+dump_file="$source_directory/database.dump"
+[[ -f "$dump_file" ]] || die "database dump is missing: $dump_file"
+pg_restore --exit-on-error --no-owner --no-privileges --dbname "$target_uri" "$dump_file"
+
+mismatches="$temporary_directory/mismatches.jsonl"
+: >"$mismatches"
+hash_file="$source_directory/table-hashes.jsonl"
+[[ -f "$hash_file" ]] || die "source table hashes are missing: $hash_file"
+while IFS= read -r item; do
+  schema=$(jq -r '.schema' <<<"$item")
+  table=$(jq -r '.table' <<<"$item")
+  expected=$(jq -r '.rows' <<<"$item")
+  quoted_schema=${schema//\"/\"\"}
+  quoted_table=${table//\"/\"\"}
+  actual=$(psql --no-psqlrc --quiet --tuples-only --no-align --set ON_ERROR_STOP=1 \
+    --dbname "$target_uri" \
+    --command "SELECT count(*) FROM \"$quoted_schema\".\"$quoted_table\";")
+  expected_hash=$(jq -r --arg schema "$schema" --arg table "$table" 'select(.schema == $schema and .table == $table) | .contentHash' "$hash_file")
+  actual_hash=$(psql --no-psqlrc --quiet --tuples-only --no-align --set ON_ERROR_STOP=1 \
+    --dbname "$target_uri" \
+    --command "SELECT md5(COALESCE(string_agg(row_hash, '' ORDER BY row_hash), '')) FROM (SELECT md5(row_to_json(source_row)::text) AS row_hash FROM \"$quoted_schema\".\"$quoted_table\" AS source_row) hashes;")
+  if [[ "$actual" != "$expected" || "$actual_hash" != "$expected_hash" ]]; then
+    jq -cn --arg schema "$schema" --arg table "$table" --argjson expected "$expected" --argjson actual "$actual" --arg expectedHash "$expected_hash" --arg actualHash "$actual_hash" \
+      '{schema: $schema, table: $table, expectedRows: $expected, actualRows: $actual, expectedHash: $expectedHash, actualHash: $actualHash}' >>"$mismatches"
+  fi
+done <"$source_directory/table-rows.jsonl"
+
+verification="$source_directory/restore-verification.json"
+assert_new_path "$verification"
+mismatch_count=$(wc -l <"$mismatches" | tr -d ' ')
+jq -n \
+  --arg verifiedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+  --arg targetDatabase "$target_name" \
+  --arg pgRestoreVersion "$(tool_version pg_restore)" \
+  --argjson mismatchCount "$mismatch_count" \
+  --slurpfile mismatches "$mismatches" \
+  '{verifiedAt: $verifiedAt, targetDatabase: $targetDatabase, pgRestoreVersion: $pgRestoreVersion, mismatchCount: $mismatchCount, mismatches: $mismatches}' \
+  >"$verification"
+
+[[ "$mismatch_count" == "0" ]] || die "restore row-count verification failed; see $verification"
+printf '%s\n' "$verification"

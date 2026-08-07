@@ -1,0 +1,133 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+SCRIPT_DIRECTORY=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)
+# shellcheck source=lib.sh
+source "$SCRIPT_DIRECTORY/lib.sh"
+
+usage() {
+  cat >&2 <<'USAGE'
+usage: backup-s3 --run-dir DIRECTORY --site LABEL --bucket BUCKET \
+  [--prefix PREFIX] [--profile PROFILE]
+
+Every current object and retained version is downloaded to the run directory,
+hashed with SHA-256, and recorded in a manifest.
+USAGE
+}
+
+run_directory=
+site=
+bucket=
+prefix=
+profile=
+versioning_status=
+
+while (($#)); do
+  case "$1" in
+    --run-dir) run_directory=${2-}; shift 2 ;;
+    --site) site=${2-}; shift 2 ;;
+    --bucket) bucket=${2-}; shift 2 ;;
+    --prefix) prefix=${2-}; shift 2 ;;
+    --profile) profile=${2-}; shift 2 ;;
+    --versioning-status) versioning_status=${2-}; shift 2 ;;
+    -h|--help) usage; exit 0 ;;
+    *) usage; die "unknown argument: $1" ;;
+  esac
+done
+
+[[ -n "$run_directory" && -n "$site" && -n "$bucket" ]] || { usage; exit 2; }
+require_command aws
+require_command jq
+run_directory=$(assert_run_directory "$run_directory")
+assert_label "$site"
+source_id="$site--$(printf '%s' "$bucket/$prefix" | sha256_text | cut -c1-16)"
+source_directory="$run_directory/objects/$source_id"
+assert_new_path "$source_directory"
+umask 077
+mkdir "$source_directory" "$source_directory/blobs"
+
+aws_args=()
+[[ -z "$profile" ]] || aws_args+=(--profile "$profile")
+versioning_json="$source_directory/versioning.json"
+if [[ -n "$versioning_status" ]]; then
+  [[ "$versioning_status" == "Enabled" || "$versioning_status" == "Suspended" || "$versioning_status" == "Disabled" ]] || \
+    die "invalid --versioning-status: $versioning_status"
+  jq -n --arg Status "$versioning_status" --arg source "retained-state" '{Status: $Status, source: $source}' >"$versioning_json"
+else
+  aws "${aws_args[@]}" s3api get-bucket-versioning --bucket "$bucket" >"$versioning_json"
+  versioning_status=$(jq -r '.Status // "Disabled"' "$versioning_json")
+fi
+
+inventory=$(mktemp "${TMPDIR:-/tmp}/s3-inventory.XXXXXX")
+manifest=$(mktemp "${TMPDIR:-/tmp}/s3-manifest.XXXXXX")
+temporary_directory=$(new_private_temp_directory)
+trap 'rm -f -- "$inventory" "$manifest"; rm -rf -- "$temporary_directory"' EXIT
+
+if [[ "$versioning_status" == "Enabled" || "$versioning_status" == "Suspended" ]]; then
+  aws "${aws_args[@]}" s3api list-object-versions --bucket "$bucket" --prefix "$prefix" >"$inventory"
+  jq -c '.Versions[]? | {recordType: "object", key: .Key, versionId: .VersionId, size: .Size, etag: .ETag, lastModified: .LastModified, isLatest: .IsLatest}' "$inventory" >"$temporary_directory/items.jsonl"
+  jq -c '.DeleteMarkers[]? | {recordType: "delete-marker", key: .Key, versionId: .VersionId, size: 0, etag: null, lastModified: .LastModified, isLatest: .IsLatest}' "$inventory" >"$temporary_directory/delete-markers.jsonl"
+else
+  aws "${aws_args[@]}" s3api list-objects-v2 --bucket "$bucket" --prefix "$prefix" >"$inventory"
+  jq -c '.Contents[]? | {recordType: "object", key: .Key, versionId: null, size: .Size, etag: .ETag, lastModified: .LastModified, isLatest: true}' "$inventory" >"$temporary_directory/items.jsonl"
+  : >"$temporary_directory/delete-markers.jsonl"
+fi
+
+object_count=0
+total_bytes=0
+while IFS= read -r item; do
+  key=$(jq -r '.key' <<<"$item")
+  version_id=$(jq -r '.versionId // empty' <<<"$item")
+  expected_size=$(jq -r '.size' <<<"$item")
+  object_id=$(printf '%s\0%s\0%s' "$bucket" "$key" "$version_id" | sha256_text)
+  plaintext="$temporary_directory/$object_id"
+  response="$temporary_directory/$object_id.response.json"
+  get_args=(s3api get-object --checksum-mode ENABLED --bucket "$bucket" --key "$key")
+  [[ -z "$version_id" ]] || get_args+=(--version-id "$version_id")
+  aws "${aws_args[@]}" "${get_args[@]}" "$plaintext" >"$response"
+  actual_size=$(wc -c <"$plaintext" | tr -d ' ')
+  [[ "$actual_size" == "$expected_size" ]] || die "size mismatch while downloading object id $object_id"
+  plaintext_sha=$(sha256_file "$plaintext")
+  artifact="$source_directory/blobs/$object_id"
+  assert_new_path "$artifact"
+  mv "$plaintext" "$artifact"
+  chmod 600 "$artifact"
+  write_checksum "$artifact"
+  jq -cn \
+    --arg key "$key" \
+    --arg versionId "$version_id" \
+    --arg objectId "$object_id" \
+    --arg plaintextSha256 "$plaintext_sha" \
+    --argjson source "$item" \
+    --argjson response "$(jq '{ContentType, ContentLength, CacheControl, ETag, VersionId, Metadata, ChecksumSHA256, ChecksumType}' "$response")" \
+    '{key: $key, versionId: (if $versionId == "" then null else $versionId end), objectId: $objectId, plaintextSha256: $plaintextSha256, source: $source, response: $response}' \
+    >>"$manifest"
+  object_count=$((object_count + 1))
+  total_bytes=$((total_bytes + actual_size))
+done <"$temporary_directory/items.jsonl"
+
+while IFS= read -r item; do
+  jq -cn --argjson source "$item" '{source: $source}' >>"$manifest"
+done <"$temporary_directory/delete-markers.jsonl"
+
+manifest_artifact="$source_directory/manifest.jsonl"
+assert_new_path "$manifest_artifact"
+mv "$manifest" "$manifest_artifact"
+chmod 600 "$manifest_artifact"
+write_checksum "$manifest_artifact"
+summary="$source_directory/summary.json"
+jq -n \
+  --arg sourceId "$source_id" \
+  --arg site "$site" \
+  --arg bucket "$bucket" \
+  --arg prefix "$prefix" \
+  --arg versioning "$versioning_status" \
+  --arg createdAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+  --arg awsVersion "$(tool_version aws)" \
+  --argjson objectVersions "$object_count" \
+  --argjson deleteMarkers "$(wc -l <"$temporary_directory/delete-markers.jsonl" | tr -d ' ')" \
+  --argjson totalBytes "$total_bytes" \
+  '{sourceId: $sourceId, site: $site, bucket: $bucket, prefix: $prefix, versioning: $versioning, createdAt: $createdAt, objectVersions: $objectVersions, deleteMarkers: $deleteMarkers, totalBytes: $totalBytes, tools: {aws: $awsVersion}, containsSecrets: false}' \
+  >"$summary"
+
+printf '%s\n' "$source_directory"

@@ -1,76 +1,38 @@
-# Fredrik's Personal Website
+# Personal websites
 
-A simple Go web server that serves Fredrik's homepage.
+One small pnpm monorepo for two Next.js + Payload hobby sites:
 
-The website is developed partially following the guide from [golang.dk](https://golang.dk/).
+| Site | Workspace | Vercel project/root | Production data |
+| --- | --- | --- | --- |
+| Fredrik | `@personal/fredrik` | `my-website` / `apps/fredrik` | Turso `personal-websites`, R2 `fredrik-website-media` |
+| Claire | `@personal/claire` | `website-claire` / `apps/claire` | Turso `claire-website`, R2 `claire-website-media` |
 
-## Prerequisites
+Vercel owns deployments and environment variables, Turso owns the two isolated SQLite databases, and Cloudflare R2 owns media. There is no application IaC, container runtime, managed PostgreSQL, or AWS runtime.
 
-- **Go** (1.21+) - [Download](https://go.dev/dl/) or `brew install go`
-- **Node** (22) - Use `nvm` or similar
-- **Docker** - [Download](https://docs.docker.com/get-docker/) or
-  `brew install --cask docker`
-- **Task** - Task runner for executing common tasks
-  - [Installation guide](https://taskfile.dev/installation/)
-  - Or via Homebrew: `brew install go-task`
-- **`gotestsum`** - Pretty test output for Go
-  - Install: `go install gotest.tools/gotestsum@latest`
-- **`air`** - Live reload for Go apps
-  - Install: `go install github.com/air-verse/air@latest`
-- **TailwindCSS** - CSS framework
-  - [Download standalone CLI](https://github.com/tailwindlabs/tailwindcss/releases/latest)
-  - Or on MacOS ARM64:
+## Local setup
 
-    ```bash
-    curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-macos-arm64
-    chmod +x tailwindcss-macos-arm64
-    mv tailwindcss-macos-arm64 /usr/local/bin/tailwindcss
-    ```
+Use Node 24.19.0 and pnpm 10.28.1, then:
 
-## Setup
+```bash
+pnpm install
+cp apps/fredrik/.env.example apps/fredrik/.env.local
+cp apps/claire/.env.example apps/claire/.env.local
+pnpm migrate
+pnpm dev
+```
 
-1. Clone the repository:
+Local databases and uploads live under each app's gitignored `data/` directory. R2 variables are optional locally. Fredrik runs on port 3000; use `PORT=3001 pnpm dev:claire` when running both sites.
 
-   ```bash
-   git clone <repository-url>
-   cd website
-   ```
+Common commands are `pnpm dev:fredrik`, `pnpm dev:claire`, `pnpm generate`, `pnpm migrate`, `pnpm test`, `pnpm lint`, `pnpm typecheck`, and `pnpm build`.
 
-2. Copy the example environment file and fill in your secrets:
+## Deployment and media
 
-   ```bash
-   cp .env.example .env.local
-   ```
+Both existing Vercel projects use this repository with “Include source files outside Root Directory” and “Skip deployments when there are no changes” enabled. Root-only or lockfile changes can deploy both; an app-only change should deploy only its project. Keep the existing domains attached.
 
-   Edit `.env.local` with your actual database credentials,
-   S3 keys, and Resend API key.
+Production migrations run against the Vercel-provisioned `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN`. Media uses bucket-specific `S3_*` R2 credentials and `S3_PUBLIC_URL`; browser uploads are authenticated and go directly to R2. Claire accepts JPEG, PNG, HEIC, PDF, and MP4 up to 500 MiB. Hero and work videos require an image poster; an uploaded work MP4 takes precedence over Vimeo.
 
-   Postgres TLS certificate verification is currently disabled in app config
-   (`rejectUnauthorized: false`), so `DATABASE_CA_PEM` is optional and not used.
+## Restore and rollback
 
-   Same goes for the `cms/` directory
+The one-time migration tooling is in `scripts/migration/`. The verified final source snapshot is outside the repository at `../personal-websites-migration/20260806-simplify-personal-websites/`, including six PostgreSQL restores, 80 checksummed objects, canonical Payload JSON, portable SQLite databases, new admin credentials, and git bundles. No later delta is needed unless the write freeze is broken.
 
-3. Install Go and Node dependencies:
-
-   ```bash
-   go mod download
-   cd cms
-   pnpm i
-   ```
-
-4. Run the development server and tailwind CLI:
-
-   ```bash
-   task dev
-   ```
-
-   Starts cms, databases, redis, go dev server, css building.
-
-## Run tests
-
-Tests can be run with `task test` for all tests including integration tests, or
-`task test:unit` for just unit tests.
-
-## Available Tasks
-
-Run `task --list` to see all available tasks.
+To restore data, provision empty Turso databases, run committed migrations, then run `scripts/migration/import-payload.ts` with the matching canonical JSON. Copy media with `scripts/migration/copy-to-r2.mjs`. For immediate rollback before provider retirement, point Vercel back to the preserved old project/database/storage values or redeploy the old repository bundle. Provider and repository deletion always requires explicit approval of the exact targets.

@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+SCRIPT_DIRECTORY=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)
+# shellcheck source=lib.sh
+source "$SCRIPT_DIRECTORY/lib.sh"
+
+usage() {
+  printf 'usage: %s --run-dir DIRECTORY --name LABEL --repository DIRECTORY\n' "$(basename "$0")" >&2
+}
+
+run_directory=
+name=
+repository=
+while (($#)); do
+  case "$1" in
+    --run-dir) run_directory=${2-}; shift 2 ;;
+    --name) name=${2-}; shift 2 ;;
+    --repository) repository=${2-}; shift 2 ;;
+    -h|--help) usage; exit 0 ;;
+    *) usage; die "unknown argument: $1" ;;
+  esac
+done
+
+[[ -n "$run_directory" && -n "$name" && -n "$repository" ]] || { usage; exit 2; }
+require_command git
+require_command jq
+run_directory=$(assert_run_directory "$run_directory")
+assert_label "$name"
+repository=$(canonical_existing_dir "$repository")
+git -C "$repository" rev-parse --git-dir >/dev/null 2>&1 || die "not a Git repository: $repository"
+source_directory="$run_directory/repositories/$name"
+assert_new_path "$source_directory"
+umask 077
+mkdir "$source_directory"
+
+temporary_directory=$(new_private_temp_directory)
+trap 'rm -rf -- "$temporary_directory"' EXIT
+bundle="$temporary_directory/$name.bundle"
+git -C "$repository" bundle create "$bundle" --all
+git bundle verify "$bundle" >"$temporary_directory/verify.txt" 2>&1
+git clone --quiet "$bundle" "$temporary_directory/clone"
+git -C "$temporary_directory/clone" fsck --full --strict >"$temporary_directory/fsck.txt" 2>&1
+
+artifact="$source_directory/$name.bundle"
+assert_new_path "$artifact"
+mv "$bundle" "$artifact"
+chmod 600 "$artifact"
+write_checksum "$artifact"
+jq -n \
+  --arg repository "$name" \
+  --arg head "$(git -C "$repository" rev-parse HEAD)" \
+  --arg branch "$(git -C "$repository" branch --show-current)" \
+  --arg createdAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+  --arg gitVersion "$(tool_version git)" \
+  --arg artifactSha256 "$(sha256_file "$artifact")" \
+  '{repository: $repository, head: $head, branch: $branch, createdAt: $createdAt, gitVersion: $gitVersion, artifactSha256: $artifactSha256, bundleVerified: true, cloneVerified: true, containsSecrets: false}' \
+  >"$source_directory/summary.json"
+
+printf '%s\n' "$source_directory"

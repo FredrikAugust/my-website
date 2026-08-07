@@ -1,0 +1,119 @@
+name: Source checks
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/source-check.yml"
+      - ".node-version"
+      - ".nvmrc"
+      - ".npmrc"
+      - ".oxlintrc.json"
+      - ".oxfmtrc.json"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "apps/**"
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/source-check.yml"
+      - ".node-version"
+      - ".nvmrc"
+      - ".npmrc"
+      - ".oxlintrc.json"
+      - ".oxfmtrc.json"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "apps/**"
+
+permissions:
+  contents: read
+
+jobs:
+  changes:
+    name: Detect affected sites
+    runs-on: ubuntu-latest
+    outputs:
+      apps: ${{ steps.matrix.outputs.apps }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: paths
+        with:
+          filters: |
+            fredrik:
+              - 'apps/fredrik/**'
+              - '.github/workflows/source-check.yml'
+              - '.node-version'
+              - '.nvmrc'
+              - '.npmrc'
+              - '.oxlintrc.json'
+              - '.oxfmtrc.json'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+            claire:
+              - 'apps/claire/**'
+              - '.github/workflows/source-check.yml'
+              - '.node-version'
+              - '.nvmrc'
+              - '.npmrc'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+      - name: Build application matrix
+        id: matrix
+        env:
+          CLAIRE_CHANGED: ${{ steps.paths.outputs.claire }}
+          FREDRIK_CHANGED: ${{ steps.paths.outputs.fredrik }}
+        run: |
+          apps='[]'
+          if [[ "$FREDRIK_CHANGED" == "true" ]]; then
+            apps=$(jq -c '. + ["fredrik"]' <<< "$apps")
+          fi
+          if [[ "$CLAIRE_CHANGED" == "true" ]]; then
+            apps=$(jq -c '. + ["claire"]' <<< "$apps")
+          fi
+          echo "apps=$apps" >> "$GITHUB_OUTPUT"
+
+  source-check:
+    name: Check ${{ matrix.app }}
+    needs: changes
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: ${{ fromJSON(needs.changes.outputs.apps) }}
+    env:
+      DATABASE_URI: file:./data/ci.db
+      PAYLOAD_SECRET: ci-only-not-a-secret
+      SERVER_URL: http://127.0.0.1:3000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - name: Install workspace
+        run: pnpm install --frozen-lockfile
+      - name: Check formatting
+        run: pnpm --filter "@personal/${{ matrix.app }}" format:check
+      - name: Lint
+        run: pnpm --filter "@personal/${{ matrix.app }}" lint
+      - name: Typecheck
+        run: pnpm --filter "@personal/${{ matrix.app }}" typecheck
+      - name: Check generated artifacts
+        run: |
+          pnpm --filter "@personal/${{ matrix.app }}" generate
+          git diff --exit-code -- \
+            "apps/${{ matrix.app }}/src/payload-types.ts" \
+            "apps/${{ matrix.app }}/src/app/(payload)/admin/importMap.js"
+      - name: Apply database migrations
+        run: pnpm --filter "@personal/${{ matrix.app }}" migrate
+      - name: Test
+        run: pnpm --filter "@personal/${{ matrix.app }}" test
+      - name: Build
+        run: pnpm --filter "@personal/${{ matrix.app }}" build

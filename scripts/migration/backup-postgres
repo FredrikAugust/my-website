@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+SCRIPT_DIRECTORY=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)
+# shellcheck source=lib.sh
+source "$SCRIPT_DIRECTORY/lib.sh"
+
+usage() {
+  cat >&2 <<'USAGE'
+usage: backup-postgres --run-dir DIRECTORY --site LABEL --branch LABEL \
+  --database LABEL [--uri-env VARIABLE]
+
+The connection URI is read from VARIABLE (default DATABASE_URI) and is never
+written to a report or manifest.
+USAGE
+}
+
+run_directory=
+site=
+branch=
+database=
+uri_env=DATABASE_URI
+
+while (($#)); do
+  case "$1" in
+    --run-dir) run_directory=${2-}; shift 2 ;;
+    --site) site=${2-}; shift 2 ;;
+    --branch) branch=${2-}; shift 2 ;;
+    --database) database=${2-}; shift 2 ;;
+    --uri-env) uri_env=${2-}; shift 2 ;;
+    -h|--help) usage; exit 0 ;;
+    *) usage; die "unknown argument: $1" ;;
+  esac
+done
+
+[[ -n "$run_directory" && -n "$site" && -n "$branch" && -n "$database" ]] || { usage; exit 2; }
+require_command jq
+require_command pg_dump
+require_command psql
+run_directory=$(assert_run_directory "$run_directory")
+assert_label "$site"
+assert_label "$branch"
+assert_label "$database"
+connection_uri=$(read_secret_env "$uri_env")
+source_id="$site--$branch--$database"
+source_directory="$run_directory/databases/$source_id"
+assert_new_path "$source_directory"
+umask 077
+mkdir "$source_directory"
+
+dump_artifact="$source_directory/database.dump"
+if ! pg_dump --format=custom --no-owner --no-privileges --dbname "$connection_uri" --file "$dump_artifact"; then
+  rm -rf -- "$source_directory"
+  die "PostgreSQL dump failed for $source_id"
+fi
+chmod 600 "$dump_artifact"
+write_checksum "$dump_artifact"
+
+schemas_json="$source_directory/schemas.json"
+psql --no-psqlrc --quiet --tuples-only --no-align --set ON_ERROR_STOP=1 \
+  --dbname "$connection_uri" \
+  --command "SELECT COALESCE(json_agg(schema_name ORDER BY schema_name), '[]'::json) FROM information_schema.schemata WHERE schema_name NOT LIKE 'pg_%' AND schema_name <> 'information_schema';" \
+  >"$schemas_json"
+
+roles_json="$source_directory/roles.json"
+psql --no-psqlrc --quiet --tuples-only --no-align --set ON_ERROR_STOP=1 \
+  --dbname "$connection_uri" \
+  --command "SELECT COALESCE(json_agg(json_build_object('name', rolname, 'superuser', rolsuper, 'inherit', rolinherit, 'createRole', rolcreaterole, 'createDb', rolcreatedb, 'canLogin', rolcanlogin) ORDER BY rolname), '[]'::json) FROM pg_roles WHERE rolname !~ '^pg_';" \
+  >"$roles_json"
+
+tables_tsv="$source_directory/tables.tsv"
+psql --no-psqlrc --quiet --tuples-only --no-align --field-separator=$'\t' --set ON_ERROR_STOP=1 \
+  --dbname "$connection_uri" \
+  --command "SELECT schemaname, tablename FROM pg_tables WHERE schemaname NOT IN ('pg_catalog', 'information_schema') ORDER BY schemaname, tablename;" \
+  >"$tables_tsv"
+
+rows_jsonl="$source_directory/table-rows.jsonl"
+: >"$rows_jsonl"
+while IFS=$'\t' read -r schema table; do
+  [[ -n "$schema" && -n "$table" ]] || continue
+  quoted_schema=${schema//\"/\"\"}
+  quoted_table=${table//\"/\"\"}
+  row_count=$(psql --no-psqlrc --quiet --tuples-only --no-align --set ON_ERROR_STOP=1 \
+    --dbname "$connection_uri" \
+    --command "SELECT count(*) FROM \"$quoted_schema\".\"$quoted_table\";")
+  jq -cn --arg schema "$schema" --arg table "$table" --argjson rows "$row_count" \
+    '{schema: $schema, table: $table, rows: $rows}' >>"$rows_jsonl"
+done <"$tables_tsv"
+rm "$tables_tsv"
+
+summary="$source_directory/summary.json"
+jq -n \
+  --arg sourceId "$source_id" \
+  --arg site "$site" \
+  --arg branch "$branch" \
+  --arg database "$database" \
+  --arg createdAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+  --arg pgDumpVersion "$(tool_version pg_dump)" \
+  --arg psqlVersion "$(tool_version psql)" \
+  --arg dumpSha256 "$(sha256_file "$dump_artifact")" \
+  --argjson tableCount "$(wc -l <"$rows_jsonl" | tr -d ' ')" \
+  '{sourceId: $sourceId, site: $site, branch: $branch, database: $database, createdAt: $createdAt, tableCount: $tableCount, dumpSha256: $dumpSha256, tools: {pgDump: $pgDumpVersion, psql: $psqlVersion}, containsSecrets: false}' \
+  >"$summary"
+
+printf '%s\n' "$source_directory"
