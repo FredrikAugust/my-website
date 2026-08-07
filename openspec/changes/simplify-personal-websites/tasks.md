@@ -43,10 +43,10 @@
 
 - [x] 6.1 Replace the stale READMEs with one short root guide covering setup, commands, Vercel roots, local SQLite/media, one-time restore, deployment, video, provider ownership, and rollback from the verified local snapshot.
 - [x] 6.2 Remove Dockerfiles, Compose/MinIO, GHCR, PostgreSQL runtime packages, active Neon/AWS/OpenTofu references, and obsolete infrastructure scripts while retaining only labeled migration evidence and disposable restore tooling.
-- [ ] 6.3 Connect both existing Vercel projects to the monorepo, set `apps/fredrik` and `apps/claire` roots, preserve domains, configure Turso/R2 values, enable unaffected-project skipping, and verify an app-only change skips the other project.
+- [x] 6.3 Connect both existing Vercel projects to the monorepo, set `apps/fredrik` and `apps/claire` roots, preserve domains, configure Turso/R2 values, enable unaffected-project skipping, and verify an app-only change skips the other project.
 - [x] 6.4 Deploy Fredrik first and run a short smoke of public/blog/admin/guestbook/media routes, content counts, writes, and error logs.
 - [x] 6.5 Deploy Claire immediately after Fredrik passes and smoke public/work/admin/global/image/PDF/direct-MP4/poster/range behavior and error logs.
 - [x] 6.6 Present the exact Neon, AWS, old-repository, and infrastructure-repository deletion targets and obtain explicit owner approval; there is no waiting-period gate.
-- [ ] 6.7 After approval, delete retired Neon and AWS resources manually, revoke their credentials, verify billing/live references are gone, and never run `tofu destroy`.
-- [ ] 6.8 Archive then delete/disconnect `website-claire` and `personal-cluster` locally/remotely after approval, leaving the verified git bundles as the compact history backup.
-- [ ] 6.9 Run final workspace checks, production smoke, provider/cost inventory, strict OpenSpec validation, and record the final Vercel/Turso/Cloudflare-only platform.
+- [x] 6.7 After approval, delete retired Neon and AWS resources manually, revoke their credentials, verify billing/live references are gone, and never run `tofu destroy`.
+- [x] 6.8 Archive then delete/disconnect `website-claire` and `personal-cluster` locally/remotely after approval, leaving the verified git bundles as the compact history backup.
+- [x] 6.9 Run final workspace checks, production smoke, provider/cost inventory, strict OpenSpec validation, and record the final Vercel/Turso/Cloudflare-only platform.

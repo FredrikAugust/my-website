@@ -87,7 +87,7 @@ jobs:
       matrix:
         app: ${{ fromJSON(needs.changes.outputs.apps) }}
     env:
-      DATABASE_URI: file:./data/ci.db
+      TURSO_DATABASE_URL: file:./data/ci.db
       PAYLOAD_SECRET: ci-only-not-a-secret
       SERVER_URL: http://127.0.0.1:3000
     steps:
