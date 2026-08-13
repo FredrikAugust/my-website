@@ -75,7 +75,7 @@ export default async function HomePage() {
               unoptimized
             />
             <Card className="border-border shadow-sm bg-[url('/images/paper.jpg')] bg-cover dark:bg-none dark:bg-card p-2">
-              <ScrollArea className="h-80">
+              <ScrollArea type="always" className="h-80">
                 <GuestbookEntries entries={guestbookEntries.docs} />
               </ScrollArea>
             </Card>
