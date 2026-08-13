@@ -99,3 +99,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+.guestbook-scroll {
+  scrollbar-color: var(--muted-foreground) transparent;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+}

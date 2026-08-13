@@ -5,7 +5,6 @@ import { GuestbookEntries } from '@/components/GuestbookEntries'
 import { GuestbookForm } from '@/components/GuestbookForm'
 import { FadeIn, FadeUp, StaggerContainer, StaggerItem } from '@/components/Motion'
 import { Card } from '@/components/ui/card'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import config from '@payload-config'
 import Image from 'next/image'
 import { getPayload } from 'payload'
@@ -75,9 +74,13 @@ export default async function HomePage() {
               unoptimized
             />
             <Card className="border-border shadow-sm bg-[url('/images/paper.jpg')] bg-cover dark:bg-none dark:bg-card p-2">
-              <ScrollArea type="always" className="h-80">
+              <div
+                className="guestbook-scroll h-80 overflow-y-scroll pr-1 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                tabIndex={0}
+                aria-label="Guestbook entries"
+              >
                 <GuestbookEntries entries={guestbookEntries.docs} />
-              </ScrollArea>
+              </div>
             </Card>
             <GuestbookForm turnstileSitekey={turnstileSitekey} />
           </section>
