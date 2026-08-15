@@ -1,4 +1,5 @@
 import config from '@/payload.config'
+import { GET as getPiVideo } from '@/app/api/pi-video/route'
 import { type Payload, getPayload } from 'payload'
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
@@ -45,9 +46,27 @@ describe('API', () => {
       'performance-page',
       'film-page',
       'works-page',
+      'pi-playback',
     ] as const
 
     const globals = await Promise.all(slugs.map((slug) => payload.findGlobal({ slug, depth: 0 })))
     expect(globals).toHaveLength(slugs.length)
+  })
+
+  it('gives offline Pis an explicit no-video response before Claire publishes one', async () => {
+    const response = await getPiVideo(
+      new Request('https://clairefoody.com/api/pi-video?device=pi1'),
+    )
+
+    expect(response.status).toBe(200)
+    await expect(response.json()).resolves.toEqual({ video: null })
+  })
+
+  it('rejects unknown Pi displays', async () => {
+    const response = await getPiVideo(
+      new Request('https://clairefoody.com/api/pi-video?device=pi4'),
+    )
+
+    expect(response.status).toBe(404)
   })
 })
