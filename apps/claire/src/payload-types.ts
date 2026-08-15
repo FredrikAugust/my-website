@@ -98,6 +98,7 @@ export interface Config {
     'performance-page': PerformancePage;
     'film-page': FilmPage;
     'works-page': WorksPage;
+    'pi-playback': PiPlayback;
   };
   globalsSelect: {
     home: HomeSelect<false> | HomeSelect<true>;
@@ -108,6 +109,7 @@ export interface Config {
     'performance-page': PerformancePageSelect<false> | PerformancePageSelect<true>;
     'film-page': FilmPageSelect<false> | FilmPageSelect<true>;
     'works-page': WorksPageSelect<false> | WorksPageSelect<true>;
+    'pi-playback': PiPlaybackSelect<false> | PiPlaybackSelect<true>;
   };
   locale: null;
   widgets: {
@@ -760,6 +762,30 @@ export interface WorksPage {
   createdAt?: string | null;
 }
 /**
+ * Choose a different MP4 for each Raspberry Pi display.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pi-playback".
+ */
+export interface PiPlayback {
+  id: number;
+  video?: (number | null) | Media;
+  /**
+   * Upload an MP4 in Media first, then select it for Pi 1.
+   */
+  pi1Video?: (number | null) | Media;
+  /**
+   * Upload an MP4 in Media first, then select it for Pi 2.
+   */
+  pi2Video?: (number | null) | Media;
+  /**
+   * Upload an MP4 in Media first, then select it for Pi 3.
+   */
+  pi3Video?: (number | null) | Media;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "home_select".
  */
@@ -931,6 +957,19 @@ export interface FilmPageSelect<T extends boolean = true> {
 export interface WorksPageSelect<T extends boolean = true> {
   heading?: T;
   description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pi-playback_select".
+ */
+export interface PiPlaybackSelect<T extends boolean = true> {
+  video?: T;
+  pi1Video?: T;
+  pi2Video?: T;
+  pi3Video?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
