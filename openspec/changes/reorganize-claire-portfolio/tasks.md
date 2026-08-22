@@ -49,6 +49,6 @@
 - [x] 6.1 Run formatting checks, Oxlint, TypeScript, unit and integration tests, Payload generation checks, and the production build for `apps/claire`.
 - [ ] 6.2 Verify desktop and narrow-mobile layouts in a browser, including keyboard-only navigation, visible focus, reduced motion, video controls, console output, readable hero navigation, and no horizontal overflow.
 - [x] 6.3 Run a link, metadata, sitemap, image-quality, and accessibility pass over the homepage and every new template with representative sparse and full content.
-- [ ] 6.4 Create a fresh verified production database backup and object manifest immediately before the approved production migration.
-- [ ] 6.5 Apply the production migration and deployment, then smoke-test the homepage, all indexes, every migrated detail page, representative redirects, media playback, About contact details, Dance, CV view and download, and Payload admin editing.
-- [ ] 6.6 Retain the old Works data and rollback-ready application version, record production parity evidence, and roll back the deployment if any launch gate fails.
+- [x] 6.4 Create a fresh verified production database backup and object manifest immediately before the approved production migration.
+- [x] 6.5 Apply the production migration and deployment, then smoke-test the homepage, all indexes, every migrated detail page, representative redirects, media playback, About contact details, Dance, CV view and download, and Payload admin editing.
+- [x] 6.6 Retain the old Works data and rollback-ready application version, record production parity evidence, and roll back the deployment if any launch gate fails.
