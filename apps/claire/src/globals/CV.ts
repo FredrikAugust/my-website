@@ -4,6 +4,22 @@ export const CV: GlobalConfig = {
   slug: 'cv',
   fields: [
     {
+      name: 'fullPdf',
+      type: 'upload',
+      relationTo: 'media',
+      filterOptions: { mimeType: { equals: 'application/pdf' } },
+      admin: { description: 'Current full CV as a PDF.' },
+    },
+    {
+      name: 'downloadFilename',
+      type: 'text',
+      defaultValue: 'Claire-Foody-CV.pdf',
+      validate: (value: string | null | undefined) =>
+        !value || /^[a-zA-Z0-9][a-zA-Z0-9._-]*\.pdf$/.test(value)
+          ? true
+          : 'Use a safe filename ending in .pdf.',
+    },
+    {
       name: 'sections',
       type: 'array',
       fields: [

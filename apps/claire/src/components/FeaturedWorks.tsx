@@ -26,13 +26,14 @@ export function FeaturedWorks({
       )}
 
       {first && (
-        <Link href={`/works/${first.slug}`} className="group block mb-16">
+        <Link href={first.href} className="group block mb-16">
           {first.imageUrl && (
             <div className="aspect-video relative overflow-hidden bg-secondary mb-6">
               <Image
                 src={first.imageUrl}
                 alt={first.imageAlt ?? first.title}
                 fill
+                priority
                 sizes="100vw"
                 className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
               />
@@ -63,10 +64,10 @@ export function FeaturedWorks({
 
       <div className="text-right">
         <Link
-          href="/works"
+          href="/exhibitions"
           className="text-xs uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground transition-colors"
         >
-          View All Works &rarr;
+          View Exhibitions &rarr;
         </Link>
       </div>
     </section>

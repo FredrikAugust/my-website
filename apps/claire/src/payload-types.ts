@@ -70,6 +70,9 @@ export interface Config {
     users: User;
     media: Media;
     works: Work;
+    installations: Installation;
+    exhibitions: Exhibition;
+    films: Film;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -80,6 +83,9 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     works: WorksSelect<false> | WorksSelect<true>;
+    installations: InstallationsSelect<false> | InstallationsSelect<true>;
+    exhibitions: ExhibitionsSelect<false> | ExhibitionsSelect<true>;
+    films: FilmsSelect<false> | FilmsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -94,6 +100,7 @@ export interface Config {
     'site-settings': SiteSetting;
     about: About;
     cv: Cv;
+    dance: Dance;
     contact: Contact;
     'performance-page': PerformancePage;
     'film-page': FilmPage;
@@ -105,6 +112,7 @@ export interface Config {
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
     about: AboutSelect<false> | AboutSelect<true>;
     cv: CvSelect<false> | CvSelect<true>;
+    dance: DanceSelect<false> | DanceSelect<true>;
     contact: ContactSelect<false> | ContactSelect<true>;
     'performance-page': PerformancePageSelect<false> | PerformancePageSelect<true>;
     'film-page': FilmPageSelect<false> | FilmPageSelect<true>;
@@ -297,6 +305,251 @@ export interface Work {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "installations".
+ */
+export interface Installation {
+  id: number;
+  title: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  /**
+   * Available for homepage curation.
+   */
+  featured?: boolean | null;
+  /**
+   * Lower numbers appear first.
+   */
+  sortOrder?: number | null;
+  year: number;
+  shortDescription: string;
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Leading image. At least 2400 px wide is recommended.
+   */
+  heroImage: number | Media;
+  /**
+   * Card image. At least 1600 px wide is recommended.
+   */
+  thumbnailImage?: (number | null) | Media;
+  /**
+   * Uploaded MP4. Takes precedence over Vimeo.
+   */
+  video?: (number | null) | Media;
+  /**
+   * Required poster when an uploaded video is selected.
+   */
+  videoPoster?: (number | null) | Media;
+  /**
+   * Vimeo URL used when no uploaded video is selected.
+   */
+  vimeoUrl?: string | null;
+  gallery?:
+    | {
+        image: number | Media;
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  materials: string;
+  dimensions: string;
+  credits?:
+    | {
+        name: string;
+        role: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "exhibitions".
+ */
+export interface Exhibition {
+  id: number;
+  title: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  /**
+   * Available for homepage curation.
+   */
+  featured?: boolean | null;
+  /**
+   * Lower numbers appear first.
+   */
+  sortOrder?: number | null;
+  overview: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  venue: string;
+  city: string;
+  startDate?: string | null;
+  endDate?: string | null;
+  /**
+   * Display label when exact dates are unavailable, e.g. “Spring 2026”.
+   */
+  dateLabel?: string | null;
+  /**
+   * Leading image. At least 2400 px wide is recommended.
+   */
+  heroImage: number | Media;
+  /**
+   * Card image. At least 1600 px wide is recommended.
+   */
+  thumbnailImage?: (number | null) | Media;
+  /**
+   * Uploaded MP4. Takes precedence over Vimeo.
+   */
+  video?: (number | null) | Media;
+  /**
+   * Required poster when an uploaded video is selected.
+   */
+  videoPoster?: (number | null) | Media;
+  /**
+   * Vimeo URL used when no uploaded video is selected.
+   */
+  vimeoUrl?: string | null;
+  documentation?:
+    | {
+        image: number | Media;
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  credits?:
+    | {
+        name: string;
+        role: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Ordered list of works in this exhibition.
+   */
+  includedInstallations?: (number | Installation)[] | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "films".
+ */
+export interface Film {
+  id: number;
+  title: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  /**
+   * Available for homepage curation.
+   */
+  featured?: boolean | null;
+  /**
+   * Lower numbers appear first.
+   */
+  sortOrder?: number | null;
+  year: number;
+  description: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Leading image. At least 2400 px wide is recommended.
+   */
+  heroImage: number | Media;
+  /**
+   * Card image. At least 1600 px wide is recommended.
+   */
+  thumbnailImage: number | Media;
+  /**
+   * Uploaded MP4. Takes precedence over Vimeo.
+   */
+  video?: (number | null) | Media;
+  /**
+   * Required poster when an uploaded video is selected.
+   */
+  videoPoster?: (number | null) | Media;
+  /**
+   * Vimeo URL used when no uploaded video is selected.
+   */
+  vimeoUrl?: string | null;
+  duration?: string | null;
+  credits?:
+    | {
+        name: string;
+        role: string;
+        id?: string | null;
+      }[]
+    | null;
+  screenings?:
+    | {
+        festival: string;
+        location: string;
+        year: number;
+        id?: string | null;
+      }[]
+    | null;
+  stills?:
+    | {
+        image: number | Media;
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -330,6 +583,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'works';
         value: number | Work;
+      } | null)
+    | ({
+        relationTo: 'installations';
+        value: number | Installation;
+      } | null)
+    | ({
+        relationTo: 'exhibitions';
+        value: number | Exhibition;
+      } | null)
+    | ({
+        relationTo: 'films';
+        value: number | Film;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -476,6 +741,128 @@ export interface WorksSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "installations_select".
+ */
+export interface InstallationsSelect<T extends boolean = true> {
+  title?: T;
+  generateSlug?: T;
+  slug?: T;
+  featured?: T;
+  sortOrder?: T;
+  year?: T;
+  shortDescription?: T;
+  description?: T;
+  heroImage?: T;
+  thumbnailImage?: T;
+  video?: T;
+  videoPoster?: T;
+  vimeoUrl?: T;
+  gallery?:
+    | T
+    | {
+        image?: T;
+        caption?: T;
+        id?: T;
+      };
+  materials?: T;
+  dimensions?: T;
+  credits?:
+    | T
+    | {
+        name?: T;
+        role?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "exhibitions_select".
+ */
+export interface ExhibitionsSelect<T extends boolean = true> {
+  title?: T;
+  generateSlug?: T;
+  slug?: T;
+  featured?: T;
+  sortOrder?: T;
+  overview?: T;
+  venue?: T;
+  city?: T;
+  startDate?: T;
+  endDate?: T;
+  dateLabel?: T;
+  heroImage?: T;
+  thumbnailImage?: T;
+  video?: T;
+  videoPoster?: T;
+  vimeoUrl?: T;
+  documentation?:
+    | T
+    | {
+        image?: T;
+        caption?: T;
+        id?: T;
+      };
+  credits?:
+    | T
+    | {
+        name?: T;
+        role?: T;
+        id?: T;
+      };
+  includedInstallations?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "films_select".
+ */
+export interface FilmsSelect<T extends boolean = true> {
+  title?: T;
+  generateSlug?: T;
+  slug?: T;
+  featured?: T;
+  sortOrder?: T;
+  year?: T;
+  description?: T;
+  heroImage?: T;
+  thumbnailImage?: T;
+  video?: T;
+  videoPoster?: T;
+  vimeoUrl?: T;
+  duration?: T;
+  credits?:
+    | T
+    | {
+        name?: T;
+        role?: T;
+        id?: T;
+      };
+  screenings?:
+    | T
+    | {
+        festival?: T;
+        location?: T;
+        year?: T;
+        id?: T;
+      };
+  stills?:
+    | T
+    | {
+        image?: T;
+        caption?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -532,6 +919,25 @@ export interface Home {
     title?: string | null;
     descriptor?: string | null;
   };
+  /**
+   * Choose up to 3 published projects in homepage order.
+   */
+  featuredProjects?:
+    | (
+        | {
+            relationTo: 'installations';
+            value: number | Installation;
+          }
+        | {
+            relationTo: 'exhibitions';
+            value: number | Exhibition;
+          }
+        | {
+            relationTo: 'films';
+            value: number | Film;
+          }
+      )[]
+    | null;
   aboutPractice?: {
     /**
      * Blockquote text for homepage about section.
@@ -625,6 +1031,11 @@ export interface About {
  */
 export interface Cv {
   id: number;
+  /**
+   * Current full CV as a PDF.
+   */
+  fullPdf?: (number | null) | Media;
+  downloadFilename?: string | null;
   sections?:
     | {
         title: string;
@@ -670,6 +1081,131 @@ export interface Cv {
                     id?: string | null;
                   }[]
                 | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "dance".
+ */
+export interface Dance {
+  id: number;
+  heading?: string | null;
+  introduction?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  showreel?: {
+    /**
+     * Uploaded MP4. Takes precedence over Vimeo.
+     */
+    video?: (number | null) | Media;
+    /**
+     * Required poster when an uploaded video is selected.
+     */
+    videoPoster?: (number | null) | Media;
+    /**
+     * Vimeo URL used when no uploaded video is selected.
+     */
+    vimeoUrl?: string | null;
+  };
+  performanceFootage?:
+    | {
+        title: string;
+        year?: number | null;
+        description?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        /**
+         * Uploaded MP4. Takes precedence over Vimeo.
+         */
+        video?: (number | null) | Media;
+        /**
+         * Required poster when an uploaded video is selected.
+         */
+        videoPoster?: (number | null) | Media;
+        /**
+         * Vimeo URL used when no uploaded video is selected.
+         */
+        vimeoUrl?: string | null;
+        credits?:
+          | {
+              name: string;
+              role: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  selectedStageWorks?:
+    | {
+        title: string;
+        anchor: string;
+        companyOrVenue?: string | null;
+        role?: string | null;
+        dateOrYear?: string | null;
+        image?: (number | null) | Media;
+        description?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        /**
+         * Uploaded MP4. Takes precedence over Vimeo.
+         */
+        video?: (number | null) | Media;
+        /**
+         * Required poster when an uploaded video is selected.
+         */
+        videoPoster?: (number | null) | Media;
+        /**
+         * Vimeo URL used when no uploaded video is selected.
+         */
+        vimeoUrl?: string | null;
+        credits?:
+          | {
+              name: string;
+              role: string;
               id?: string | null;
             }[]
           | null;
@@ -798,6 +1334,7 @@ export interface HomeSelect<T extends boolean = true> {
         title?: T;
         descriptor?: T;
       };
+  featuredProjects?: T;
   aboutPractice?:
     | T
     | {
@@ -847,6 +1384,8 @@ export interface AboutSelect<T extends boolean = true> {
  * via the `definition` "cv_select".
  */
 export interface CvSelect<T extends boolean = true> {
+  fullPdf?: T;
+  downloadFilename?: T;
   sections?:
     | T
     | {
@@ -888,6 +1427,64 @@ export interface CvSelect<T extends boolean = true> {
                     role?: T;
                     id?: T;
                   };
+              id?: T;
+            };
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "dance_select".
+ */
+export interface DanceSelect<T extends boolean = true> {
+  heading?: T;
+  introduction?: T;
+  showreel?:
+    | T
+    | {
+        video?: T;
+        videoPoster?: T;
+        vimeoUrl?: T;
+      };
+  performanceFootage?:
+    | T
+    | {
+        title?: T;
+        year?: T;
+        description?: T;
+        video?: T;
+        videoPoster?: T;
+        vimeoUrl?: T;
+        credits?:
+          | T
+          | {
+              name?: T;
+              role?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  selectedStageWorks?:
+    | T
+    | {
+        title?: T;
+        anchor?: T;
+        companyOrVenue?: T;
+        role?: T;
+        dateOrYear?: T;
+        image?: T;
+        description?: T;
+        video?: T;
+        videoPoster?: T;
+        vimeoUrl?: T;
+        credits?:
+          | T
+          | {
+              name?: T;
+              role?: T;
               id?: T;
             };
         id?: T;

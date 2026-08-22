@@ -22,9 +22,15 @@ export function WorksGrid({ works, label, subtitle, description }: WorksGridProp
         )}
       </div>
       <div className="space-y-24">
-        {works.map((work, i) => (
-          <WorkRow key={work.id} work={work} reverse={i % 2 === 1} />
-        ))}
+        {works.length > 0 ? (
+          works.map((work, i) => (
+            <WorkRow key={work.id} work={work} reverse={i % 2 === 1} priority={i === 0} />
+          ))
+        ) : (
+          <p className="max-w-xl text-muted-foreground">
+            Projects will appear here as they are published.
+          </p>
+        )}
       </div>
     </section>
   )

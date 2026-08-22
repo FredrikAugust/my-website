@@ -10,12 +10,12 @@ interface SiteSettingsData {
 }
 
 const navLinks = [
-  { href: '/works', label: 'Works' },
+  { href: '/installations', label: 'Installations' },
+  { href: '/exhibitions', label: 'Exhibitions' },
   { href: '/film', label: 'Film' },
-  { href: '/performance', label: 'Performance' },
+  { href: '/dance', label: 'Dance' },
   { href: '/about', label: 'About' },
   { href: '/cv', label: 'CV' },
-  { href: '/contact', label: 'Contact' },
 ]
 
 export function Footer({ siteSettings }: { siteSettings: SiteSettingsData }) {

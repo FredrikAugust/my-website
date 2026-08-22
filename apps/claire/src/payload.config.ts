@@ -7,12 +7,16 @@ import { buildConfig } from 'payload'
 import sharp from 'sharp'
 
 import { Media } from './collections/Media'
+import { Exhibitions } from './collections/Exhibitions'
+import { Films } from './collections/Films'
+import { Installations } from './collections/Installations'
 import { Users } from './collections/Users'
 import { Work } from './collections/Work'
 import { About } from './globals/About'
 import { CV } from './globals/CV'
 import { Contact } from './globals/Contact'
 import { Film as FilmGlobal } from './globals/Film'
+import { Dance } from './globals/Dance'
 import { Home } from './globals/Home'
 import { PiPlayback } from './globals/PiPlayback'
 import { Performance as PerformanceGlobal } from './globals/Performance'
@@ -47,12 +51,13 @@ export default buildConfig({
     },
   },
   serverURL: process.env.SERVER_URL!,
-  collections: [Users, Media, Work],
+  collections: [Users, Media, Work, Installations, Exhibitions, Films],
   globals: [
     Home,
     SiteSettings,
     About,
     CV,
+    Dance,
     Contact,
     PerformanceGlobal,
     FilmGlobal,

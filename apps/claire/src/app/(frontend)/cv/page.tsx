@@ -1,6 +1,7 @@
 import { CVSection } from '@/components/CVSection'
 import { Navigation } from '@/components/Navigation'
 import { getPayloadClient } from '@/lib/payload'
+import type { Media } from '@/payload-types'
 import type { Metadata } from 'next'
 
 export const revalidate = 60
@@ -15,9 +16,10 @@ export const metadata: Metadata = {
 export default async function CVPage() {
   const payload = await getPayloadClient()
   const [cv, siteSettings] = await Promise.all([
-    payload.findGlobal({ slug: 'cv', depth: 0 }),
+    payload.findGlobal({ slug: 'cv', depth: 1 }),
     payload.findGlobal({ slug: 'site-settings', depth: 0 }),
   ])
+  const fullPdf = typeof cv.fullPdf === 'object' ? (cv.fullPdf as Media) : null
 
   return (
     <>
@@ -41,6 +43,24 @@ export default async function CVPage() {
               </a>
             )}
           </div>
+          {fullPdf?.url ? (
+            <div className="mt-8 flex flex-wrap gap-3">
+              <a
+                className="border border-foreground px-5 py-3 text-xs uppercase tracking-[0.18em] transition-colors hover:bg-foreground hover:text-background"
+                href={fullPdf.url}
+                target="_blank"
+                rel="noreferrer"
+              >
+                View PDF
+              </a>
+              <a
+                className="border border-border px-5 py-3 text-xs uppercase tracking-[0.18em] transition-colors hover:border-foreground"
+                href="/cv/download"
+              >
+                Download PDF
+              </a>
+            </div>
+          ) : null}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-16">

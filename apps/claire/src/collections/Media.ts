@@ -1,6 +1,7 @@
 import path from 'node:path'
 import type { CollectionConfig } from 'payload'
 import { MEDIA_MIME_TYPES } from '../lib/mediaPolicy'
+import { usePublicMediaWhenLocalFileIsMissing } from '../lib/localMediaFallback'
 import { setImmutableMediaCache } from '../lib/r2Cache'
 
 export const Media: CollectionConfig = {
@@ -8,7 +9,10 @@ export const Media: CollectionConfig = {
   access: {
     read: () => true,
   },
-  hooks: { afterChange: [setImmutableMediaCache] },
+  hooks: {
+    afterChange: [setImmutableMediaCache],
+    afterRead: [usePublicMediaWhenLocalFileIsMissing],
+  },
   defaultPopulate: {
     url: true,
     alt: true,

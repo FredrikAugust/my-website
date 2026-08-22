@@ -7,6 +7,7 @@
   "type": "module",
   "scripts": {
     "build": "NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build --webpack",
+    "copy:production-db": "NODE_OPTIONS=--no-deprecation payload run scripts/copy-production-database.ts",
     "dev": "NODE_OPTIONS=--no-deprecation next dev",
     "generate:importmap": "NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "generate:types": "NODE_OPTIONS=--no-deprecation payload generate:types",
@@ -18,10 +19,16 @@
     "format:check": "oxfmt -c ../../.oxfmtrc.json --check .",
     "typecheck": "tsc --noEmit",
     "generate": "pnpm generate:types && pnpm generate:importmap",
+    "inventory": "NODE_OPTIONS=--no-deprecation payload run scripts/export-portfolio-inventory.ts",
+    "verify:public-media": "NODE_OPTIONS=--no-deprecation payload run scripts/verify-public-media.ts",
+    "migrate:portfolio-content": "NODE_OPTIONS=--no-deprecation payload run scripts/migrate-portfolio-content.ts ../../openspec/changes/reorganize-claire-portfolio/content/mapping.json",
+    "seed:development": "NODE_OPTIONS=--no-deprecation payload run scripts/seed-development-content.ts",
+    "verify:portfolio-content": "NODE_OPTIONS=--no-deprecation payload run scripts/verify-portfolio-migration.ts ../../openspec/changes/reorganize-claire-portfolio/content/mapping.json",
     "migrate": "NODE_OPTIONS=--no-deprecation payload migrate"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "3.999.0",
+    "@libsql/client": "0.14.0",
     "@payloadcms/db-sqlite": "3.87.0",
     "@payloadcms/next": "3.87.0",
     "@payloadcms/richtext-lexical": "3.87.0",

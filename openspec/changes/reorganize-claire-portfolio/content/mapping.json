@@ -1,0 +1,64 @@
+{
+  "approvedFrom": "Claire's website reorganization brief supplied for this change",
+  "homepageSelection": [
+    "exhibitions:saudade",
+    "exhibitions:on-repeat",
+    "exhibitions:tides-and-threads"
+  ],
+  "records": [
+    {
+      "sourceId": 1,
+      "sourceSlug": "saudade",
+      "destination": "exhibitions",
+      "destinationSlug": "saudade",
+      "legacyUrl": "/works/saudade",
+      "canonicalUrl": "/exhibitions/saudade",
+      "city": "Odense",
+      "includedInstallations": []
+    },
+    {
+      "sourceId": 9,
+      "sourceSlug": "wish-you-were-here",
+      "destination": "films",
+      "destinationSlug": "wish-you-were-here",
+      "legacyUrl": "/works/wish-you-were-here",
+      "canonicalUrl": "/film/wish-you-were-here"
+    },
+    {
+      "sourceId": 2,
+      "sourceSlug": "on-repeat",
+      "destination": "exhibitions",
+      "destinationSlug": "on-repeat",
+      "legacyUrl": "/works/on-repeat",
+      "canonicalUrl": "/exhibitions/on-repeat",
+      "city": "Odense",
+      "includedInstallations": []
+    },
+    {
+      "sourceId": 3,
+      "sourceSlug": "tides-and-threads",
+      "destination": "exhibitions",
+      "destinationSlug": "tides-and-threads",
+      "legacyUrl": "/works/tides-and-threads",
+      "canonicalUrl": "/exhibitions/tides-and-threads",
+      "city": "Karlstad",
+      "includedInstallations": []
+    },
+    {
+      "sourceId": 5,
+      "sourceSlug": "thepace",
+      "destination": "dance",
+      "destinationSlug": "dance",
+      "legacyUrl": "/works/thepace",
+      "canonicalUrl": "/dance#thepace"
+    },
+    {
+      "sourceId": 4,
+      "sourceSlug": "centrifuge",
+      "destination": "films",
+      "destinationSlug": "centrifuge",
+      "legacyUrl": "/works/centrifuge",
+      "canonicalUrl": "/film/centrifuge"
+    }
+  ]
+}

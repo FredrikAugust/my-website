@@ -26,7 +26,7 @@ export function AboutPractice({ quote, body }: AboutPracticeProps) {
         <div className="mt-8">
           <Link
             href="/about"
-            className="text-xs uppercase tracking-[0.2em] hover:tracking-[0.3em] transition-all"
+            className="text-xs uppercase tracking-[0.2em] transition-[letter-spacing,color] hover:tracking-[0.3em] hover:text-muted-foreground"
           >
             Read More &rarr;
           </Link>

@@ -3,6 +3,7 @@ import Link from 'next/link'
 
 export interface WorkRowData {
   id: number
+  href: string
   slug: string
   title: string
   year: number
@@ -17,20 +18,22 @@ export interface WorkRowData {
 interface WorkRowProps {
   work: WorkRowData
   reverse?: boolean
+  priority?: boolean
 }
 
-export function WorkRow({ work, reverse = false }: WorkRowProps) {
+export function WorkRow({ work, reverse = false, priority = false }: WorkRowProps) {
   return (
     <div
       className={`grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 ${reverse ? 'lg:[direction:rtl]' : ''}`}
     >
-      <Link href={`/works/${work.slug}`} className="group block lg:[direction:ltr]">
+      <Link href={work.href} className="group block lg:[direction:ltr]">
         {work.imageUrl && (
           <div className="aspect-4/3 relative overflow-hidden bg-secondary">
             <Image
               src={work.imageUrl}
               alt={work.imageAlt ?? work.title}
               fill
+              priority={priority}
               sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
             />
@@ -49,7 +52,7 @@ export function WorkRow({ work, reverse = false }: WorkRowProps) {
           </span>
         </div>
 
-        <Link href={`/works/${work.slug}`} className="group">
+        <Link href={work.href} className="group">
           <h2 className="font-heading text-3xl md:text-4xl tracking-tight mb-3 uppercase group-hover:text-muted-foreground transition-colors">
             {work.title}
           </h2>
@@ -63,8 +66,8 @@ export function WorkRow({ work, reverse = false }: WorkRowProps) {
         )}
 
         <Link
-          href={`/works/${work.slug}`}
-          className="inline-block text-xs uppercase tracking-[0.2em] hover:tracking-[0.3em] transition-all"
+          href={work.href}
+          className="inline-block text-xs uppercase tracking-[0.2em] transition-[letter-spacing,color] hover:tracking-[0.3em] hover:text-muted-foreground"
         >
           View Project &rarr;
         </Link>

@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     template: '%s | Claire Foody',
   },
   description:
-    'Claire Foody is a Canadian artist based in Europe working across installation, film, and performance.',
+    'Claire Foody is a Canadian artist based in Europe working across installation, film, and dance.',
   alternates: {
     canonical: '/',
   },
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Claire Foody',
     description:
-      'Claire Foody is a Canadian artist based in Europe working across installation, film, and performance.',
+      'Claire Foody is a Canadian artist based in Europe working across installation, film, and dance.',
     url: '/',
   },
 }
@@ -52,7 +52,12 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${bodoniModa.variable} ${karla.variable}`}>
       <body className="bg-foreground">
-        <main className="bg-background">{children}</main>
+        <a href="#main-content" className="skip-link">
+          Skip to main content
+        </a>
+        <main id="main-content" tabIndex={-1} className="scroll-mt-24 bg-background">
+          {children}
+        </main>
         <Footer siteSettings={siteSettings} />
         <Analytics />
       </body>

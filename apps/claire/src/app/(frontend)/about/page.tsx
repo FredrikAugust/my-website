@@ -17,7 +17,10 @@ export const metadata: Metadata = {
 
 export default async function AboutPage() {
   const payload = await getPayloadClient()
-  const about = await payload.findGlobal({ slug: 'about', depth: 1 })
+  const [about, siteSettings] = await Promise.all([
+    payload.findGlobal({ slug: 'about', depth: 1 }),
+    payload.findGlobal({ slug: 'site-settings', depth: 0 }),
+  ])
   const portrait = about.portrait as Media | null
 
   return (
@@ -53,15 +56,9 @@ export default async function AboutPage() {
             <div className="flex gap-8 mt-10">
               <Link
                 href="/cv"
-                className="text-xs uppercase tracking-[0.2em] hover:tracking-[0.3em] transition-all"
+                className="text-xs uppercase tracking-[0.2em] transition-[letter-spacing,color] hover:tracking-[0.3em] hover:text-muted-foreground"
               >
                 View CV &rarr;
-              </Link>
-              <Link
-                href="/contact"
-                className="text-xs uppercase tracking-[0.2em] hover:tracking-[0.3em] transition-all"
-              >
-                Contact &rarr;
               </Link>
             </div>
           </div>
@@ -77,6 +74,60 @@ export default async function AboutPage() {
             )}
           </div>
         )}
+
+        <section
+          id="contact"
+          className="scroll-mt-24 mt-24 border-t border-border pt-12"
+          aria-labelledby="contact-heading"
+        >
+          <p className="mb-4 text-xs uppercase tracking-[0.2em] text-muted-foreground">Contact</p>
+          <h2
+            id="contact-heading"
+            className="text-balance font-heading text-3xl tracking-tight md:text-4xl"
+          >
+            Work With Claire
+          </h2>
+          <div className="mt-8 flex flex-col items-start gap-3 text-lg">
+            {siteSettings.email ? (
+              <a
+                className="underline decoration-border underline-offset-4 hover:decoration-foreground"
+                href={`mailto:${siteSettings.email}`}
+              >
+                {siteSettings.email}
+              </a>
+            ) : null}
+            {siteSettings.phone ? (
+              <a
+                className="underline decoration-border underline-offset-4 hover:decoration-foreground"
+                href={`tel:${siteSettings.phone.replace(/\s/g, '')}`}
+              >
+                {siteSettings.phone}
+              </a>
+            ) : null}
+            <div className="mt-3 flex gap-6 text-sm text-muted-foreground">
+              {siteSettings.vimeoUrl ? (
+                <a
+                  className="hover:text-foreground"
+                  href={siteSettings.vimeoUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Vimeo
+                </a>
+              ) : null}
+              {siteSettings.instagramUrl ? (
+                <a
+                  className="hover:text-foreground"
+                  href={siteSettings.instagramUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Instagram
+                </a>
+              ) : null}
+            </div>
+          </div>
+        </section>
       </section>
     </>
   )

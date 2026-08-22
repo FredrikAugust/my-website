@@ -3,6 +3,7 @@ import Link from 'next/link'
 
 export interface WorkCardData {
   id: number
+  href: string
   slug: string
   title: string
   year: number
@@ -17,7 +18,7 @@ export interface WorkCardData {
 export function WorkCard({ work }: { work: WorkCardData }) {
   return (
     <div>
-      <Link href={`/works/${work.slug}`} className="group block">
+      <Link href={work.href} className="group block">
         {work.imageUrl && (
           <div className="aspect-4/3 relative overflow-hidden bg-secondary mb-4">
             <Image

@@ -2,8 +2,8 @@ import { AboutPractice } from '@/components/AboutPractice'
 import { FeaturedWorks } from '@/components/FeaturedWorks'
 import { HeroVideo } from '@/components/HeroVideo'
 import { Navigation } from '@/components/Navigation'
-import { mapWorkToCard } from '@/lib/mapWorkToCard'
 import { getPayloadClient } from '@/lib/payload'
+import { mapProjectToCard } from '@/lib/projects'
 import type { Media as MediaType } from '@/payload-types'
 import type { Metadata } from 'next'
 
@@ -19,27 +19,7 @@ export const metadata: Metadata = {
 export default async function HomePage() {
   const payload = await getPayloadClient()
 
-  const [home, worksResult] = await Promise.all([
-    payload.findGlobal({ slug: 'home', depth: 1 }),
-    payload.find({
-      collection: 'works',
-      where: { featured: { equals: true } },
-      sort: 'sortOrder',
-      limit: 3,
-      depth: 1,
-      select: {
-        title: true,
-        slug: true,
-        year: true,
-        category: true,
-        medium: true,
-        venue: true,
-        thumbnailImage: true,
-        heroImage: true,
-        subtitle: true,
-      },
-    }),
-  ])
+  const home = await payload.findGlobal({ slug: 'home', depth: 2 })
 
   const heroVideo = home.hero?.video as MediaType | null
   const fallbackImage = home.hero?.fallbackImage as MediaType | null
@@ -54,7 +34,17 @@ export default async function HomePage() {
         fallbackImageAlt={fallbackImage?.alt}
       />
       <FeaturedWorks
-        works={worksResult.docs.map(mapWorkToCard)}
+        works={(home.featuredProjects ?? []).flatMap((relation) => {
+          if (typeof relation.value !== 'object' || relation.value._status !== 'published')
+            return []
+          const kind =
+            relation.relationTo === 'films'
+              ? 'film'
+              : relation.relationTo === 'exhibitions'
+                ? 'exhibition'
+                : 'installation'
+          return [mapProjectToCard(kind, relation.value)]
+        })}
         descriptor={home.hero?.descriptor}
       />
       <AboutPractice quote={home.aboutPractice?.quote} body={home.aboutPractice?.body} />
