@@ -9,6 +9,27 @@ const serverUrl = process.env.SERVER_URL ? new URL(process.env.SERVER_URL) : und
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
+  async redirects() {
+    return [
+      { source: '/works', destination: '/exhibitions', permanent: true },
+      { source: '/performance', destination: '/dance', permanent: true },
+      { source: '/contact', destination: '/about#contact', permanent: true },
+      { source: '/works/saudade', destination: '/exhibitions/saudade', permanent: true },
+      { source: '/works/on-repeat', destination: '/exhibitions/on-repeat', permanent: true },
+      {
+        source: '/works/tides-and-threads',
+        destination: '/exhibitions/tides-and-threads',
+        permanent: true,
+      },
+      {
+        source: '/works/wish-you-were-here',
+        destination: '/film/wish-you-were-here',
+        permanent: true,
+      },
+      { source: '/works/centrifuge', destination: '/film/centrifuge', permanent: true },
+      { source: '/works/thepace', destination: '/dance#thepace', permanent: true },
+    ]
+  },
   images: {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
