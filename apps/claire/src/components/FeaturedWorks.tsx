@@ -1,79 +1,68 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import type { WorkCardData } from './WorkCard'
-import { WorkCard } from './WorkCard'
 
 export function FeaturedWorks({ works }: { works: WorkCardData[] }) {
   if (!works.length) return null
 
-  const [first, ...rest] = works
-
   return (
-    <section id="selected-works" className="score-grid bg-[#f4f3ee] px-6 py-24 md:px-10 md:py-36">
-      <div className="mx-auto max-w-[96rem]">
-        <div className="mb-16 grid grid-cols-12 border-y border-black/25 py-4 text-xs uppercase tracking-[0.18em] md:mb-24">
-          <p className="col-span-5 text-[#1648ff]">Index / Selected works</p>
-          <p className="col-span-7 text-right">Three movements in space</p>
-        </div>
+    <section
+      id="selected-works"
+      className="overflow-hidden bg-[#f2f2ee] py-28 text-[#10110f] md:py-44"
+    >
+      <div className="mb-20 grid gap-8 px-5 md:grid-cols-[1fr_1fr] md:px-9">
+        <h2 className="font-heading text-[clamp(3.8rem,8vw,9rem)] leading-[0.88] tracking-[-0.055em]">
+          Works in motion
+        </h2>
+        <p className="max-w-md border-t border-black/30 pt-4 text-lg leading-relaxed text-black/48 md:justify-self-end">
+          Each work changes according to the room, the body, and the person looking.
+        </p>
+      </div>
 
-        {first && (
-          <Link href={first.href} className="group mb-28 grid grid-cols-12 gap-x-4 md:gap-x-6">
-            <div className="col-span-12 mb-5 md:col-span-4 md:mb-0 md:flex md:flex-col md:justify-between">
-              <div>
-                <p className="mb-5 text-xs uppercase tracking-[0.2em] text-[#1648ff]">
-                  Movement 01
-                </p>
-                <h3 className="font-heading text-5xl uppercase leading-[0.9] tracking-[0.04em] md:text-7xl">
-                  {first.title}
-                </h3>
-              </div>
-              <div className="mt-8 border-t border-[#1648ff] pt-3 text-xs uppercase tracking-[0.17em]">
-                <p>{first.category}</p>
-                <p>{first.year}</p>
-              </div>
+      <div className="score-rail flex snap-x snap-mandatory gap-6 overflow-x-auto px-5 pb-10 md:gap-9 md:px-9">
+        {works.map((work, index) => (
+          <Link
+            key={work.id}
+            href={work.href}
+            className="group w-[84vw] shrink-0 snap-start md:w-[66vw] lg:w-[52vw]"
+          >
+            <div
+              className={`${index % 2 ? 'aspect-[4/3]' : 'aspect-[16/10]'} relative overflow-hidden bg-[#d5d6d1]`}
+            >
+              {work.imageUrl ? (
+                <Image
+                  src={work.imageUrl}
+                  alt={work.imageAlt ?? work.title}
+                  fill
+                  sizes="(max-width: 768px) 84vw, 55vw"
+                  className="artwork-hover object-cover grayscale"
+                />
+              ) : null}
             </div>
-            <div className="col-span-12 md:col-span-8">
-              {first.imageUrl && (
-                <div className="relative aspect-video overflow-hidden bg-[#d7d7d2]">
-                  <Image
-                    src={first.imageUrl}
-                    alt={first.imageAlt ?? first.title}
-                    fill
-                    priority
-                    sizes="(max-width: 768px) 100vw, 68vw"
-                    className="artwork-hover object-cover"
-                  />
-                </div>
-              )}
-              <p className="mt-4 max-w-md text-sm text-black/60">{first.subtitle}</p>
+            <div className="mt-5 flex items-start justify-between gap-8 border-t border-black/30 pt-4">
+              <div>
+                <h3 className="font-heading text-[clamp(2.6rem,4.5vw,5.5rem)] leading-[0.95] tracking-[-0.045em]">
+                  {work.title}
+                </h3>
+                <p className="mt-3 text-sm text-black/48">
+                  {[work.category, work.year].filter(Boolean).join(', ')}
+                </p>
+              </div>
+              <span className="stage-arrow text-2xl text-[#2447ff]" aria-hidden="true">
+                ↗
+              </span>
             </div>
           </Link>
-        )}
-
-        {rest.length > 0 && (
-          <div className="mb-24 grid grid-cols-12 gap-x-4 gap-y-20 border-y border-black/25 py-10 md:gap-x-6">
-            {rest.map((work, index) => (
-              <div
-                key={work.id}
-                className={
-                  index % 2 === 0
-                    ? 'col-span-10 md:col-span-6'
-                    : 'col-span-9 col-start-4 md:col-span-5 md:col-start-8 md:pt-32'
-                }
-              >
-                <p className="mb-4 text-xs uppercase tracking-[0.2em] text-[#1648ff]">
-                  Movement 0{index + 2} / axis {index % 2 === 0 ? 'x' : 'y'}
-                </p>
-                <WorkCard work={work} />
-              </div>
-            ))}
-          </div>
-        )}
-
-        <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-[#1648ff]">
-          <span>Score continues</span>
-          <Link href="/works" className="text-link-underline">
-            Complete index ⟶
+        ))}
+        <div className="flex w-[16vw] shrink-0 snap-end items-end pb-12 md:w-[24vw]">
+          <Link
+            href="/works"
+            className="group inline-flex items-center gap-5 text-sm text-[#2447ff]"
+          >
+            <span className="text-link-underline">All works</span>
+            <span className="stage-arrow" aria-hidden="true">
+              ↗
+            </span>
           </Link>
         </div>
       </div>

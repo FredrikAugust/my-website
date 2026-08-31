@@ -15,18 +15,19 @@ interface HeroVideoProps {
   featuredYear?: number
 }
 
+const words = ['Bodies', 'Objects', 'Memory'] as const
+
 export function HeroVideo({
   videoUrl,
   videoMimeType,
   fallbackImageUrl,
   fallbackImageAlt,
-  descriptor,
   featuredHref,
   featuredTitle,
-  featuredYear,
 }: HeroVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [motionAllowed, setMotionAllowed] = useState(false)
+  const [activeWord, setActiveWord] = useState(0)
 
   useEffect(() => {
     const query = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -45,88 +46,88 @@ export function HeroVideo({
     void video.play().catch(() => undefined)
   }, [motionAllowed])
 
+  const selectWord = (index: number) => {
+    setActiveWord(index)
+    const video = videoRef.current
+    if (!video || !Number.isFinite(video.duration) || video.duration <= 0) return
+    video.currentTime = (video.duration / words.length) * index
+  }
+
   return (
     <section
-      className="score-grid relative min-h-[100svh] overflow-hidden bg-[#f4f3ee] px-6 pb-12 pt-28 text-[#111] md:px-10 md:pt-32"
+      className="min-h-[100svh] overflow-hidden bg-[#f2f2ee] px-5 pb-10 pt-28 text-[#10110f] md:px-9 md:pt-32"
       aria-label="Featured artwork"
     >
-      <div className="mx-auto grid min-h-[calc(100svh-11rem)] max-w-[96rem] grid-cols-12 grid-rows-[auto_auto_auto_auto] gap-x-4 md:grid-rows-[auto_auto_1fr] md:gap-x-6">
-        <div className="col-span-12 flex items-center justify-between border-y border-black/25 py-3 text-[0.65rem] uppercase tracking-[0.19em] text-[#1648ff]">
-          <span>Score 2.1 / Homepage</span>
-          <span>Tempo 72</span>
-          <span className="hidden sm:inline">Duration ∞</span>
-        </div>
-
-        <h1 className="col-span-12 mt-8 max-w-[12ch] font-heading text-[clamp(3.5rem,8vw,8.7rem)] uppercase leading-[0.82] tracking-[0.09em] md:col-span-7 md:mt-12">
-          Bodies <span className="text-[#1648ff]">/</span>
-          <br /> Objects <span className="text-[#1648ff]">/</span>
-          <br /> Memory
-        </h1>
-
-        <div className="relative col-span-8 col-start-5 row-start-3 mt-8 self-end md:col-span-7 md:col-start-6 md:row-start-2 md:mt-20 md:self-start">
-          <div className="relative aspect-[16/10] overflow-hidden bg-[#d7d7d2]">
-            {fallbackImageUrl ? (
-              <Image
-                src={fallbackImageUrl}
-                alt={fallbackImageAlt ?? ''}
-                fill
-                sizes="(max-width: 768px) 72vw, 58vw"
-                className="object-cover grayscale"
-                priority
-              />
-            ) : null}
-            {videoUrl && motionAllowed ? (
-              <video
-                ref={videoRef}
-                muted
-                loop
-                playsInline
-                poster={fallbackImageUrl ?? undefined}
-                className="absolute inset-0 h-full w-full object-cover grayscale"
-                preload="metadata"
-                aria-hidden="true"
-              >
-                <source src={videoUrl} type={videoMimeType ?? 'video/mp4'} />
-              </video>
-            ) : null}
-          </div>
-          <span className="absolute -left-8 top-1/2 h-px w-16 bg-[#1648ff]" aria-hidden="true" />
-          <span
-            className="absolute -left-2 top-[calc(50%-0.25rem)] text-xs text-[#1648ff]"
-            aria-hidden="true"
-          >
-            ×
-          </span>
-        </div>
-
-        <div className="col-span-12 row-start-4 mt-10 self-end md:col-span-4 md:row-start-3 md:mt-0">
-          <p className="max-w-xs text-sm leading-relaxed text-black/60">
-            {descriptor ?? 'Choreography, installation, and film.'}
+      <div className="mx-auto grid min-h-[calc(100svh-10rem)] max-w-[105rem] items-start gap-12 pt-10 md:pt-14 lg:grid-cols-[minmax(0,1.1fr)_minmax(28rem,0.9fr)] lg:gap-14 lg:pt-16">
+        <div>
+          <p className="mb-8 max-w-xs text-sm leading-relaxed text-black/48">
+            Move through the ideas that shape Claire Foody’s practice.
           </p>
-          <div className="mt-6 border-t border-[#1648ff] pt-3">
-            <p className="text-2xl uppercase tracking-[0.16em]">
-              {featuredTitle ?? 'Selected work'}
-            </p>
-            <p className="mt-2 text-xs uppercase tracking-[0.17em] text-[#1648ff]">
-              01 — 04 {featuredYear ? `/ ${featuredYear}` : ''}
-            </p>
+          <h1 className="flex max-w-[10ch] flex-col items-start font-heading text-[clamp(4rem,8.1vw,9.5rem)] leading-[0.78] tracking-[-0.055em]">
+            {words.map((word, index) => (
+              <button
+                key={word}
+                type="button"
+                onPointerEnter={() => selectWord(index)}
+                onFocus={() => selectWord(index)}
+                onClick={() => selectWord(index)}
+                aria-pressed={activeWord === index}
+                className={`score-word ${activeWord === index ? 'is-active' : ''}`}
+              >
+                {word}
+              </button>
+            ))}
+          </h1>
+        </div>
+
+        <div>
+          <div className="score-frame relative aspect-[4/3] overflow-hidden bg-[#d5d6d1]">
+            <div className={`score-media score-media-${activeWord} absolute -inset-4`}>
+              {fallbackImageUrl ? (
+                <Image
+                  src={fallbackImageUrl}
+                  alt={fallbackImageAlt ?? ''}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 45vw"
+                  className="object-cover grayscale"
+                  priority
+                />
+              ) : null}
+              {videoUrl && motionAllowed ? (
+                <video
+                  ref={videoRef}
+                  muted
+                  loop
+                  playsInline
+                  poster={fallbackImageUrl ?? undefined}
+                  className="absolute inset-0 h-full w-full object-cover grayscale"
+                  preload="metadata"
+                  aria-hidden="true"
+                >
+                  <source src={videoUrl} type={videoMimeType ?? 'video/mp4'} />
+                </video>
+              ) : null}
+            </div>
+          </div>
+          <div className="mt-5 flex items-start justify-between gap-6 border-t border-black/30 pt-4 text-sm">
+            <div>
+              <p className="font-heading text-2xl">{featuredTitle ?? 'Selected work'}</p>
+              <p className="mt-2 text-black/48">Film, installation, choreography</p>
+            </div>
             {featuredHref ? (
               <Link
                 href={featuredHref}
-                className="mt-7 inline-flex items-center gap-12 text-xs uppercase tracking-[0.2em] text-[#1648ff]"
+                className="group inline-flex items-center gap-4 text-[#2447ff]"
               >
-                View work <span aria-hidden="true">⟶</span>
+                <span className="text-link-underline">View work</span>
+                <span className="stage-arrow" aria-hidden="true">
+                  ↗
+                </span>
               </Link>
             ) : null}
           </div>
         </div>
       </div>
-      <a
-        href="#selected-works"
-        className="absolute bottom-3 right-6 text-[0.62rem] uppercase tracking-[0.2em] text-[#1648ff]"
-      >
-        Continue ↓
-      </a>
     </section>
   )
 }

@@ -10,27 +10,21 @@ export function AboutPractice({ quote, body }: AboutPracticeProps) {
   if (!quote && !body) return null
 
   return (
-    <section className="score-grid bg-[#1648ff] px-6 py-24 text-white md:px-10 md:py-36">
-      <div className="mx-auto grid max-w-[96rem] grid-cols-12 gap-x-4 md:gap-x-6">
-        <div className="col-span-12 mb-16 flex justify-between border-y border-white/40 py-3 text-xs uppercase tracking-[0.2em] md:col-span-3 md:mb-0 md:block">
-          <p>Movement 04</p>
-          <p className="md:mt-2">Practice</p>
-        </div>
-        <div className="col-span-12 md:col-span-8 md:col-start-5">
-          {quote && (
-            <blockquote className="max-w-[20ch] font-heading text-4xl uppercase leading-[0.98] tracking-[0.035em] md:text-6xl">
+    <section className="bg-[#f2f2ee] px-5 pb-32 pt-10 text-[#10110f] md:px-9 md:pb-48">
+      <div className="mx-auto grid max-w-[105rem] gap-16 border-t border-black/30 pt-6 md:grid-cols-[0.55fr_1.45fr]">
+        <p className="font-heading text-xl text-[#2447ff]">The thinking behind the work</p>
+        <div>
+          {quote ? (
+            <blockquote className="max-w-[24ch] font-heading text-[clamp(2.8rem,5.4vw,6.5rem)] leading-[0.96] tracking-[-0.045em]">
               {quote}
             </blockquote>
-          )}
-          <div className="mt-14 flex flex-wrap items-center gap-8 border-t border-white/40 pt-4">
-            <Link href="/about" className="text-link-underline text-xs uppercase tracking-[0.2em]">
-              Read the practice ⟶
+          ) : null}
+          <div className="mt-14 flex flex-wrap gap-x-10 gap-y-5 text-sm">
+            <Link href="/about" className="text-link-underline">
+              Read more
             </Link>
-            <Link
-              href="/about#contact"
-              className="text-link-underline text-xs uppercase tracking-[0.2em]"
-            >
-              Contact / collaborate
+            <Link href="/about#contact" className="text-link-underline text-[#2447ff]">
+              Begin a conversation
             </Link>
           </div>
         </div>
