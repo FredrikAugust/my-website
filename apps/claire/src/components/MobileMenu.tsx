@@ -17,18 +17,48 @@ export function MobileMenu({ artistName, links, variant = 'dark' }: MobileMenuPr
   const pathname = usePathname()
   const triggerRef = useRef<HTMLButtonElement>(null)
   const closeRef = useRef<HTMLButtonElement>(null)
+  const dialogRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!open) return
     const previousOverflow = document.body.style.overflow
+    const main = document.querySelector<HTMLElement>('#main-content')
+    const footer = document.querySelector<HTMLElement>('body > footer')
+    const previousMainInert = main?.inert ?? false
+    const previousFooterInert = footer?.inert ?? false
     document.body.style.overflow = 'hidden'
+    if (main) main.inert = true
+    if (footer) footer.inert = true
     closeRef.current?.focus()
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setOpen(false)
+      if (event.key === 'Escape') {
+        setOpen(false)
+        return
+      }
+      if (event.key !== 'Tab') return
+
+      const focusable = Array.from(
+        dialogRef.current?.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ) ?? [],
+      )
+      const first = focusable.at(0)
+      const last = focusable.at(-1)
+      if (!first || !last) return
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first.focus()
+      }
     }
     document.addEventListener('keydown', handleKeyDown)
     return () => {
       document.body.style.overflow = previousOverflow
+      if (main) main.inert = previousMainInert
+      if (footer) footer.inert = previousFooterInert
       document.removeEventListener('keydown', handleKeyDown)
       triggerRef.current?.focus()
     }
@@ -52,6 +82,7 @@ export function MobileMenu({ artistName, links, variant = 'dark' }: MobileMenuPr
 
       {open ? (
         <div
+          ref={dialogRef}
           id={menuId}
           role="dialog"
           aria-modal="true"

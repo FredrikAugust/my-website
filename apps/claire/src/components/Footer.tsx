@@ -62,7 +62,14 @@ export function Footer({ siteSettings }: { siteSettings: SiteSettingsData }) {
                   {siteSettings.email}
                 </a>
               )}
-              {siteSettings.phone && <span>{siteSettings.phone}</span>}
+              {siteSettings.phone && (
+                <a
+                  href={`tel:${siteSettings.phone.replace(/[^+\d]/g, '')}`}
+                  className="hover:text-primary-foreground transition-colors"
+                >
+                  {siteSettings.phone}
+                </a>
+              )}
               <div className="flex gap-4 mt-2">
                 {siteSettings.vimeoUrl && (
                   <a

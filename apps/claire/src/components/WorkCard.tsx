@@ -26,7 +26,7 @@ export function WorkCard({ work }: { work: WorkCardData }) {
               alt={work.imageAlt ?? work.title}
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+              className="artwork-hover object-cover"
             />
           </div>
         )}

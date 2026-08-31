@@ -35,7 +35,7 @@ export function FeaturedWorks({
                 fill
                 priority
                 sizes="100vw"
-                className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                className="artwork-hover object-cover"
               />
             </div>
           )}
@@ -64,10 +64,10 @@ export function FeaturedWorks({
 
       <div className="text-right">
         <Link
-          href="/exhibitions"
+          href="/works"
           className="text-xs uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground transition-colors"
         >
-          View Exhibitions &rarr;
+          View all work &rarr;
         </Link>
       </div>
     </section>
