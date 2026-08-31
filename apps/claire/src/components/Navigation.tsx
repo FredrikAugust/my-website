@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 import { MobileMenu } from './MobileMenu'
 
@@ -16,15 +17,29 @@ export const navLinks = [
 
 const artistName = 'Claire Foody'
 
-export function Navigation({ variant = 'dark' }: { variant?: 'light' | 'dark' }) {
+export function Navigation({ variant = 'dark' }: { variant?: 'light' | 'dark' | 'adaptive' }) {
   const pathname = usePathname()
-  const isLight = variant === 'light'
+  const [pastHero, setPastHero] = useState(false)
+
+  useEffect(() => {
+    if (variant !== 'adaptive') return
+    const update = () => setPastHero(window.scrollY > window.innerHeight * 0.78)
+    update()
+    window.addEventListener('scroll', update, { passive: true })
+    window.addEventListener('resize', update)
+    return () => {
+      window.removeEventListener('scroll', update)
+      window.removeEventListener('resize', update)
+    }
+  }, [variant])
+
+  const isLight = variant === 'light' || (variant === 'adaptive' && !pastHero)
   const textColor = isLight ? 'text-white' : 'text-foreground'
 
   return (
     <nav
       aria-label="Primary"
-      className={`fixed inset-x-0 top-0 z-50 border-b ${isLight ? 'border-white/15 bg-black/30' : 'border-border/70 bg-background/95'}`}
+      className={`fixed inset-x-0 top-0 z-50 border-b transition-[background-color,border-color,color] duration-300 ${isLight ? 'border-white/15 bg-black/20' : 'border-border/70 bg-background/95'}`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         <Link
@@ -48,7 +63,7 @@ export function Navigation({ variant = 'dark' }: { variant?: 'light' | 'dark' })
             )
           })}
         </div>
-        <MobileMenu artistName={artistName} links={navLinks} variant={variant} />
+        <MobileMenu artistName={artistName} links={navLinks} variant={isLight ? 'light' : 'dark'} />
       </div>
     </nav>
   )

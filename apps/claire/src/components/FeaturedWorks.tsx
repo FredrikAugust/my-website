@@ -3,72 +3,83 @@ import Link from 'next/link'
 import type { WorkCardData } from './WorkCard'
 import { WorkCard } from './WorkCard'
 
-export function FeaturedWorks({
-  works,
-  descriptor,
-}: {
-  works: WorkCardData[]
-  descriptor?: string | null
-}) {
+export function FeaturedWorks({ works }: { works: WorkCardData[] }) {
   if (!works.length) return null
 
   const [first, ...rest] = works
 
   return (
-    <section className="mx-auto max-w-7xl px-6 py-24">
-      <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground mb-2">
-        Selected Works
-      </p>
-      {descriptor && (
-        <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl tracking-tight mb-16">
-          {descriptor}
-        </h2>
-      )}
+    <section
+      id="selected-works"
+      className="bg-[#f0ede6] px-6 py-24 text-[#121212] md:px-10 md:py-36"
+    >
+      <div className="mx-auto max-w-[96rem]">
+        <div className="mb-20 flex items-end justify-between gap-8 border-t border-black/30 pt-5 md:mb-28">
+          <div>
+            <p className="mb-5 text-xs uppercase tracking-[0.2em] text-[#b64e25]">Scenes / 01—03</p>
+            <h2 className="font-heading text-5xl leading-[0.95] tracking-[-0.04em] md:text-7xl">
+              Selected works
+            </h2>
+          </div>
+          <p className="hidden max-w-xs text-sm leading-relaxed text-black/55 md:block">
+            Bodies enter, objects hold their ground, and each image keeps the trace of an action.
+          </p>
+        </div>
 
-      {first && (
-        <Link href={first.href} className="group block mb-16">
-          {first.imageUrl && (
-            <div className="aspect-video relative overflow-hidden bg-secondary mb-6">
-              <Image
-                src={first.imageUrl}
-                alt={first.imageAlt ?? first.title}
-                fill
-                priority
-                sizes="100vw"
-                className="artwork-hover object-cover"
-              />
-            </div>
-          )}
-          <div className="flex flex-wrap items-baseline gap-1 flex-col">
-            <span className="text-muted-foreground">{first.year}</span>
-            <div className="flex md:flex-row flex-col gap-4 justify-between w-full">
-              <div className="flex flex-col gap-1">
-                <h3 className="font-heading text-2xl md:text-3xl tracking-tight group-hover:text-foreground transition-colors">
+        {first && (
+          <Link href={first.href} className="group mb-28 block">
+            {first.imageUrl && (
+              <div className="relative mb-6 aspect-[16/8] overflow-hidden bg-[#d4d0c8]">
+                <Image
+                  src={first.imageUrl}
+                  alt={first.imageAlt ?? first.title}
+                  fill
+                  priority
+                  sizes="100vw"
+                  className="artwork-hover object-cover"
+                />
+              </div>
+            )}
+            <div className="grid gap-4 border-t border-black/25 pt-4 md:grid-cols-[1fr_1fr]">
+              <div>
+                <p className="mb-2 text-xs uppercase tracking-[0.2em] text-[#b64e25]">Scene 01</p>
+                <h3 className="font-heading text-4xl tracking-[-0.03em] md:text-6xl">
                   {first.title}
                 </h3>
-                <span className="text-md capitalize text-muted-foreground">{first.category}</span>
               </div>
-              <p className="text-muted-foreground max-w-sm text-md">{first.subtitle}</p>
+              <div className="flex justify-between gap-6 text-sm text-black/55">
+                <p className="max-w-sm">{first.subtitle}</p>
+                <p className="shrink-0 text-xs uppercase tracking-[0.17em]">
+                  {first.category}
+                  <br />
+                  {first.year}
+                </p>
+              </div>
             </div>
+          </Link>
+        )}
+
+        {rest.length > 0 && (
+          <div className="mb-28 grid gap-x-14 gap-y-20 md:grid-cols-12">
+            {rest.map((work, index) => (
+              <div
+                key={work.id}
+                className={index % 2 === 0 ? 'md:col-span-7' : 'md:col-span-5 md:pt-40'}
+              >
+                <p className="mb-4 text-xs uppercase tracking-[0.2em] text-[#b64e25]">
+                  Scene 0{index + 2}
+                </p>
+                <WorkCard work={work} />
+              </div>
+            ))}
           </div>
-        </Link>
-      )}
+        )}
 
-      {rest.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-16 mb-16">
-          {rest.map((work) => (
-            <WorkCard key={work.id} work={work} />
-          ))}
+        <div className="flex justify-end border-t border-black/25 pt-5">
+          <Link href="/works" className="text-link-underline text-xs uppercase tracking-[0.2em]">
+            Enter the full programme →
+          </Link>
         </div>
-      )}
-
-      <div className="text-right">
-        <Link
-          href="/works"
-          className="text-xs uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground transition-colors"
-        >
-          View all work &rarr;
-        </Link>
       </div>
     </section>
   )
