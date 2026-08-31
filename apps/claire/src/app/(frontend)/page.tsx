@@ -23,30 +23,32 @@ export default async function HomePage() {
 
   const heroVideo = home.hero?.video as MediaType | null
   const fallbackImage = home.hero?.fallbackImage as MediaType | null
+  const works = (home.featuredProjects ?? []).flatMap((relation) => {
+    if (typeof relation.value !== 'object' || relation.value._status !== 'published') return []
+    const kind =
+      relation.relationTo === 'films'
+        ? 'film'
+        : relation.relationTo === 'exhibitions'
+          ? 'exhibition'
+          : 'installation'
+    return [mapProjectToCard(kind, relation.value)]
+  })
+  const featuredWork = works.at(0)
 
   return (
     <>
-      <Navigation variant="light" />
+      <Navigation />
       <HeroVideo
         videoUrl={heroVideo?.url}
         videoMimeType={heroVideo?.mimeType}
         fallbackImageUrl={fallbackImage?.url}
         fallbackImageAlt={fallbackImage?.alt}
-      />
-      <FeaturedWorks
-        works={(home.featuredProjects ?? []).flatMap((relation) => {
-          if (typeof relation.value !== 'object' || relation.value._status !== 'published')
-            return []
-          const kind =
-            relation.relationTo === 'films'
-              ? 'film'
-              : relation.relationTo === 'exhibitions'
-                ? 'exhibition'
-                : 'installation'
-          return [mapProjectToCard(kind, relation.value)]
-        })}
         descriptor={home.hero?.descriptor}
+        featuredHref={featuredWork?.href}
+        featuredTitle={featuredWork?.title}
+        featuredYear={featuredWork?.year}
       />
+      <FeaturedWorks works={works} />
       <AboutPractice quote={home.aboutPractice?.quote} body={home.aboutPractice?.body} />
     </>
   )

@@ -1,5 +1,4 @@
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical'
-import { RichText } from '@payloadcms/richtext-lexical/react'
 import Link from 'next/link'
 
 interface AboutPracticeProps {
@@ -11,25 +10,29 @@ export function AboutPractice({ quote, body }: AboutPracticeProps) {
   if (!quote && !body) return null
 
   return (
-    <section className="bg-secondary py-24">
-      <div className="mx-auto max-w-4xl px-6">
-        {quote && (
-          <blockquote className="font-heading text-2xl md:text-3xl lg:text-4xl leading-snug tracking-tight text-foreground/90 border-l-2 border-foreground/20 pl-8">
-            {quote}
-          </blockquote>
-        )}
-        {body && (
-          <div className="mt-12 max-w-2xl text-muted-foreground leading-relaxed">
-            <RichText data={body} />
+    <section className="score-grid bg-[#1648ff] px-6 py-24 text-white md:px-10 md:py-36">
+      <div className="mx-auto grid max-w-[96rem] grid-cols-12 gap-x-4 md:gap-x-6">
+        <div className="col-span-12 mb-16 flex justify-between border-y border-white/40 py-3 text-xs uppercase tracking-[0.2em] md:col-span-3 md:mb-0 md:block">
+          <p>Movement 04</p>
+          <p className="md:mt-2">Practice</p>
+        </div>
+        <div className="col-span-12 md:col-span-8 md:col-start-5">
+          {quote && (
+            <blockquote className="max-w-[20ch] font-heading text-4xl uppercase leading-[0.98] tracking-[0.035em] md:text-6xl">
+              {quote}
+            </blockquote>
+          )}
+          <div className="mt-14 flex flex-wrap items-center gap-8 border-t border-white/40 pt-4">
+            <Link href="/about" className="text-link-underline text-xs uppercase tracking-[0.2em]">
+              Read the practice ⟶
+            </Link>
+            <Link
+              href="/about#contact"
+              className="text-link-underline text-xs uppercase tracking-[0.2em]"
+            >
+              Contact / collaborate
+            </Link>
           </div>
-        )}
-        <div className="mt-8">
-          <Link
-            href="/about"
-            className="text-link-underline text-xs uppercase tracking-[0.2em] hover:text-muted-foreground"
-          >
-            Read More &rarr;
-          </Link>
         </div>
       </div>
     </section>
