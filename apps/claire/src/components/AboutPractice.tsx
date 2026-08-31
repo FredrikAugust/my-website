@@ -1,5 +1,4 @@
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical'
-import { RichText } from '@payloadcms/richtext-lexical/react'
 import Link from 'next/link'
 
 interface AboutPracticeProps {
@@ -11,25 +10,26 @@ export function AboutPractice({ quote, body }: AboutPracticeProps) {
   if (!quote && !body) return null
 
   return (
-    <section className="bg-secondary py-24">
-      <div className="mx-auto max-w-4xl px-6">
-        {quote && (
-          <blockquote className="font-heading text-2xl md:text-3xl lg:text-4xl leading-snug tracking-tight text-foreground/90 border-l-2 border-foreground/20 pl-8">
-            {quote}
-          </blockquote>
-        )}
-        {body && (
-          <div className="mt-12 max-w-2xl text-muted-foreground leading-relaxed">
-            <RichText data={body} />
+    <section className="bg-[#7e332b] px-6 py-24 text-[#f2efe7] md:px-10 md:py-36">
+      <div className="mx-auto grid max-w-[96rem] gap-12 md:grid-cols-[1fr_2fr]">
+        <p className="text-xs uppercase tracking-[0.2em] text-[#f2efe7]/65">Practice / 04</p>
+        <div>
+          {quote && (
+            <blockquote className="max-w-[22ch] font-heading text-3xl leading-[1.03] tracking-[-0.03em] md:text-5xl lg:text-6xl">
+              {quote}
+            </blockquote>
+          )}
+          <div className="mt-12 flex flex-wrap items-center gap-8 border-t border-[#f2efe7]/35 pt-5">
+            <Link href="/about" className="text-link-underline text-xs uppercase tracking-[0.2em]">
+              Read about the practice &rarr;
+            </Link>
+            <Link
+              href="/about#contact"
+              className="text-link-underline text-xs uppercase tracking-[0.2em]"
+            >
+              Start a conversation
+            </Link>
           </div>
-        )}
-        <div className="mt-8">
-          <Link
-            href="/about"
-            className="text-link-underline text-xs uppercase tracking-[0.2em] hover:text-muted-foreground"
-          >
-            Read More &rarr;
-          </Link>
         </div>
       </div>
     </section>
