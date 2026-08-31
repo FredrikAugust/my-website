@@ -37,7 +37,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <Navigation variant="adaptive" />
+      <Navigation variant="light" />
       <HeroVideo
         videoUrl={heroVideo?.url}
         videoMimeType={heroVideo?.mimeType}

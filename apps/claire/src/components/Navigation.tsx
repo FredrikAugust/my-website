@@ -2,9 +2,8 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
-
-import { MobileMenu } from './MobileMenu'
+import type { CSSProperties } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 export const navLinks = [
   { href: '/installations', label: 'Installations' },
@@ -19,51 +18,133 @@ const artistName = 'Claire Foody'
 
 export function Navigation({ variant = 'dark' }: { variant?: 'light' | 'dark' | 'adaptive' }) {
   const pathname = usePathname()
-  const [pastHero, setPastHero] = useState(false)
+  const [open, setOpen] = useState(false)
+  const panelRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const usesLightChrome = variant === 'light'
 
   useEffect(() => {
-    if (variant !== 'adaptive') return
-    const update = () => setPastHero(window.scrollY > window.innerHeight * 0.78)
-    update()
-    window.addEventListener('scroll', update, { passive: true })
-    window.addEventListener('resize', update)
-    return () => {
-      window.removeEventListener('scroll', update)
-      window.removeEventListener('resize', update)
-    }
-  }, [variant])
+    const panel = panelRef.current
+    if (!panel) return
 
-  const isLight = variant === 'light' || (variant === 'adaptive' && !pastHero)
-  const textColor = isLight ? 'text-white' : 'text-foreground'
+    if (!open) {
+      panel.setAttribute('inert', '')
+      return
+    }
+
+    panel.removeAttribute('inert')
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    const main = document.getElementById('main-content')
+    const footer = document.querySelector('footer')
+    main?.setAttribute('inert', '')
+    footer?.setAttribute('inert', '')
+
+    const focusable = panel.querySelectorAll<HTMLElement>('a[href], button:not([disabled])')
+    focusable[0]?.focus()
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setOpen(false)
+      if (event.key !== 'Tab' || focusable.length === 0) return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+
+    document.addEventListener('keydown', onKeyDown)
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+      document.body.style.overflow = previousOverflow
+      main?.removeAttribute('inert')
+      footer?.removeAttribute('inert')
+      triggerRef.current?.focus()
+    }
+  }, [open])
+
+  const chromeColor = usesLightChrome ? 'text-white' : 'text-[#11110f]'
+  const panelTone = usesLightChrome ? 'bg-[#ee3f1f] text-[#11110f]' : 'bg-[#11110f] text-[#f3f1ea]'
 
   return (
-    <nav
-      aria-label="Primary"
-      className={`fixed inset-x-0 top-0 z-50 border-b transition-[background-color,border-color,color] duration-300 ${isLight ? 'border-white/15 bg-black/20' : 'border-border/70 bg-background/95'}`}
-    >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+    <nav aria-label="Primary" className="pointer-events-none fixed inset-x-0 top-0 z-50">
+      <div
+        className={`relative z-10 flex items-center justify-between px-5 py-5 md:px-9 md:py-7 ${open ? (usesLightChrome ? 'text-[#11110f]' : 'text-[#f3f1ea]') : chromeColor}`}
+      >
         <Link
           href="/"
-          className={`rounded-sm px-2 py-1 font-heading text-xl font-medium ${textColor}`}
+          onClick={() => setOpen(false)}
+          className="pointer-events-auto font-heading text-[1.35rem] leading-none tracking-[-0.025em] transition-opacity duration-200 hover:opacity-60"
         >
           {artistName}
         </Link>
-        <div className="hidden items-center gap-7 md:flex">
-          {navLinks.map((link) => {
-            const active = pathname === link.href || pathname.startsWith(`${link.href}/`)
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                aria-current={active ? 'page' : undefined}
-                className={`border-b py-1 text-xs uppercase tracking-[0.17em] transition-colors ${textColor} ${active ? 'border-current' : 'border-transparent hover:border-current/50'}`}
-              >
-                {link.label}
-              </Link>
-            )
-          })}
+        <button
+          ref={triggerRef}
+          type="button"
+          aria-expanded={open}
+          aria-controls="site-index"
+          onClick={() => setOpen((current) => !current)}
+          className="nav-trigger pointer-events-auto flex min-h-11 min-w-11 items-center justify-end gap-3 text-sm"
+        >
+          <span>{open ? 'Close' : 'Index'}</span>
+          <span className={`nav-trigger-mark ${open ? 'is-open' : ''}`} aria-hidden="true">
+            <span />
+            <span />
+          </span>
+        </button>
+      </div>
+
+      <div
+        ref={panelRef}
+        id="site-index"
+        className={`nav-curtain pointer-events-auto fixed inset-0 overflow-y-auto ${panelTone} ${open ? 'is-open' : ''}`}
+        aria-hidden={!open}
+      >
+        <div className="flex min-h-[100svh] flex-col px-5 pb-8 pt-28 md:px-9 md:pb-10 md:pt-32">
+          <div className="grid flex-1 items-end gap-12 lg:grid-cols-[minmax(0,1fr)_18rem]">
+            <div className="max-w-[70rem]">
+              {navLinks.map((link, index) => {
+                const active = pathname === link.href || pathname.startsWith(`${link.href}/`)
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setOpen(false)}
+                    aria-current={active ? 'page' : undefined}
+                    className="nav-index-link group flex items-baseline justify-between border-b border-current/20 py-2 font-heading text-[clamp(2.8rem,8.5vh,7.6rem)] leading-[0.9] tracking-[-0.055em]"
+                    style={{ '--nav-order': index } as CSSProperties}
+                  >
+                    <span className="nav-index-label">{link.label}</span>
+                    <span
+                      className="text-[0.7rem] font-normal tracking-normal opacity-0 transition-opacity duration-200 group-hover:opacity-55 group-focus-visible:opacity-55"
+                      aria-hidden="true"
+                    >
+                      View
+                    </span>
+                  </Link>
+                )
+              })}
+            </div>
+            <div className="nav-index-meta grid gap-8 text-sm leading-relaxed md:grid-cols-2 lg:grid-cols-1">
+              <p>
+                Canadian multidisciplinary artist and dancer working across choreography,
+                installation, and film.
+              </p>
+              <div className="flex gap-6">
+                <a href="mailto:contact@clairefoody.com" className="text-link-underline">
+                  Email
+                </a>
+                <a href="https://www.instagram.com/claire.foody" className="text-link-underline">
+                  Instagram
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
-        <MobileMenu artistName={artistName} links={navLinks} variant={isLight ? 'light' : 'dark'} />
       </div>
     </nav>
   )

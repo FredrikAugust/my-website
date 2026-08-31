@@ -10,28 +10,20 @@ export function AboutPractice({ quote, body }: AboutPracticeProps) {
   if (!quote && !body) return null
 
   return (
-    <section className="bg-[#0a0a0a] px-6 py-24 text-[#f0ede6] md:px-10 md:py-36">
-      <div className="mx-auto grid max-w-[96rem] gap-12 md:grid-cols-[1fr_2fr]">
+    <section className="bg-[#070707] px-5 py-28 text-[#f3f1ea] md:px-9 md:py-44">
+      <div className="mx-auto grid max-w-[105rem] gap-16 border-t border-white/20 pt-6 md:grid-cols-[0.55fr_1.45fr]">
+        <p className="font-heading text-xl text-[#f3f1ea]/48">The practice</p>
         <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-[#ef6b2e]">
-            Final scene / Practice
-          </p>
-          <p className="mt-3 text-sm text-[#f0ede6]/50">The work continues beyond the frame.</p>
-        </div>
-        <div>
-          {quote && (
-            <blockquote className="max-w-[20ch] font-heading text-4xl leading-[1.01] tracking-[-0.035em] md:text-6xl">
+          {quote ? (
+            <blockquote className="max-w-[24ch] font-heading text-[clamp(2.8rem,5.4vw,6.5rem)] leading-[0.96] tracking-[-0.045em]">
               {quote}
             </blockquote>
-          )}
-          <div className="mt-14 flex flex-wrap gap-8 border-t border-[#f0ede6]/25 pt-5">
-            <Link href="/about" className="text-link-underline text-xs uppercase tracking-[0.2em]">
-              About the practice →
+          ) : null}
+          <div className="mt-14 flex flex-wrap gap-x-10 gap-y-5 text-sm">
+            <Link href="/about" className="text-link-underline">
+              Read about the practice
             </Link>
-            <Link
-              href="/about#contact"
-              className="text-link-underline text-xs uppercase tracking-[0.2em] text-[#ef6b2e]"
-            >
+            <Link href="/about#contact" className="text-link-underline text-[#ff532e]">
               Begin a conversation
             </Link>
           </div>
