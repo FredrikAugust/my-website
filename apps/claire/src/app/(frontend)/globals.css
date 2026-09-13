@@ -430,7 +430,7 @@ body:has(.home-work) .site-footer {
   margin-top: 10px;
 }
 .project-hero {
-  width: var(--project-media-width, 100%);
+  width: 100%;
   height: auto;
   max-height: 860px;
   object-fit: contain;
@@ -439,7 +439,13 @@ body:has(.home-work) .site-footer {
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
   gap: var(--project-column-gap);
-  padding-block: 72px;
+  align-items: start;
+  padding-bottom: 48px;
+}
+.project-story {
+  display: grid;
+  gap: 32px;
+  min-width: 0;
 }
 .project-facts {
   display: grid;
@@ -746,7 +752,10 @@ body:has(.home-work) .site-footer {
   .project-reading {
     grid-template-columns: 1fr;
     gap: 48px;
-    padding-block: 48px;
+    padding-bottom: 48px;
+  }
+  .project-story {
+    gap: 24px;
   }
   .project-film {
     margin-block: 16px 64px;

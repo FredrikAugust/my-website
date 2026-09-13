@@ -70,13 +70,15 @@ export function ProjectDetail({
         <h1 className="page-title">{title}</h1>
         <p className="metadata">{metadata}</p>
       </header>
-      {image?.url ? <ProjectHero image={image} /> : null}
       <div className="project-reading">
-        {hasDescription || summary ? (
-          <div className="prose-copy">
-            {hasDescription && description ? <RichText data={description} /> : <p>{summary}</p>}
-          </div>
-        ) : null}
+        <div className="project-story">
+          {image?.url ? <ProjectHero image={image} /> : null}
+          {hasDescription || summary ? (
+            <div className="prose-copy">
+              {hasDescription && description ? <RichText data={description} /> : <p>{summary}</p>}
+            </div>
+          ) : null}
+        </div>
         <aside className="project-facts">
           {facts
             ?.filter(({ value }) => value)
