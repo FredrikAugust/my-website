@@ -28,17 +28,15 @@ function formatYear(year: number, yearEnd?: number | null): string {
 
 export function CVSection({ title, entries, compact = false }: CVSectionProps) {
   return (
-    <div className="mb-12">
-      <h2 className="font-heading text-2xl tracking-tight mb-6 pb-3 border-b border-border">
-        {title}
-      </h2>
+    <div className="cv-section">
+      <h2 className="section-title">{title}</h2>
       <div className="space-y-3">
         {entries.map((entry) => (
-          <div key={entry.id} className="grid grid-cols-[80px_1fr] gap-4">
+          <div key={entry.id} className="cv-entry">
             <span className="text-sm text-muted-foreground tabular-nums">
               {formatYear(entry.year, entry.yearEnd)}
             </span>
-            <div>
+            <div className="text-sm">
               <span className="text-sm">{entry.title}</span>
               {!compact && entry.venue && (
                 <span className="text-sm text-muted-foreground">, {entry.venue}</span>

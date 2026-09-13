@@ -3,6 +3,9 @@ import { RichText } from '@payloadcms/richtext-lexical/react'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 
+import { extractPlainText } from '@/lib/richtext'
+import { Arrow } from './Arrow'
+import { ProjectHero } from './ProjectHero'
 import { Credits } from './Credits'
 import { ImageGallery } from './ImageGallery'
 import { ProjectPlayback } from './ProjectPlayback'
@@ -19,7 +22,12 @@ interface RelatedLink {
 }
 
 interface ProjectDetailProps {
-  eyebrow: string
+  image?: Media | null
+  backHref: string
+  backLabel: string
+  nextProject?: RelatedLink | null
+  previousProject?: RelatedLink | null
+  metadata: string
   title: string
   description?: Parameters<typeof RichText>[0]['data'] | null
   summary?: string | null
@@ -33,12 +41,16 @@ interface ProjectDetailProps {
   facts?: { label: string; value?: ReactNode }[]
   relatedLabel?: string
   related?: RelatedLink[]
-  playbackFirst?: boolean
   children?: ReactNode
 }
 
 export function ProjectDetail({
-  eyebrow,
+  image,
+  backHref,
+  backLabel,
+  nextProject,
+  previousProject,
+  metadata,
   title,
   description,
   summary,
@@ -48,68 +60,80 @@ export function ProjectDetail({
   facts,
   relatedLabel,
   related,
-  playbackFirst = false,
   children,
 }: ProjectDetailProps) {
   const playback = <ProjectPlayback source={source} />
+  const hasDescription = description && extractPlainText(description).trim().length > 0
   return (
-    <article className="mx-auto max-w-7xl px-6 py-16 md:py-24">
-      <header className="mb-14 max-w-4xl">
-        <p className="mb-4 text-xs uppercase tracking-[0.2em] text-muted-foreground">{eyebrow}</p>
-        <h1 className="text-balance font-heading text-4xl tracking-tight md:text-6xl lg:text-7xl">
-          {title}
-        </h1>
-        {summary ? (
-          <p className="mt-6 max-w-2xl text-lg leading-relaxed text-foreground/75">{summary}</p>
-        ) : null}
+    <article className="site-shell project-detail">
+      <header className="project-header">
+        <h1 className="page-title">{title}</h1>
+        <p className="metadata">{metadata}</p>
       </header>
-
-      <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,2fr)_minmax(15rem,1fr)] lg:gap-20">
-        <div className="min-w-0 space-y-12">
-          {playbackFirst ? playback : null}
-          {description ? (
-            <div className="prose prose-lg max-w-3xl text-pretty text-foreground/80">
-              <RichText data={description} />
-            </div>
-          ) : null}
-          {!playbackFirst ? playback : null}
-          {gallery?.length ? <ImageGallery images={gallery} /> : null}
-          {children}
-        </div>
-
-        <aside className="space-y-8">
+      {image?.url ? <ProjectHero image={image} /> : null}
+      <div className="project-reading">
+        {hasDescription || summary ? (
+          <div className="prose-copy">
+            {hasDescription && description ? <RichText data={description} /> : <p>{summary}</p>}
+          </div>
+        ) : null}
+        <aside className="project-facts">
           {facts
             ?.filter(({ value }) => value)
             .map(({ label, value }) => (
               <div key={label}>
-                <h2 className="mb-1 text-xs uppercase tracking-[0.15em] text-muted-foreground">
-                  {label}
-                </h2>
-                <div className="text-sm leading-relaxed">{value}</div>
+                <h2>{label}</h2>
+                <div className="project-fact-value">{value}</div>
               </div>
             ))}
           <Credits credits={credits} />
-          {related?.length ? (
-            <div>
-              <h2 className="mb-3 text-xs uppercase tracking-[0.15em] text-muted-foreground">
-                {relatedLabel}
-              </h2>
-              <ul className="space-y-2">
-                {related.map((item) => (
-                  <li key={item.href}>
-                    <Link
-                      className="underline decoration-border underline-offset-4 hover:decoration-foreground"
-                      href={item.href}
-                    >
-                      {item.title}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
         </aside>
       </div>
+      {source.video || source.vimeoUrl ? <div className="project-film">{playback}</div> : null}
+      {gallery?.length ? <ImageGallery images={gallery} /> : null}
+      {children}
+      <div className="project-related">
+        {related?.length ? (
+          <section>
+            <h2>{relatedLabel}</h2>
+            <ul>
+              {related.map((item) => (
+                <li key={item.href}>
+                  <Link className="text-link" href={item.href}>
+                    {item.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+      </div>
+      <nav className="project-bottom-nav" aria-label="Project navigation">
+        <Link className="project-back text-link" href={backHref}>
+          <Arrow direction="left" />
+          <span>Back to {backLabel}</span>
+        </Link>
+        <div className="project-neighbors">
+          {previousProject && (
+            <Link className="project-previous" href={previousProject.href}>
+              <span className="project-next-label">Previous project</span>
+              <span className="project-next-title">
+                <Arrow direction="left" />
+                <span className="title-highlight">{previousProject.title}</span>
+              </span>
+            </Link>
+          )}
+          {nextProject && (
+            <Link className="project-next" href={nextProject.href}>
+              <span className="project-next-label">Next project</span>
+              <span className="project-next-title">
+                <span className="title-highlight">{nextProject.title}</span>
+                <Arrow />
+              </span>
+            </Link>
+          )}
+        </div>
+      </nav>
     </article>
   )
 }

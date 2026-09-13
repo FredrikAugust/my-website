@@ -11,7 +11,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const result = await payload.find({
     collection: 'films',
     where: { _status: { equals: 'published' } },
-    sort: 'sortOrder',
+    sort: ['sortOrder', '-id'],
     limit: 1,
     depth: 1,
     overrideAccess: false,
@@ -30,27 +30,21 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function FilmPage() {
   const payload = await getPayloadClient()
-  const [films, filmPage] = await Promise.all([
-    payload.find({
-      collection: 'films',
-      where: { _status: { equals: 'published' } },
-      sort: 'sortOrder',
-      limit: 100,
-      depth: 1,
-      overrideAccess: false,
-    }),
-    payload.findGlobal({ slug: 'film-page', depth: 0 }),
-  ])
+  const films = await payload.find({
+    collection: 'films',
+    where: { _status: { equals: 'published' } },
+    sort: ['sortOrder', '-id'],
+    limit: 100,
+    depth: 1,
+    overrideAccess: false,
+  })
   return (
     <>
       <Navigation />
       <WorksGrid
+        subtitle="Moving-image works where choreography is created for the camera."
         works={films.docs.map((project) => mapProjectToRow('film', project))}
         label="Film"
-        subtitle={filmPage.heading || 'Independent dance films'}
-        description={
-          filmPage.description || 'Moving-image works where choreography is created for the camera.'
-        }
       />
     </>
   )

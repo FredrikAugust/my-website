@@ -13,65 +13,32 @@ export interface WorkRowData {
   description?: string | null
   imageUrl?: string | null
   imageAlt?: string
+  imageWidth?: number | null
+  imageHeight?: number | null
 }
 
-interface WorkRowProps {
-  work: WorkRowData
-  reverse?: boolean
-  priority?: boolean
-}
-
-export function WorkRow({ work, reverse = false, priority = false }: WorkRowProps) {
+export function WorkRow({ work, reverse = false }: { work: WorkRowData; reverse?: boolean }) {
   return (
-    <div
-      className={`grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 ${reverse ? 'lg:[direction:rtl]' : ''}`}
-    >
-      <Link href={work.href} className="group block lg:[direction:ltr]">
-        {work.imageUrl && (
-          <div className="aspect-4/3 relative overflow-hidden bg-secondary">
-            <Image
-              src={work.imageUrl}
-              alt={work.imageAlt ?? work.title}
-              fill
-              priority={priority}
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-            />
-          </div>
-        )}
-      </Link>
-
-      <div className="flex flex-col justify-center lg:[direction:ltr]">
-        <div className="flex items-center gap-3 mb-4">
-          <span className="text-xs uppercase tracking-[0.15em] text-muted-foreground">
-            {work.year}
-          </span>
-          <span className="text-muted-foreground/40">&mdash;</span>
-          <span className="text-xs uppercase tracking-[0.15em] text-muted-foreground">
-            {work.category}
-          </span>
-        </div>
-
-        <Link href={work.href} className="group">
-          <h2 className="font-heading text-3xl md:text-4xl tracking-tight mb-3 uppercase group-hover:text-muted-foreground transition-colors">
-            {work.title}
-          </h2>
-        </Link>
-
-        {work.venue && <p className="text-sm text-muted-foreground mb-2">{work.venue}</p>}
-        {work.medium && <p className="text-sm text-muted-foreground mb-4">{work.medium}</p>}
-
-        {work.description && (
-          <p className="text-foreground/70 leading-relaxed mb-6">{work.description}</p>
-        )}
-
-        <Link
-          href={work.href}
-          className="inline-block text-xs uppercase tracking-[0.2em] transition-[letter-spacing,color] hover:tracking-[0.3em] hover:text-muted-foreground"
-        >
-          View Project &rarr;
-        </Link>
+    <Link href={work.href} className={`project-row ${reverse ? 'is-reversed' : ''}`}>
+      <div className="project-caption">
+        <h2>
+          <span className="title-highlight">{work.title}</span>
+        </h2>
+        <p className="metadata">
+          {work.year}
+          {work.medium ? ` · ${work.medium}` : ''}
+        </p>
       </div>
-    </div>
+      {work.imageUrl && (
+        <Image
+          src={work.imageUrl}
+          alt={work.imageAlt || work.title}
+          width={work.imageWidth || 1600}
+          height={work.imageHeight || 1000}
+          sizes="(max-width: 767px) calc(100vw - 40px), 65vw"
+          className="project-image"
+        />
+      )}
+    </Link>
   )
 }

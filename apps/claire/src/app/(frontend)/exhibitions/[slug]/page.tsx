@@ -1,6 +1,6 @@
 import { Navigation } from '@/components/Navigation'
 import { ProjectDetail } from '@/components/ProjectDetail'
-import { ProjectHero } from '@/components/ProjectHero'
+import { getProjectNeighbors } from '@/lib/nextProject'
 import { getPayloadClient } from '@/lib/payload'
 import { projectSocialImage } from '@/lib/projects'
 import type { Installation, Media } from '@/payload-types'
@@ -54,15 +54,20 @@ export default async function ExhibitionPage({ params }: PageProps) {
   const { slug } = await params
   const project = await getExhibition(slug)
   if (!project) notFound()
+  const { nextProject, previousProject } = await getProjectNeighbors('exhibition', project.id)
   const installations = (project.includedInstallations ?? []).filter(
     (item): item is Installation => typeof item === 'object' && item._status === 'published',
   )
   return (
     <>
       <Navigation />
-      <ProjectHero image={project.heroImage as Media} />
       <ProjectDetail
-        eyebrow="Exhibition"
+        image={project.heroImage as Media}
+        backHref="/exhibitions"
+        backLabel="Exhibition"
+        nextProject={nextProject}
+        previousProject={previousProject}
+        metadata="Exhibition"
         title={project.title}
         description={project.overview}
         source={project}

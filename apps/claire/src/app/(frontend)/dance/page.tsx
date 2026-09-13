@@ -1,3 +1,5 @@
+import { CVSection } from '@/components/CVSection'
+import Link from 'next/link'
 import { Credits } from '@/components/Credits'
 import { Navigation } from '@/components/Navigation'
 import { ProjectPlayback } from '@/components/ProjectPlayback'
@@ -45,29 +47,27 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function DancePage() {
-  const dance = await getDance()
+  const [dance, payload] = await Promise.all([getDance(), getPayloadClient()])
+  const cv = await payload.findGlobal({ slug: 'cv', depth: 0 })
+  const experience = cv.sections?.find((section) => /professional dance/i.test(section.title))
   const hasShowreel = dance.showreel?.video || dance.showreel?.vimeoUrl
 
   return (
     <>
       <Navigation />
-      <section className="mx-auto max-w-7xl px-6 py-24">
-        <header className="mb-16 max-w-4xl">
-          <p className="mb-4 text-xs uppercase tracking-[0.2em] text-muted-foreground">
-            Professional Practice
-          </p>
-          <h1 className="text-balance font-heading text-5xl tracking-tight md:text-7xl">
-            {dance.heading || 'Dance'}
-          </h1>
+      <section className="site-shell page-section dance-page">
+        <header className="page-intro">
+          <h1 className="page-title">{dance.heading || 'Dance'}</h1>
+          <p className="page-subtitle">Professional dancer and movement artist.</p>
           {dance.introduction ? (
-            <div className="mt-8 max-w-3xl text-lg leading-relaxed text-foreground/80">
+            <div className="prose-copy intro-copy">
               <RichText data={dance.introduction} />
             </div>
           ) : null}
         </header>
 
         {hasShowreel ? (
-          <section className="mb-24" aria-labelledby="showreel-heading">
+          <section className="dance-showreel" aria-labelledby="showreel-heading">
             <h2
               id="showreel-heading"
               className="mb-6 text-xs uppercase tracking-[0.2em] text-muted-foreground"
@@ -75,6 +75,15 @@ export default async function DancePage() {
               Showreel
             </h2>
             <ProjectPlayback source={dance.showreel ?? {}} />
+          </section>
+        ) : null}
+
+        {experience?.entries?.length ? (
+          <section className="dance-experience">
+            <CVSection title="Selected Experience" entries={experience.entries.slice(0, 4)} />
+            <Link href="/cv" className="text-link">
+              View full CV
+            </Link>
           </section>
         ) : null}
 
@@ -98,14 +107,14 @@ export default async function DancePage() {
                       {item.year}
                     </p>
                     <h3 className="mt-2 font-heading text-2xl tracking-tight">{item.title}</h3>
-                    {item.description ? (
-                      <div className="mt-4 text-foreground/75">
-                        <RichText data={item.description} />
-                      </div>
-                    ) : null}
                     <div className="mt-6">
                       <Credits credits={item.credits} />
                     </div>
+                    {item.description ? (
+                      <div className="prose-copy mt-4">
+                        <RichText data={item.description} />
+                      </div>
+                    ) : null}
                   </div>
                 </article>
               ))}
@@ -113,7 +122,7 @@ export default async function DancePage() {
           </section>
         ) : null}
 
-        <section aria-labelledby="stage-heading">
+        <section className="dance-works" aria-labelledby="stage-heading">
           <h2 id="stage-heading" className="mb-10 font-heading text-3xl tracking-tight md:text-4xl">
             Selected Stage Work
           </h2>
@@ -125,7 +134,7 @@ export default async function DancePage() {
                   <article
                     id={item.anchor}
                     key={item.id}
-                    className="scroll-mt-24 grid gap-10 border-t border-border pt-10 lg:grid-cols-2"
+                    className="scroll-mt-12 grid gap-10 lg:grid-cols-2"
                   >
                     {image?.url ? (
                       <div className="relative aspect-4/3 overflow-hidden bg-secondary">
@@ -139,7 +148,7 @@ export default async function DancePage() {
                         />
                       </div>
                     ) : null}
-                    <div className="min-w-0">
+                    <div className="min-w-0 lg:order-first">
                       <p className="text-xs uppercase tracking-[0.15em] text-muted-foreground">
                         {item.dateOrYear}
                       </p>
@@ -152,16 +161,16 @@ export default async function DancePage() {
                       {item.role ? (
                         <p className="text-sm text-muted-foreground">{item.role}</p>
                       ) : null}
+                      <div className="mt-8">
+                        <Credits credits={item.credits} />
+                      </div>
                       {item.description ? (
-                        <div className="mt-6 text-foreground/75">
+                        <div className="prose-copy mt-6">
                           <RichText data={item.description} />
                         </div>
                       ) : null}
                       <div className="mt-8">
                         <ProjectPlayback source={item} />
-                      </div>
-                      <div className="mt-8">
-                        <Credits credits={item.credits} />
                       </div>
                     </div>
                   </article>

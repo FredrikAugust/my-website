@@ -1,6 +1,6 @@
 import { Navigation } from '@/components/Navigation'
 import { ProjectDetail } from '@/components/ProjectDetail'
-import { ProjectHero } from '@/components/ProjectHero'
+import { getProjectNeighbors } from '@/lib/nextProject'
 import { getPayloadClient } from '@/lib/payload'
 import { projectSocialImage } from '@/lib/projects'
 import type { Media } from '@/payload-types'
@@ -45,12 +45,17 @@ export default async function FilmDetailPage({ params }: PageProps) {
   const { slug } = await params
   const project = await getFilm(slug)
   if (!project) notFound()
+  const { nextProject, previousProject } = await getProjectNeighbors('film', project.id)
   return (
     <>
       <Navigation />
-      <ProjectHero image={project.heroImage as Media} />
       <ProjectDetail
-        eyebrow={`Film · ${project.year}`}
+        image={project.heroImage as Media}
+        backHref="/film"
+        backLabel="Film"
+        nextProject={nextProject}
+        previousProject={previousProject}
+        metadata="Film"
         title={project.title}
         description={project.description}
         source={project}
@@ -76,7 +81,6 @@ export default async function FilmDetailPage({ params }: PageProps) {
             ) : null,
           },
         ]}
-        playbackFirst
       />
     </>
   )

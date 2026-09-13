@@ -1,5 +1,6 @@
 import type { Media } from '@/payload-types'
 import Image from 'next/image'
+import { ImageZoom } from './ImageZoom'
 
 interface GalleryItem {
   image: number | Media
@@ -15,16 +16,18 @@ export function ImageGallery({ images }: { images: GalleryItem[] }) {
         if (!img?.url) return null
         return (
           <figure key={item.id} className="break-inside-avoid">
-            <div className="relative overflow-hidden bg-secondary">
-              <Image
-                src={img.url}
-                alt={img.alt}
-                width={img.width ?? 800}
-                height={img.height ?? 600}
-                sizes="(max-width: 768px) 100vw, 50vw"
-                className="w-full h-auto"
-              />
-            </div>
+            <ImageZoom src={img.url}>
+              <div className="relative overflow-hidden bg-secondary">
+                <Image
+                  src={img.url}
+                  alt={img.alt}
+                  width={img.width ?? 800}
+                  height={img.height ?? 600}
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  className="w-full h-auto"
+                />
+              </div>
+            </ImageZoom>
             {item.caption && (
               <figcaption className="mt-2 text-xs text-muted-foreground">{item.caption}</figcaption>
             )}

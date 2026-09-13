@@ -1,6 +1,6 @@
 import { Navigation } from '@/components/Navigation'
 import { ProjectDetail } from '@/components/ProjectDetail'
-import { ProjectHero } from '@/components/ProjectHero'
+import { getProjectNeighbors } from '@/lib/nextProject'
 import { getPayloadClient } from '@/lib/payload'
 import { projectSocialImage } from '@/lib/projects'
 import type { Media } from '@/payload-types'
@@ -44,6 +44,7 @@ export default async function InstallationPage({ params }: PageProps) {
   const { slug } = await params
   const project = await getInstallation(slug)
   if (!project) notFound()
+  const { nextProject, previousProject } = await getProjectNeighbors('installation', project.id)
 
   const payload = await getPayloadClient()
   const exhibitions = await payload.find({
@@ -63,9 +64,13 @@ export default async function InstallationPage({ params }: PageProps) {
   return (
     <>
       <Navigation />
-      <ProjectHero image={project.heroImage as Media} />
       <ProjectDetail
-        eyebrow={`Installation · ${project.year}`}
+        image={project.heroImage as Media}
+        backHref="/installations"
+        backLabel="Installation"
+        nextProject={nextProject}
+        previousProject={previousProject}
+        metadata="Installation"
         title={project.title}
         summary={project.shortDescription}
         description={project.description}
@@ -73,6 +78,7 @@ export default async function InstallationPage({ params }: PageProps) {
         gallery={project.gallery}
         credits={project.credits}
         facts={[
+          { label: 'Year', value: project.year },
           { label: 'Materials', value: project.materials },
           { label: 'Dimensions', value: project.dimensions },
         ]}

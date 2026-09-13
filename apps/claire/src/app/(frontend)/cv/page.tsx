@@ -1,85 +1,60 @@
 import { CVSection } from '@/components/CVSection'
 import { Navigation } from '@/components/Navigation'
+import { PrintCV } from '@/components/PrintCV'
 import { getPayloadClient } from '@/lib/payload'
 import type { Media } from '@/payload-types'
 import type { Metadata } from 'next'
 
 export const revalidate = 60
-
-export const metadata: Metadata = {
-  title: 'CV',
-  alternates: {
-    canonical: '/cv',
-  },
-}
+export const metadata: Metadata = { title: 'CV', alternates: { canonical: '/cv' } }
 
 export default async function CVPage() {
   const payload = await getPayloadClient()
-  const [cv, siteSettings] = await Promise.all([
-    payload.findGlobal({ slug: 'cv', depth: 1 }),
-    payload.findGlobal({ slug: 'site-settings', depth: 0 }),
-  ])
+  const cv = await payload.findGlobal({ slug: 'cv', depth: 1 })
   const fullPdf = typeof cv.fullPdf === 'object' ? (cv.fullPdf as Media) : null
-
   return (
     <>
       <Navigation />
-      <section className="mx-auto max-w-7xl px-6 py-24">
-        <div className="mb-16">
-          <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-4">
-            Curriculum Vitae
-          </p>
-          <div className="flex items-baseline justify-between flex-wrap gap-4">
-            <div>
-              <h1 className="font-heading text-4xl md:text-5xl tracking-tight">Claire Foody</h1>
-              <p className="text-muted-foreground mt-2">Canadian artist based in Europe</p>
-            </div>
-            {siteSettings.email && (
-              <a
-                href={`mailto:${siteSettings.email}`}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                {siteSettings.email}
-              </a>
-            )}
+      <section className="site-shell page-section">
+        <div className="cv-heading">
+          <div>
+            <h1 className="page-title">CV</h1>
+            <p>
+              <span className="cv-name">Claire Foody</span>
+              Canadian artist based in Europe
+            </p>
           </div>
           {fullPdf?.url ? (
-            <div className="mt-8 flex flex-wrap gap-3">
-              <a
-                className="border border-foreground px-5 py-3 text-xs uppercase tracking-[0.18em] transition-colors hover:bg-foreground hover:text-background"
-                href={fullPdf.url}
-                target="_blank"
-                rel="noreferrer"
+            <a href="/cv/download" className="text-link print-button">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                aria-hidden="true"
               >
-                View PDF
-              </a>
-              <a
-                className="border border-border px-5 py-3 text-xs uppercase tracking-[0.18em] transition-colors hover:border-foreground"
-                href="/cv/download"
-              >
-                Download PDF
-              </a>
-            </div>
-          ) : null}
+                <path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5" />
+              </svg>
+              Download PDF
+            </a>
+          ) : (
+            <PrintCV />
+          )}
         </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-16">
-          <div className="lg:col-span-2">
-            {cv.sections?.map((section) => (
-              <CVSection key={section.id} title={section.title} entries={section.entries ?? []} />
-            ))}
-          </div>
-
-          <div>
-            {cv.sidebarSections?.map((section) => (
-              <CVSection
-                key={section.id}
-                title={section.title}
-                entries={section.entries ?? []}
-                compact
-              />
-            ))}
-          </div>
+        <div className="cv-sections">
+          {cv.sections?.map((section) => (
+            <CVSection key={section.id} title={section.title} entries={section.entries ?? []} />
+          ))}
+          {cv.sidebarSections?.map((section) => (
+            <CVSection
+              key={section.id}
+              title={section.title}
+              entries={section.entries ?? []}
+              compact
+            />
+          ))}
         </div>
       </section>
     </>
