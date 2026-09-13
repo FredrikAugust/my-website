@@ -67,6 +67,20 @@ export function ProjectDetail({
   return (
     <article className="site-shell project-detail">
       <header className="project-header">
+        <Link className="project-back text-link" href={backHref}>
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            aria-hidden="true"
+          >
+            <path d="m9 10-5 5 5 5M4 15h10a6 6 0 0 0 6-6V4" />
+          </svg>
+          <span>Back to {backLabel}</span>
+        </Link>
         <h1 className="page-title">{title}</h1>
         <p className="metadata">{metadata}</p>
       </header>
@@ -111,10 +125,6 @@ export function ProjectDetail({
         ) : null}
       </div>
       <nav className="project-bottom-nav" aria-label="Project navigation">
-        <Link className="project-back text-link" href={backHref}>
-          <Arrow direction="left" />
-          <span>Back to {backLabel}</span>
-        </Link>
         <div className="project-neighbors">
           {previousProject && (
             <Link className="project-previous" href={previousProject.href}>
