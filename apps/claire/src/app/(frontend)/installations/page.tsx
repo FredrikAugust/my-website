@@ -11,7 +11,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const result = await payload.find({
     collection: 'installations',
     where: { _status: { equals: 'published' } },
-    sort: 'sortOrder',
+    sort: ['sortOrder', '-id'],
     limit: 1,
     depth: 1,
     overrideAccess: false,
@@ -33,7 +33,7 @@ export default async function InstallationsPage() {
   const result = await payload.find({
     collection: 'installations',
     where: { _status: { equals: 'published' } },
-    sort: 'sortOrder',
+    sort: ['sortOrder', '-id'],
     limit: 100,
     depth: 1,
     overrideAccess: false,
@@ -43,10 +43,9 @@ export default async function InstallationsPage() {
     <>
       <Navigation />
       <WorksGrid
+        subtitle="Objects shaped by film, movement and space."
         works={result.docs.map((project) => mapProjectToRow('installation', project))}
-        label="Installations"
-        subtitle="Objects shaped by film and movement"
-        description="Individual physical artworks, presented through moving image, material, and space."
+        label="Installation"
       />
     </>
   )

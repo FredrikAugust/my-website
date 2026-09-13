@@ -2,19 +2,22 @@ import { Footer } from '@/components/Footer'
 import { getPayloadClient } from '@/lib/payload'
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata } from 'next'
-import { Bodoni_Moda, Karla } from 'next/font/google'
+import localFont from 'next/font/local'
 import type React from 'react'
 import './globals.css'
 
-const bodoniModa = Bodoni_Moda({
-  subsets: ['latin'],
-  variable: '--font-bodoni-moda',
+const cormorant = localFont({
+  src: '../../fonts/CormorantGaramond-Regular.ttf',
+  variable: '--font-cormorant',
   display: 'swap',
+  weight: '400',
 })
-
-const karla = Karla({
-  subsets: ['latin'],
-  variable: '--font-karla',
+const manrope = localFont({
+  src: [
+    { path: '../../fonts/Manrope-Regular.woff2', weight: '400' },
+    { path: '../../fonts/Manrope-Medium.woff2', weight: '500' },
+  ],
+  variable: '--font-manrope',
   display: 'swap',
 })
 
@@ -27,7 +30,7 @@ export const metadata: Metadata = {
     template: '%s | Claire Foody',
   },
   description:
-    'Claire Foody is a Canadian artist based in Europe working across installation, film, and dance.',
+    'Claire Foody is a Canadian artist based in Europe working across installation, film, and performance.',
   alternates: {
     canonical: '/',
   },
@@ -35,7 +38,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Claire Foody',
     description:
-      'Claire Foody is a Canadian artist based in Europe working across installation, film, and dance.',
+      'Claire Foody is a Canadian artist based in Europe working across installation, film, and performance.',
     url: '/',
   },
 }
@@ -50,14 +53,12 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   })
 
   return (
-    <html lang="en" className={`${bodoniModa.variable} ${karla.variable}`}>
-      <body className="bg-foreground">
+    <html lang="en" className={`${cormorant.variable} ${manrope.variable}`}>
+      <body>
         <a href="#main-content" className="skip-link">
-          Skip to main content
+          Skip to content
         </a>
-        <main id="main-content" tabIndex={-1} className="scroll-mt-24 bg-background">
-          {children}
-        </main>
+        <main id="main-content">{children}</main>
         <Footer siteSettings={siteSettings} />
         <Analytics />
       </body>

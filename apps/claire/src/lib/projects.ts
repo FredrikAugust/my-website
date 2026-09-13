@@ -41,7 +41,13 @@ export const mapProjectToCard = (kind: ProjectKind, project: Project): WorkCardD
 
 export const mapProjectToRow = (kind: ProjectKind, project: Project): WorkRowData => {
   const card = mapProjectToCard(kind, project)
-  return { ...card, description: projectDescription(project) }
+  const image = projectImage(project)
+  return {
+    ...card,
+    imageWidth: image?.width,
+    imageHeight: image?.height,
+    description: projectDescription(project),
+  }
 }
 
 export const projectSocialImage = (project: Project) => {
