@@ -5,7 +5,12 @@ import type { ReactNode } from 'react'
 
 export function ImageZoom({ children, src }: { children: ReactNode; src: string }) {
   return (
-    <Zoom zoomMargin={24} zoomImg={{ src }} classDialog="image-spotlight">
+    <Zoom
+      zoomMargin={24}
+      // Clear the thumbnail's responsive sources so the browser selects the original.
+      zoomImg={{ src, srcSet: '', sizes: '' }}
+      classDialog="image-spotlight"
+    >
       {children}
     </Zoom>
   )
