@@ -31,6 +31,34 @@ Both existing Vercel projects use this repository with “Include source files o
 
 Production migrations run against the Vercel-provisioned `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN`. Media uses bucket-specific `S3_*` R2 credentials and `S3_PUBLIC_URL`; browser uploads are authenticated and go directly to R2. Claire accepts JPEG, PNG, HEIC, PDF, and MP4 up to 500 MiB. Hero and work videos require an image poster; an uploaded work MP4 takes precedence over Vimeo.
 
+### Browser upload CORS
+
+Claire's admin uploads with a presigned PUT to the R2 S3 endpoint (`S3_ENDPOINT`), not to `media.clairefoody.com`. That bucket CORS policy is set in Cloudflare and cannot be changed from this repo. A missing or incomplete policy makes the browser PUT fail. Payload saves a media row only after `HeadObject` confirms the object exists, so a rejected PUT shows an error in the admin instead of a record that 404s later.
+
+Presigned PUTs are valid for 10 minutes and send `Content-Type`, `Content-Length`, and `If-None-Match: *` (the last header makes R2 reject a PUT that would overwrite an existing key). The S3 client asks for checksums only when the operation requires them, because the admin does not send `x-amz-checksum-*` headers. R2's single PUT limit is 5 GiB; this app rejects anything over 500 MiB before signing. Payload 3.92 stores each new object at `claire-media-uploads/<object key>/<filename>`. Older objects stay at `claire-media-uploads/<filename>`. `/api/media/file/<filename>` redirects to the path that media row actually uses.
+
+For bucket `claire-website-media`, confirm a rule equivalent to:
+
+```json
+[
+  {
+    "AllowedOrigins": [
+      "https://clairefoody.com",
+      "https://www.clairefoody.com",
+      "https://*.vercel.app",
+      "http://localhost:3000",
+      "http://localhost:3001"
+    ],
+    "AllowedMethods": ["GET", "HEAD", "PUT"],
+    "AllowedHeaders": ["content-type", "content-length", "if-none-match"],
+    "ExposeHeaders": ["ETag"],
+    "MaxAgeSeconds": 3600
+  }
+]
+```
+
+Origins must match the browser `Origin` header exactly, with no path and no trailing slash. R2 allows a single `*` in an origin, so `https://*.vercel.app` covers `website-claire.vercel.app` and preview hosts such as `website-claire-git-branch-team.vercel.app`. If the dashboard rejects that wildcard, list each origin you actually upload from. `If-None-Match` has to be allowed or every admin upload fails the CORS preflight.
+
 ## Restore and rollback
 
 The one-time migration tooling is in `scripts/migration/`. The verified final source snapshot is outside the repository at `../personal-websites-migration/20260806-simplify-personal-websites/`, including six PostgreSQL restores, 80 checksummed objects, canonical Payload JSON, portable SQLite databases, new admin credentials, and git bundles. No later delta is needed unless the write freeze is broken.

@@ -1,8 +1,9 @@
 import path from 'node:path'
 import type { CollectionConfig } from 'payload'
-import { MEDIA_MIME_TYPES } from '../lib/mediaPolicy'
+import { redirectLegacyMediaFile } from '../lib/legacyMediaFile'
 import { usePublicMediaWhenLocalFileIsMissing } from '../lib/localMediaFallback'
-import { setImmutableMediaCache } from '../lib/r2Cache'
+import { MEDIA_MIME_TYPES } from '../lib/mediaPolicy'
+import { requireStoredMedia } from '../lib/requireStoredMedia'
 
 export const Media: CollectionConfig = {
   slug: 'media',
@@ -10,7 +11,7 @@ export const Media: CollectionConfig = {
     read: () => true,
   },
   hooks: {
-    afterChange: [setImmutableMediaCache],
+    beforeChange: [requireStoredMedia],
     afterRead: [usePublicMediaWhenLocalFileIsMissing],
   },
   defaultPopulate: {
@@ -30,6 +31,7 @@ export const Media: CollectionConfig = {
   ],
   upload: {
     filesRequiredOnCreate: process.env.PAYLOAD_MIGRATION_MODE !== 'true',
+    handlers: [redirectLegacyMediaFile],
     mimeTypes: MEDIA_MIME_TYPES,
     staticDir: path.resolve(process.cwd(), 'data/media'),
   },
