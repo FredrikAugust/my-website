@@ -24,6 +24,8 @@ import { SiteSettings } from './globals/SiteSettings'
 import { Works as WorksGlobal } from './globals/Works'
 import { migrations } from './migrations'
 import { MAX_MEDIA_BYTES, mayUploadDirectly } from './lib/mediaPolicy'
+import { publicObjectUrl } from './lib/mediaStorage'
+import { applyImmutableMediaCache } from './lib/r2Cache'
 import { enforceR2UploadPolicy } from './lib/r2UploadPolicy'
 
 const filename = fileURLToPath(import.meta.url)
@@ -34,14 +36,9 @@ const r2Enabled = Boolean(
   process.env.S3_ACCESS_KEY_ID &&
   process.env.S3_SECRET_ACCESS_KEY,
 )
-const mediaURL = (prefix: string | undefined, filename: string) => {
-  const base = process.env.S3_PUBLIC_URL?.replace(/\/$/, '')
-  const key = [prefix, filename]
-    .filter((part): part is string => Boolean(part))
-    .map(encodeURIComponent)
-    .join('/')
-  return base ? `${base}/${key}` : key
-}
+const mediaURL = (prefix: string | undefined, filename: string) =>
+  publicObjectUrl(filename, prefix, process.env.S3_PUBLIC_URL) ||
+  [prefix, filename].filter(Boolean).join('/')
 
 export default buildConfig({
   admin: {
@@ -91,6 +88,9 @@ export default buildConfig({
     s3Storage({
       alwaysInsertFields: true,
       enabled: r2Enabled,
+      // Browser PUTs go to the R2 S3 endpoint, so the bucket CORS policy must allow
+      // this site's origin to PUT with content-type, content-length, and if-none-match.
+      // The rule itself lives in Cloudflare, not this repo. See README "Browser upload CORS".
       clientUploads: { access: mayUploadDirectly },
       collections: {
         media: {
@@ -109,8 +109,13 @@ export default buildConfig({
         endpoint: process.env.S3_ENDPOINT,
         forcePathStyle: true,
         region: process.env.S3_REGION || 'auto',
+        // Default checksum signing adds headers the admin upload does not send, and R2
+        // then rejects the PUT. The media row must not be created for that rejection.
+        requestChecksumCalculation: 'WHEN_REQUIRED',
+        responseChecksumValidation: 'WHEN_REQUIRED',
       },
     }),
     enforceR2UploadPolicy,
+    applyImmutableMediaCache,
   ],
 })
